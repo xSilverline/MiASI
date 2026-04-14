@@ -24,12 +24,10 @@ jobs:
           cache: 'maven'
 
       - name: Weryfikacja czystości kodu (Spotless)
-        run: |
-          chmod +x mvnw
-          ./mvnw spotless:check
+        run: mvn spotless:check
 
       - name: Uruchomienie testów jednostkowych (TDD)
-        run: ./mvnw test
+        run: mvn test
 
   frontend-checks:
     name: Frontend (React & ESLint)
