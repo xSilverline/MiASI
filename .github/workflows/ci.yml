@@ -1,0 +1,59 @@
+﻿name: Projekt CI Pipeline
+
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  backend-checks:
+    name: Backend (Java & Spotless)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Pobranie kodu repozytorium
+        uses: actions/checkout@v4
+
+      - name: Setup Java 26
+        uses: actions/setup-java@v4
+        with:
+          java-version: '26'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Weryfikacja czystości kodu (Spotless)
+        run: |
+          chmod +x mvnw
+          ./mvnw spotless:check
+
+      - name: Uruchomienie testów jednostkowych (TDD)
+        run: ./mvnw test
+
+  frontend-checks:
+    name: Frontend (React & ESLint)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Pobranie kodu repozytorium
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Instalacja zależności
+        run: npm ci
+
+      - name: Weryfikacja czystości kodu (ESLint & Prettier)
+        run: npm run lint
+
+      - name: Weryfikacja budowania (Build)
+        run: npm run build
