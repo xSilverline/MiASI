@@ -48,5 +48,9 @@ public class Authorization {
         }
     }
 
+    public boolean isAuthenticated(String token) {
+        return activeSession != null && activeSession.getSessionToken().equals(token);
+    }
+
 
 }
