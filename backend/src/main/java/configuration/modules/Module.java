@@ -1,0 +1,22 @@
+package configuration.modules;
+
+import configuration.enums.ModuleStatus;
+import javafx.util.Pair;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+public class Module {
+  String name;
+  Pair<Float, Float> resourcesAmount;
+  ModuleStatus status;
+
+  public void addTimestamp() {
+  }
+}
