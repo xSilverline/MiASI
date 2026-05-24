@@ -1,7 +1,6 @@
-package configuration.modules;
+package configuration.other;
 
-import configuration.enums.ModuleStatus;
-import javafx.util.Pair;
+import configuration.MissionPlan;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,9 +11,7 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class Module {
-  String name;
-  Pair<Float, Float> resourcesAmount;
-  ModuleStatus status;
-  ModuleType type;
+public class MissionPlanCreatedEvent {
+  String missionPlanId;
+  MissionPlan missionPlan;
 }

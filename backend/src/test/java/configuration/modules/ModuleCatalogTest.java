@@ -23,7 +23,7 @@ class ModuleCatalogTest {
   @Test
   void addTest() {
     //Given
-    ModuleCatalog catalog = new ModuleCatalog(mockList);
+    ModuleCatalogExample catalog = new ModuleCatalogExample(mockList);
 
     //When
     catalog.add(mockModule);
@@ -41,7 +41,7 @@ class ModuleCatalogTest {
     String name = "Adam";
     List<Module> moduleList = new ArrayList<>();
     moduleList.add(mockModule);
-    ModuleCatalog catalog = new ModuleCatalog(moduleList);
+    ModuleCatalogExample catalog = new ModuleCatalogExample(moduleList);
     given(mockModule.getName()).willReturn(name);
 
     //When
