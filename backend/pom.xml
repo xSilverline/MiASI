@@ -76,5 +76,21 @@
       <version>5.23.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.mindrot</groupId>
+      <artifactId>jbcrypt</artifactId>
+      <version>0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.46</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>22-ea+11</version>
+    </dependency>
   </dependencies>
 </project>
