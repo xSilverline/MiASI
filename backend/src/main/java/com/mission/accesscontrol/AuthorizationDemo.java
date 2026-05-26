@@ -8,11 +8,11 @@ public class AuthorizationDemo {
         Scanner scanner = new Scanner(System.in);
 
         IUserRepository repository = new CsvUserRepository(); //where do we get the data from
-        UserRegistrationService regService = new UserRegistrationService(repository);
+        //UserRegistrationService regService = new UserRegistrationService(repository);
         Authorization authModule = new Authorization(repository);
 
         System.out.println("Access control system");
-
+/*
         //registration
         while (true) {
             System.out.print("Do you want to register a new commander? (yes/no): ");
@@ -36,7 +36,7 @@ public class AuthorizationDemo {
                 System.out.println("Please type 'yes' or 'no'.");
             }
         }
-
+*/
         // logging
         String currentToken = null;
         while (true) {

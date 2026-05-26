@@ -2,6 +2,9 @@ package com.mission.accesscontrol;
 
 import org.mindrot.jbcrypt.BCrypt;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+@FieldDefaults(level = AccessLevel.PRIVATE)
 
 public class Authorization {
     private final IUserRepository repository;

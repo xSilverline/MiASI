@@ -2,10 +2,10 @@ package com.mission.accesscontrol;
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
-public class CsvUserRepository implements IUserRepository {
+public class CsvUserRepository implements IUserRepository, IUserManagementRepository {
     private final String CSV_PATH = "access_list.csv";
 
-    @Override
+
     public void save(Identity identity) {
         String csvLine = identity.getLogin() + "," + identity.getPasswordHash() + "\n";
         try {
@@ -15,6 +15,7 @@ public class CsvUserRepository implements IUserRepository {
             throw new RuntimeException("Data storage error", e);
         }
     }
+
 
     @Override
     public Identity findByLogin(String login) {
