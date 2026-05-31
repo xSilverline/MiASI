@@ -1,3 +1,7 @@
+# Prerequisites
+- JDK 21+
+- Maven 3.9+
+
 # Tests:
 
 0. Make sure you are in terminal "MiASI/backend" directory

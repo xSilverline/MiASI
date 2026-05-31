@@ -1,0 +1,32 @@
+package miasi.backend.domains.analisis.types.modules;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import miasi.backend.domains.analisis.types.core.DailyBalance;
+import miasi.backend.domains.analisis.types.core.Resource;
+import miasi.backend.enums.ModuleState;
+
+import java.util.List;
+
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+public class Module {
+    String name;
+    float weight;
+    int minCount;       // Może być null jeśli wcale nie musi to być
+    Integer maxCount;   // Może być null dla braku limitu (np. panele słoneczne)
+    List<Resource> production;
+    List<Resource> consumption;
+    ModuleState status;
+    float efficiency;
+
+    public DailyBalance getDailyBalance() {
+        // W przyszłości: przeliczenie production i consumption przez wartość efficiency (np. 0.8)
+        return new DailyBalance(production, consumption);
+    }
+}
