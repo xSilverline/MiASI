@@ -8,34 +8,43 @@ const menuGroups = [
     icon: LayoutDashboard,
     color: "text-mars-orange",
     items: [
-      { text: "PODSUMOWANIE", active: true },
-      { text: "EDYCJA PLANU" },
-      { text: "HARMONOGRAM MISJI" },
+      { text: "PODSUMOWANIE", viewId: "dashboard" },
+      { text: "EDYCJA PLANU", viewId: "editPlan" },
+      { text: "HARMONOGRAM MISJI", viewId: "schedule" },
     ],
   },
   {
     group: "SYMULACJA",
     icon: Rocket,
     color: "text-mars-orange",
-    items: [{ text: "AUTOMATYCZNA" }, { text: "RĘCZNA" }],
+    items: [
+      { text: "AUTOMATYCZNA", viewId: "simAuto" },
+      { text: "RĘCZNA", viewId: "simManual" },
+    ],
   },
   {
     group: "KONFIGURACJA",
     icon: Settings,
     color: "text-mars-orange",
     items: [
-      { text: "ZUŻYCIE ZASOBÓW" },
-      { text: "MODUŁY" },
-      { text: "ZDARZENIA" },
-      { text: "KREATOR MISJI" },
+      { text: "ZUŻYCIE ZASOBÓW", viewId: "resources" },
+      { text: "MODUŁY", viewId: "modules" },
+      { text: "ZDARZENIA", viewId: "events" },
+      { text: "KREATOR MISJI", viewId: "configCreator" }, // Nasz kreator
     ],
   },
 ];
 interface SidebarProps {
   onLogout: () => void;
+  currentView: string;
+  onNavigate: (viewId: string) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  currentView,
+  onNavigate,
+  onLogout,
+}) => {
   return (
     <aside className=" bg-mars-sidebarBackground py-6 flex flex-col shrink-0 h-full">
       <div className="flex items-center gap-3 mb-10 px-6">
@@ -62,24 +71,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
               </span>
             </div>
             <ul className="text-sm text-slate-300 flex flex-col">
-              {group.items.map((item, iIdx) => (
-                <li
-                  key={iIdx}
-                  className={`cursor-pointer transition-all duration-200 relative py-3 pl-12 pr-6 flex items-center overflow-hidden
-                    ${item.active ? "text-white font-medium" : "hover:text-white hover:bg-white/5"}`}
-                >
-                  {item.active && (
-                    <>
-                      <div className="absolute inset-0 bg-linear-to-r from-mars-orange/40 via-mars-orange/10 to-transparent pointer-events-none" />
-                      <div
-                        className="absolute left-0 top-0 bottom-0 w-4 bg-linear-to-r from-mars-orange to-[#B33C12]"
-                        style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
-                      />
-                    </>
-                  )}
-                  <span className="relative z-10">{item.text}</span>
-                </li>
-              ))}
+              {group.items.map((item, iIdx) => {
+                const isActive = currentView === item.viewId;
+
+                return (
+                  <li
+                    key={iIdx}
+                    onClick={() => onNavigate(item.viewId)}
+                    className={`cursor-pointer transition-all duration-200 relative py-3 pl-12 pr-6 flex items-center overflow-hidden
+                      ${isActive ? "text-white font-medium" : "hover:text-white hover:bg-white/5"}`}
+                  >
+                    {isActive && (
+                      <>
+                        <div className="absolute inset-0 bg-linear-to-r from-mars-orange/40 via-mars-orange/10 to-transparent pointer-events-none" />
+                        <div
+                          className="absolute left-0 top-0 bottom-0 w-4 bg-linear-to-r from-mars-orange to-[#B33C12]"
+                          style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+                        />
+                      </>
+                    )}
+                    <span className="relative z-10">{item.text}</span>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}

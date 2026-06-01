@@ -18,10 +18,21 @@ import {
   ENERGY_USAGE,
   ENERGY_DIFFERENCE,
 } from "./config/config.ts";
+export type ViewState = "login" | "dashboard" | "configCreator" | string;
 import { LoginView } from "./views/LoginView.tsx";
+import { ConfigCreatorView } from "./views/ConfigCreator/ConfigCreatorView.tsx";
 
 const App: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [currentView, setCurrentView] = useState<ViewState>("login");
+  const MOCK_HAS_CONFIG = false;
+  const handleLogin = () => {
+    if (MOCK_HAS_CONFIG) {
+      setCurrentView("dashboard");
+    } else {
+      setCurrentView("configCreator");
+    }
+  };
+
   const resourceData: DetailItem[] = [
     { label: "TLEN", value: formatNumber(OXYGEN_AMOUNT), valueSuffix: "L" },
     { label: "WODA", value: formatNumber(WATER_AMOUNT), valueSuffix: "L" },
@@ -59,38 +70,53 @@ const App: React.FC = () => {
     },
   ];
 
-  if (!isLoggedIn) {
-    return <LoginView onLogin={() => setIsLoggedIn(true)} />;
+  if (currentView === "login") {
+    return <LoginView onLogin={handleLogin} />;
+  }
+
+  if (currentView === "configCreator") {
+    return <ConfigCreatorView onFinish={() => setCurrentView("dashboard")} />;
   }
 
   return (
     <div className="flex h-screen w-screen bg-mars-background text-slate-100 font-sans overflow-hidden">
-      <Sidebar onLogout={() => setIsLoggedIn(false)} />
+      <Sidebar
+        currentView={currentView}
+        onNavigate={(viewId) => setCurrentView(viewId)}
+        onLogout={() => setCurrentView("login")}
+      />
 
       <main className="grow p-10 flex flex-col h-full min-w-0 gap-8 box-border">
-        {/* TOP ROW */}
-        <div className="grid grid-cols-2 gap-8 w-full shrink-0">
-          <HeaderCard
-            icon={Users}
-            title="ZAŁOGA"
-            value={`${CREW_MEMBERS_NUMBER} OSOBY`}
-          />
-          <HeaderCard
-            icon={Clock}
-            title="CZAS TRWANIA MISJI"
-            value={`${MISSION_DURATION} SOL`}
-          />
-        </div>
+        {currentView === "dashboard" ? (
+          <>
+            <div className="grid grid-cols-2 gap-8 w-full shrink-0">
+              <HeaderCard
+                icon={Users}
+                title="ZAŁOGA"
+                value={`${CREW_MEMBERS_NUMBER} OSOBY`}
+              />
+              <HeaderCard
+                icon={Clock}
+                title="CZAS TRWANIA MISJI"
+                value={`${MISSION_DURATION} SOL`}
+              />
+            </div>
 
-        {/* CHART SECTION */}
-        <UsageChart />
+            <UsageChart />
 
-        {/* BOTTOM ROW */}
-        <div className="grid grid-cols-3 gap-8 w-full shrink-0">
-          <DetailCard title="ZASOBY POCZĄTKOWE" items={resourceData} />
-          <DetailCard title="MODUŁY" items={moduleData} />
-          <DetailCard title="BILANS ENERGII" items={energyData} />
-        </div>
+            <div className="grid grid-cols-3 gap-8 w-full shrink-0">
+              <DetailCard title="ZASOBY POCZĄTKOWE" items={resourceData} />
+              <DetailCard title="MODUŁY" items={moduleData} />
+              <DetailCard title="BILANS ENERGII" items={energyData} />
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <h2 className="text-2xl text-slate-400 uppercase tracking-widest">
+              WIDOK "{currentView}" W BUDOWIE...
+            </h2>
+          </div>
+        )}
       </main>
     </div>
   );
