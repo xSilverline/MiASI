@@ -2,7 +2,9 @@ package miasi.backend.domains.configuration.modules;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.ResourceType;
+import miasi.backend.domains.configuration.other.Resources;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -11,6 +13,6 @@ import miasi.backend.enums.ResourceType;
 @NoArgsConstructor
 public class ModuleType {
   String name;
-  ResourceType resourceConsumption;
-  ResourceType resourceProduction;
+  List<Resources> resourceConsumption;
+  List<Resources> resourceProduction;
 }

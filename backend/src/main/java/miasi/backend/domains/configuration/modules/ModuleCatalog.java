@@ -1,43 +1,55 @@
 package miasi.backend.domains.configuration.modules;
 
 import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Synchronized;
 import lombok.experimental.FieldDefaults;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
+@Component
+@Scope(WebApplicationContext.SCOPE_APPLICATION)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public final class ModuleCatalog {
-  List<ModuleType> moduleTypes;
-  List<Module> modules;
-  private static final ModuleCatalog INSTANCE = new ModuleCatalog();
+  final List<ModuleType> moduleTypes = new ArrayList<>();
+  final List<Module> modules = new ArrayList<>();
 
-  private ModuleCatalog() {
-    moduleTypes = new ArrayList<>();
-    modules = new ArrayList<>();
+  public ModuleCatalog() {
+    //TODO: zczytywanie z bazy
   }
 
-  public static ModuleCatalog getInstance() {
-    return INSTANCE;
-  }
-
-  public void add(Module module) {
+  @Synchronized
+  public int add(Module module) {
     modules.add(module);
+    return modules.size() - 1;
   }
 
-  public void add(ModuleType type) {
+  @Synchronized
+  public int add(ModuleType type) {
     moduleTypes.add(type);
+    return moduleTypes.size() - 1;
   }
 
+  @Synchronized
   public void remove(Module module) {
     modules.remove(module);
   }
 
+  @Synchronized
   public void remove(ModuleType moduleType) {
     moduleTypes.remove(moduleType);
+  }
+
+  @Synchronized
+  public List<Module> getModules() {
+    return List.copyOf(modules);
+  }
+
+  @Synchronized
+  public List<ModuleType> getModuleTypes() {
+    return List.copyOf(moduleTypes);
   }
 }
