@@ -24,6 +24,9 @@
 @utility bg-gradient-mars {
     background-image: linear-gradient(180deg, #666666 29%, #FF6A00 100%);
 }
+@utility bg-gradient-mars-horizontal {
+    background-image: linear-gradient(90deg, #666666 29%, #FF6A00 100%);
+}
 
 body {
     background-color: var(--color-mars-background);

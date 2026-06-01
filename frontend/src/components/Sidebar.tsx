@@ -31,8 +31,11 @@ const menuGroups = [
     ],
   },
 ];
+interface SidebarProps {
+  onLogout: () => void;
+}
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<SidebarProps> = ({ onLogout }) => {
   return (
     <aside className=" bg-mars-sidebarBackground py-6 flex flex-col shrink-0 h-full">
       <div className="flex items-center gap-3 mb-10 px-6">
@@ -82,7 +85,10 @@ export const Sidebar: React.FC = () => {
         ))}
       </nav>
 
-      <div className="mt-6 border-t border-mars-line pt-4 px-6 text-slate-400 hover:text-white cursor-pointer flex items-center gap-3 text-sm transition-colors">
+      <div
+        onClick={onLogout}
+        className="mt-6 border-t border-mars-line pt-4 px-6 text-slate-400 hover:text-white cursor-pointer flex items-center gap-3 text-sm transition-colors"
+      >
         <LogOut size={18} />
         WYLOGUJ
       </div>

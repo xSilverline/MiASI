@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Users, Clock } from "lucide-react";
-import { Sidebar } from "../components/Sidebar";
-import { HeaderCard } from "../components/HeaderCard";
-import { DetailCard, type DetailItem } from "../components/DetailCard";
-import { UsageChart } from "../components/UsageChart";
-import { formatNumber } from "../utils/formatters";
+import { Sidebar } from "./components/Sidebar.tsx";
+import { HeaderCard } from "./components/HeaderCard.tsx";
+import { DetailCard, type DetailItem } from "./components/DetailCard.tsx";
+import { UsageChart } from "./components/UsageChart.tsx";
+import { formatNumber } from "./utils/formatters.ts";
 import {
   MISSION_DURATION,
   CREW_MEMBERS_NUMBER,
@@ -17,9 +17,11 @@ import {
   ENERGY_PRODUCTION,
   ENERGY_USAGE,
   ENERGY_DIFFERENCE,
-} from "../config/config";
+} from "./config/config.ts";
+import { LoginView } from "./views/LoginView.tsx";
 
 const App: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const resourceData: DetailItem[] = [
     { label: "TLEN", value: formatNumber(OXYGEN_AMOUNT), valueSuffix: "L" },
     { label: "WODA", value: formatNumber(WATER_AMOUNT), valueSuffix: "L" },
@@ -57,9 +59,13 @@ const App: React.FC = () => {
     },
   ];
 
+  if (!isLoggedIn) {
+    return <LoginView onLogin={() => setIsLoggedIn(true)} />;
+  }
+
   return (
     <div className="flex h-screen w-screen bg-mars-background text-slate-100 font-sans overflow-hidden">
-      <Sidebar />
+      <Sidebar onLogout={() => setIsLoggedIn(false)} />
 
       <main className="grow p-10 flex flex-col h-full min-w-0 gap-8 box-border">
         {/* TOP ROW */}
