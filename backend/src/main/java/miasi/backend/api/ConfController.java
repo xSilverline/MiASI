@@ -35,7 +35,6 @@ public class ConfController {
 
   @GetMapping("/module-catalog")
   public ResponseEntity<ModuleCatalog> getModuleCatalog() {
-    System.out.println(confService.getModuleCatalog().moduleList());
     return ResponseEntity.ok(confService.getModuleCatalog());
   }
 

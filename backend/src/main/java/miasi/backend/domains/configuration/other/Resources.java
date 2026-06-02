@@ -1,15 +1,16 @@
 package miasi.backend.domains.configuration.other;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import miasi.backend.enums.ResourceType;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
-@RequiredArgsConstructor
 public class Resources {
-  final ResourceType resourceType;
-  float quantity;
+  private ResourceType resourceType;
+  private float quantity;
 }

@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.database.JsonFileStorage;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +13,9 @@ import java.util.List;
 public class ModuleRecordList<T> {
   final List<T> objects;
   final String fileName;
-  final JsonFileStorage<List<T>> database;
+  final JsonFileStorage database;
 
-  public ModuleRecordList(List<T> objects, String fileName, JsonFileStorage<List<T>> database) {
+  public ModuleRecordList(List<T> objects, String fileName, JsonFileStorage database) {
     this.objects = new ArrayList<>(objects);
     this.fileName = fileName;
     this.database = database;
@@ -26,7 +25,7 @@ public class ModuleRecordList<T> {
     objects.add(object);
   }
 
-  public void save() throws IOException {
+  public void save() {
     database.saveToFile(objects, fileName);
   }
 

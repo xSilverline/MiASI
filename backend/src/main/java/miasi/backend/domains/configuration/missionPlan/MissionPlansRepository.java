@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Repository;
+import tools.jackson.core.type.TypeReference;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +16,7 @@ public class MissionPlansRepository {
   private List<MissionPlan> plans = new ArrayList<>();
   private final String filePath;
 
-  JsonFileStorage<List<MissionPlan>> database = new JsonFileStorage<>();
+  JsonFileStorage database = new JsonFileStorage();
 
   @Autowired
   private ApplicationEventPublisher applicationEventPublisher;
@@ -24,12 +24,12 @@ public class MissionPlansRepository {
   public MissionPlansRepository(
       @Value("${database.filename.missions}") String filePath
   ) {
-    List<MissionPlan> plansTemp;
-    try {
-      plansTemp = database.loadFromFile(filePath);
-    } catch (IOException ex) {
-      plansTemp = null;
-    }
+    List<MissionPlan> plansTemp =
+        database.loadFromFile(
+            filePath,
+            new TypeReference<List<MissionPlan>>() {
+            }
+        );
     if (plansTemp != null)
       plans = plansTemp;
     this.filePath = filePath;
@@ -44,14 +44,10 @@ public class MissionPlansRepository {
   }
 
   public int save(MissionPlan plan) {
-    try {
-      plans.add(plan);
-      database.saveToFile(plans, filePath);
-      this.throwCreatedEvent();
-      return plans.size() - 1;
-    } catch (IOException ex) {
-      return -1;
-    }
+    plans.add(plan);
+    database.saveToFile(plans, filePath);
+    this.throwCreatedEvent();
+    return plans.size() - 1;
   }
 
   public void delete(int missionId) {

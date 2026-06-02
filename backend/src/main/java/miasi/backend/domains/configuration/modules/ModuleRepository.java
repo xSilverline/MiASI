@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import miasi.backend.database.JsonFileStorage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
+import tools.jackson.core.type.TypeReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,21 +22,21 @@ public final class ModuleRepository {
       @Value("${database.filename.modules}") String filePath1,
       @Value("${database.filename.module.types}") String filePath2
   ) throws IOException {
-    JsonFileStorage<List<Module>> f1 = new JsonFileStorage<>();
+    JsonFileStorage f1 = new JsonFileStorage();
     this.modules = new ModuleRecordList<>(
-        this.loadFile(f1, filePath1),
+        this.loadFile(f1, filePath1, new TypeReference<List<Module>>() {
+        }),
         filePath1,
         f1
     );
 
-    JsonFileStorage<List<ModuleType>> f2 = new JsonFileStorage<>();
+    JsonFileStorage f2 = new JsonFileStorage();
     this.types = new ModuleRecordList<>(
-        this.loadFile(f2, filePath2),
+        this.loadFile(f2, filePath2, new TypeReference<List<ModuleType>>() {
+        }),
         filePath2,
         f2
     );
-    System.out.println("MODULE FILE PATH: " + filePath1);
-    System.out.println("LOADED MODULES: " + this.modules.getObjects().size());
   }
 
   @Synchronized
@@ -66,12 +67,8 @@ public final class ModuleRepository {
 
   @Synchronized
   public void save() {
-    try {
-      modules.save();
-      types.save();
-    } catch (IOException e) {
-      //TODO: zrobić cos z exception
-    }
+    modules.save();
+    types.save();
   }
 
   @Synchronized
@@ -84,8 +81,13 @@ public final class ModuleRepository {
     return List.copyOf(types.getObjects());
   }
 
-  private <T> List<T> loadFile(JsonFileStorage<List<T>> database, String fileName) throws IOException {
-    List<T> loaded = database.loadFromFile(fileName);
+  private <T> List<T> loadFile(
+      JsonFileStorage database,
+      String fileName,
+      TypeReference<List<T>> type
+  ) throws IOException {
+
+    List<T> loaded = database.loadFromFile(fileName, type);
     return loaded != null ? loaded : new ArrayList<>();
   }
 

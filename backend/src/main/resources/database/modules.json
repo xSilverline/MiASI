@@ -4,18 +4,18 @@
   "type" : {
     "name" : "laboratory",
     "resourceConsumption" : [ {
-      "resourceType" : "ENERGY",
-      "quantity" : 1.0
+      "quantity" : 1.0,
+      "resourceType" : "ResourceType.ENERGY(weightRatio=0.0)"
     }, {
-      "resourceType" : "WATER",
-      "quantity" : 1.0
+      "quantity" : 1.0,
+      "resourceType" : "ResourceType.WATER(weightRatio=1.0)"
     } ],
     "resourceProduction" : [ {
-      "resourceType" : "FOOD",
-      "quantity" : 2.5
+      "quantity" : 2.5,
+      "resourceType" : "ResourceType.FOOD(weightRatio=0.5)"
     }, {
-      "resourceType" : "OXYGEN",
-      "quantity" : 15.0
+      "quantity" : 15.0,
+      "resourceType" : "ResourceType.OXYGEN(weightRatio=1.0)"
     } ]
   },
   "weight" : 2137.0
