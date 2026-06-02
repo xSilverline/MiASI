@@ -2,7 +2,7 @@ package miasi.backend.api;
 
 import lombok.RequiredArgsConstructor;
 import miasi.backend.api.jsons.BasicResponseEntity;
-import miasi.backend.domains.configuration.ConfContextProvider;
+import miasi.backend.domains.configuration.ConfService;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
 import miasi.backend.domains.configuration.modules.ModuleCatalog;
@@ -14,40 +14,38 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
-@CrossOrigin(origins = "http://localhost:*")// TODO: do zmiany gdy będą znane porty frontendu
+@CrossOrigin(origins = "http://localhost:*") // TODO: do zmiany gdy będą znane porty frontendu
 @RestController
 @RequestMapping("/api/conf")
 @RequiredArgsConstructor
 public class ConfController {
-  private final ConfContextProvider ctx;
+
+  private final ConfService confService;
 
   @GetMapping("/default/plan")
   public ResponseEntity<MissionPlan> getDefaultMissionPlan() {
-    return ResponseEntity.ok(new MissionPlan());
+    return ResponseEntity.ok(confService.getDefaultMissionPlan());
   }
 
   @GetMapping("/{missionId}/plan")
-  public ResponseEntity<MissionPlan> getMissionPlan(
-      @PathVariable int missionId) {
-    MissionPlan plan = ctx.getRepository().findById(missionId);
-    if (plan == null)
-      return ResponseEntity.notFound().build();
-    return ResponseEntity.ok(plan);
+  public ResponseEntity<MissionPlan> getMissionPlan(@PathVariable int missionId) {
+    MissionPlan plan = confService.getMissionPlan(missionId);
+    return plan != null ? ResponseEntity.ok(plan) : ResponseEntity.notFound().build();
   }
 
   @GetMapping("/module-catalog")
   public ResponseEntity<ModuleCatalog> getModuleCatalog() {
-    return ResponseEntity.ok(ctx.getModuleCatalog());
+    return ResponseEntity.ok(confService.getModuleCatalog());
   }
 
   @PostMapping("/plan")
   public ResponseEntity<BasicResponseEntity> postMissionPlan(
       @RequestBody MissionPlan missionPlan
   ) {
-    int id = ctx.getRepository().save(missionPlan);
-    missionPlan.throwCreatedEvent();
+    int id = confService.saveMissionPlan(missionPlan);
+
     return ResponseEntity
-        .created(URI.create("/{%d}/module-catalog".formatted(id)))
+        .created(URI.create("/api/conf/%d/plan".formatted(id)))
         .body(BasicResponseEntity.success(Integer.toString(id)));
   }
 
@@ -55,16 +53,23 @@ public class ConfController {
   public ResponseEntity<BasicResponseEntity> postModule(
       @RequestBody Module module
   ) {
-    return ResponseEntity.created(URI.create("/module-catalog")).body(BasicResponseEntity.success(Integer.toString(ctx.getModuleCatalog().add(module))));
+    int id = confService.addModule(module);
+
+    return ResponseEntity
+        .created(URI.create("/api/conf/module-catalog"))
+        .body(BasicResponseEntity.success(Integer.toString(id)));
   }
 
   @PostMapping("/module-type")
   public ResponseEntity<BasicResponseEntity> postModuleType(
       @RequestBody ModuleType type
   ) {
-    return ResponseEntity.created(URI.create("/module-catalog")).body(BasicResponseEntity.success(Integer.toString(ctx.getModuleCatalog().add(type))));
-  }
+    int id = confService.addModuleType(type);
 
+    return ResponseEntity
+        .created(URI.create("/api/conf/module-catalog"))
+        .body(BasicResponseEntity.success(Integer.toString(id)));
+  }
 
   @GetMapping("/resource-types")
   public ResponseEntity<ResourceType[]> getResourceTypes() {

@@ -10,9 +10,6 @@ import miasi.backend.domains.configuration.other.AtmosphereComposition;
 import miasi.backend.domains.configuration.other.Resources;
 import miasi.backend.domains.configuration.other.SexProfile;
 import miasi.backend.enums.ResourceType;
-import miasi.backend.events.MissionPlanCreatedEvent;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +19,12 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public class MissionPlan {
-  String uuid;
   List<SexProfile> crew;
   int missionDurationSols;
   List<Resources> startingResources;
   List<Module> modules;
   AtmosphereComposition atmosphereComposition;
   float maxStartingWeight;
-
-  @Autowired
-  private ApplicationEventPublisher applicationEventPublisher;
 
   public MissionPlan() {
     crew = new ArrayList<>();
@@ -53,9 +46,5 @@ public class MissionPlan {
 
   void addModule(Module module) {
     modules.add(module);
-  }
-
-  public void throwCreatedEvent() {
-    applicationEventPublisher.publishEvent(new MissionPlanCreatedEvent(this));
   }
 }

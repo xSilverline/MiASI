@@ -1,0 +1,247 @@
+[
+  {
+    "crew": [
+      {
+        "name": "male",
+        "population": 15,
+        "optimalDemand": {
+          "ResourceType.FOOD(weightRatio=0.5)": 1.0,
+          "ResourceType.WATER(weightRatio=1.0)": 1.0,
+          "ResourceType.OXYGEN(weightRatio=1.0)": 1.0
+        },
+        "minimalDemand": {
+          "ResourceType.FOOD(weightRatio=0.5)": 0.3,
+          "ResourceType.WATER(weightRatio=1.0)": 0.5,
+          "ResourceType.OXYGEN(weightRatio=1.0)": 0.3
+        }
+      },
+      {
+        "name": "female",
+        "population": 3,
+        "optimalDemand": {
+          "ResourceType.FOOD(weightRatio=0.5)": 0.8,
+          "ResourceType.WATER(weightRatio=1.0)": 0.8,
+          "ResourceType.OXYGEN(weightRatio=1.0)": 0.8
+        },
+        "minimalDemand": {
+          "ResourceType.FOOD(weightRatio=0.5)": 0.2,
+          "ResourceType.WATER(weightRatio=1.0)": 0.3,
+          "ResourceType.OXYGEN(weightRatio=1.0)": 0.2
+        }
+      }
+    ],
+    "missionDurationSols": 67,
+    "startingResources": [
+      {
+        "quantity": 200.0,
+        "resourceType": "ResourceType.FOOD(weightRatio=0.5)"
+      },
+      {
+        "quantity": 200.0,
+        "resourceType": "ResourceType.OXYGEN(weightRatio=1.0)"
+      },
+      {
+        "quantity": 2000.0,
+        "resourceType": "ResourceType.CARBON_DIOXIDE(weightRatio=1.0)"
+      },
+      {
+        "quantity": 200.0,
+        "resourceType": "ResourceType.WATER(weightRatio=1.0)"
+      },
+      {
+        "quantity": 200.0,
+        "resourceType": "ResourceType.ENERGY(weightRatio=0.0)"
+      }
+    ],
+    "modules": [
+      {
+        "name": "default_laboratory",
+        "status": "ACTIVE",
+        "type": {
+          "name": "laboratory",
+          "resourceConsumption": [
+            {
+              "quantity": 1.0,
+              "resourceType": "ResourceType.ENERGY(weightRatio=0.0)"
+            },
+            {
+              "quantity": 1.0,
+              "resourceType": "ResourceType.WATER(weightRatio=1.0)"
+            }
+          ],
+          "resourceProduction": [
+            {
+              "quantity": 2.5,
+              "resourceType": "ResourceType.FOOD(weightRatio=0.5)"
+            },
+            {
+              "quantity": 15.0,
+              "resourceType": "ResourceType.OXYGEN(weightRatio=1.0)"
+            }
+          ]
+        },
+        "weight": 2137.0
+      }
+    ],
+    "atmosphereComposition": {
+      "oxygen": 66.6,
+      "carbonDioxide": 6.6,
+      "nitrogen": 6.6
+    },
+    "maxStartingWeight": 7777.0
+  },
+  {
+    "crew": [
+      {
+        "name": "default",
+        "population": 0,
+        "optimalDemand": {
+          "ResourceType.FOOD(weightRatio=0.5)": 0.0,
+          "ResourceType.WATER(weightRatio=1.0)": 0.0,
+          "ResourceType.OXYGEN(weightRatio=1.0)": 0.0
+        },
+        "minimalDemand": {
+          "ResourceType.FOOD(weightRatio=0.5)": 0.0,
+          "ResourceType.WATER(weightRatio=1.0)": 0.0,
+          "ResourceType.OXYGEN(weightRatio=1.0)": 0.0
+        }
+      }
+    ],
+    "missionDurationSols": 0,
+    "startingResources": [
+      {
+        "quantity": 0.0,
+        "resourceType": "ResourceType.FOOD(weightRatio=0.5)"
+      },
+      {
+        "quantity": 0.0,
+        "resourceType": "ResourceType.OXYGEN(weightRatio=1.0)"
+      },
+      {
+        "quantity": 0.0,
+        "resourceType": "ResourceType.CARBON_DIOXIDE(weightRatio=1.0)"
+      },
+      {
+        "quantity": 0.0,
+        "resourceType": "ResourceType.WATER(weightRatio=1.0)"
+      },
+      {
+        "quantity": 0.0,
+        "resourceType": "ResourceType.ENERGY(weightRatio=0.0)"
+      }
+    ],
+    "modules": [
+      {
+        "name": "default_laboratory",
+        "status": "ACTIVE",
+        "type": {
+          "name": "laboratory",
+          "resourceConsumption": [
+            {
+              "quantity": 1.0,
+              "resourceType": "ResourceType.ENERGY(weightRatio=0.0)"
+            },
+            {
+              "quantity": 1.0,
+              "resourceType": "ResourceType.WATER(weightRatio=1.0)"
+            }
+          ],
+          "resourceProduction": [
+            {
+              "quantity": 2.5,
+              "resourceType": "ResourceType.FOOD(weightRatio=0.5)"
+            },
+            {
+              "quantity": 15.0,
+              "resourceType": "ResourceType.OXYGEN(weightRatio=1.0)"
+            }
+          ]
+        },
+        "weight": 2137.0
+      }
+    ],
+    "atmosphereComposition": {
+      "oxygen": 0.0,
+      "carbonDioxide": 0.0,
+      "nitrogen": 0.0
+    },
+    "maxStartingWeight": 0.0
+  },
+  {
+    "crew": [
+      {
+        "name": "default",
+        "population": 0,
+        "optimalDemand": {
+          "ResourceType.FOOD(weightRatio=0.5)": 0.0,
+          "ResourceType.WATER(weightRatio=1.0)": 0.0,
+          "ResourceType.OXYGEN(weightRatio=1.0)": 0.0
+        },
+        "minimalDemand": {
+          "ResourceType.FOOD(weightRatio=0.5)": 0.0,
+          "ResourceType.WATER(weightRatio=1.0)": 0.0,
+          "ResourceType.OXYGEN(weightRatio=1.0)": 0.0
+        }
+      }
+    ],
+    "missionDurationSols": 0,
+    "startingResources": [
+      {
+        "quantity": 0.0,
+        "resourceType": "ResourceType.FOOD(weightRatio=0.5)"
+      },
+      {
+        "quantity": 0.0,
+        "resourceType": "ResourceType.OXYGEN(weightRatio=1.0)"
+      },
+      {
+        "quantity": 0.0,
+        "resourceType": "ResourceType.CARBON_DIOXIDE(weightRatio=1.0)"
+      },
+      {
+        "quantity": 0.0,
+        "resourceType": "ResourceType.WATER(weightRatio=1.0)"
+      },
+      {
+        "quantity": 0.0,
+        "resourceType": "ResourceType.ENERGY(weightRatio=0.0)"
+      }
+    ],
+    "modules": [
+      {
+        "name": "default_laboratory",
+        "status": "ACTIVE",
+        "type": {
+          "name": "laboratory",
+          "resourceConsumption": [
+            {
+              "quantity": 1.0,
+              "resourceType": "ResourceType.ENERGY(weightRatio=0.0)"
+            },
+            {
+              "quantity": 1.0,
+              "resourceType": "ResourceType.WATER(weightRatio=1.0)"
+            }
+          ],
+          "resourceProduction": [
+            {
+              "quantity": 2.5,
+              "resourceType": "ResourceType.FOOD(weightRatio=0.5)"
+            },
+            {
+              "quantity": 15.0,
+              "resourceType": "ResourceType.OXYGEN(weightRatio=1.0)"
+            }
+          ]
+        },
+        "weight": 2137.0
+      }
+    ],
+    "atmosphereComposition": {
+      "oxygen": 0.0,
+      "carbonDioxide": 0.0,
+      "nitrogen": 0.0
+    },
+    "maxStartingWeight": 0.0
+  }
+]
