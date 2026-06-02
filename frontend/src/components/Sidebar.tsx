@@ -9,7 +9,6 @@ const menuGroups = [
     color: "text-mars-orange",
     items: [
       { text: "PODSUMOWANIE", viewId: "dashboard" },
-      { text: "EDYCJA PLANU", viewId: "editPlan" },
       { text: "HARMONOGRAM MISJI", viewId: "schedule" },
     ],
   },
@@ -30,7 +29,7 @@ const menuGroups = [
       { text: "ZUŻYCIE ZASOBÓW", viewId: "resources" },
       { text: "MODUŁY", viewId: "modules" },
       { text: "ZDARZENIA", viewId: "events" },
-      { text: "KREATOR MISJI", viewId: "configCreator" }, // Nasz kreator
+      { text: "KREATOR MISJI", viewId: "configCreator" },
     ],
   },
 ];

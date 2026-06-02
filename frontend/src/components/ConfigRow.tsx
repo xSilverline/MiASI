@@ -25,7 +25,7 @@ export const ConfigRow: React.FC<ConfigRowProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-[1fr_120px_80px] md:grid-cols-[1fr_160px_100px] items-center gap-4 md:gap-8 w-full">
+    <div className="grid grid-cols-[1fr_130px_80px] md:grid-cols-[1fr_180px_100px] items-center gap-4 md:gap-8 w-full">
       <div className="text-[10px] md:text-xs tracking-widest uppercase text-center leading-relaxed text-slate-200">
         {label}
       </div>
