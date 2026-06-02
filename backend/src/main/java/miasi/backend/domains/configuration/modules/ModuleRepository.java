@@ -7,6 +7,7 @@ import miasi.backend.database.JsonFileStorage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public final class ModuleRepository {
   public ModuleRepository(
       @Value("${database.filename.modules}") String filePath1,
       @Value("${database.filename.module.types}") String filePath2
-  ) {
+  ) throws IOException {
     JsonFileStorage<List<Module>> f1 = new JsonFileStorage<>();
     this.modules = new ModuleRecordList<>(
         this.loadFile(f1, filePath1),
@@ -33,6 +34,8 @@ public final class ModuleRepository {
         filePath2,
         f2
     );
+    System.out.println("MODULE FILE PATH: " + filePath1);
+    System.out.println("LOADED MODULES: " + this.modules.getObjects().size());
   }
 
   @Synchronized
@@ -63,8 +66,12 @@ public final class ModuleRepository {
 
   @Synchronized
   public void save() {
-    modules.save();
-    types.save();
+    try {
+      modules.save();
+      types.save();
+    } catch (IOException e) {
+      //TODO: zrobić cos z exception
+    }
   }
 
   @Synchronized
@@ -77,7 +84,7 @@ public final class ModuleRepository {
     return List.copyOf(types.getObjects());
   }
 
-  private <T> List<T> loadFile(JsonFileStorage<List<T>> database, String fileName) {
+  private <T> List<T> loadFile(JsonFileStorage<List<T>> database, String fileName) throws IOException {
     List<T> loaded = database.loadFromFile(fileName);
     return loaded != null ? loaded : new ArrayList<>();
   }

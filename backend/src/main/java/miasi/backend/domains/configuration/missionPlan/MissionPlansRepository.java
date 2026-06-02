@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Repository;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,12 @@ public class MissionPlansRepository {
   public MissionPlansRepository(
       @Value("${database.filename.missions}") String filePath
   ) {
-    List<MissionPlan> plansTemp = database.loadFromFile(filePath);
+    List<MissionPlan> plansTemp;
+    try {
+      plansTemp = database.loadFromFile(filePath);
+    } catch (IOException ex) {
+      plansTemp = null;
+    }
     if (plansTemp != null)
       plans = plansTemp;
     this.filePath = filePath;
@@ -38,10 +44,14 @@ public class MissionPlansRepository {
   }
 
   public int save(MissionPlan plan) {
-    plans.add(plan);
-    database.saveToFile(plans, filePath);
-    this.throwCreatedEvent();
-    return plans.size() - 1;
+    try {
+      plans.add(plan);
+      database.saveToFile(plans, filePath);
+      this.throwCreatedEvent();
+      return plans.size() - 1;
+    } catch (IOException ex) {
+      return -1;
+    }
   }
 
   public void delete(int missionId) {
