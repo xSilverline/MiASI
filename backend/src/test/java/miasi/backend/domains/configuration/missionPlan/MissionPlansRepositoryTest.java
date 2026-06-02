@@ -12,7 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 class MissionPlansRepositoryTest {
   @Autowired
   ConfService ctx;
-
+  
   @Test
   void saveMissionPlan() {
     ctx.saveMissionPlan(new MissionPlan());

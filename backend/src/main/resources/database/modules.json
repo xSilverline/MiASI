@@ -1,22 +1,30 @@
-[ {
-  "name" : "default_laboratory",
-  "status" : "ACTIVE",
-  "type" : {
-    "name" : "laboratory",
-    "resourceConsumption" : [ {
-      "quantity" : 1.0,
-      "resourceType" : "ResourceType.ENERGY(weightRatio=0.0)"
-    }, {
-      "quantity" : 1.0,
-      "resourceType" : "ResourceType.WATER(weightRatio=1.0)"
-    } ],
-    "resourceProduction" : [ {
-      "quantity" : 2.5,
-      "resourceType" : "ResourceType.FOOD(weightRatio=0.5)"
-    }, {
-      "quantity" : 15.0,
-      "resourceType" : "ResourceType.OXYGEN(weightRatio=1.0)"
-    } ]
-  },
-  "weight" : 2137.0
-} ]
+[
+  {
+    "name": "default_laboratory",
+    "status": "ACTIVE",
+    "type": {
+      "name": "laboratory",
+      "resourceConsumption": [
+        {
+          "resourceType": "ResourceType.ENERGY(weightRatio=0.0)",
+          "quantity": 1.0
+        },
+        {
+          "resourceType": "ResourceType.WATER(weightRatio=1.0)",
+          "quantity": 1.0
+        }
+      ],
+      "resourceProduction": [
+        {
+          "resourceType": "ResourceType.FOOD(weightRatio=0.5)",
+          "quantity": 2.5
+        },
+        {
+          "resourceType": "ResourceType.OXYGEN(weightRatio=1.0)",
+          "quantity": 15.0
+        }
+      ]
+    },
+    "weight": 2137.0
+  }
+]

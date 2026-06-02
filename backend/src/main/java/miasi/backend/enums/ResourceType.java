@@ -8,7 +8,6 @@ import lombok.ToString;
 public enum ResourceType {
   FOOD(0.5f),
   OXYGEN(1f),
-  CARBON_DIOXIDE(1f),
   WATER(1f),
   ENERGY(0f);
 

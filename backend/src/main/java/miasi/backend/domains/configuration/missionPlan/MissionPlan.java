@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.configuration.modules.Module;
-import miasi.backend.domains.configuration.other.AtmosphereComposition;
 import miasi.backend.domains.configuration.other.Resources;
 import miasi.backend.domains.configuration.other.SexProfile;
 import miasi.backend.enums.ResourceType;
@@ -23,7 +22,6 @@ public class MissionPlan {
   int missionDurationSols;
   List<Resources> startingResources;
   List<Module> modules;
-  AtmosphereComposition atmosphereComposition;
   float maxStartingWeight;
 
   public MissionPlan() {
@@ -36,7 +34,6 @@ public class MissionPlan {
     }
     modules = new ArrayList<>();
     modules.add(new Module());
-    atmosphereComposition = new AtmosphereComposition();
     maxStartingWeight = 0;
   }
 
