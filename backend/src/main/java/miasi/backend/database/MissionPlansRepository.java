@@ -1,0 +1,63 @@
+package miasi.backend.database;
+
+import miasi.backend.database.JsonFileStorage;
+import miasi.backend.domains.configuration.missionPlan.MissionPlan;
+import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
+import miasi.backend.events.MissionPlanCreatedEvent;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Repository;
+import tools.jackson.core.type.TypeReference;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Repository
+public class MissionPlansRepository implements IMissionPlanRepositoryPort {
+  private List<MissionPlan> plans = new ArrayList<>();
+  private final String filePath;
+
+  JsonFileStorage database = new JsonFileStorage();
+
+  @Autowired
+ // private ApplicationEventPublisher applicationEventPublisher;
+
+  public MissionPlansRepository(
+      @Value("${database.filename.missions}") String filePath
+  ) {
+    List<MissionPlan> plansTemp =
+        database.loadFromFile(
+            filePath,
+            new TypeReference<List<MissionPlan>>() {
+            }
+        );
+    if (plansTemp != null)
+      plans = plansTemp;
+    this.filePath = filePath;
+  }
+  @Override
+  public MissionPlan findById(int missionId) {
+    try {
+      return plans.get(missionId);
+    } catch (IndexOutOfBoundsException ex) {
+      return null;
+    }
+  }
+  @Override
+  public int save(MissionPlan plan) {
+    plans.add(plan);
+    database.saveToFile(plans, filePath);
+    //this.throwCreatedEvent(); -> przeniesione do confService
+    return plans.size() - 1;
+  }
+
+  @Override
+  public void delete(int missionId) {
+    plans.remove(missionId);
+  }
+/*
+  public void throwCreatedEvent() {
+    applicationEventPublisher.publishEvent(new MissionPlanCreatedEvent(plans.getLast()));
+  }*/
+}

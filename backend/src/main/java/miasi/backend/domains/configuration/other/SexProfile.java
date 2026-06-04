@@ -1,25 +1,38 @@
 package miasi.backend.domains.configuration.other;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.enums.ResourceType;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@NoArgsConstructor
 public class SexProfile {
   String name;
   int population;
   Map<ResourceType, Float> optimalDemand;
   Map<ResourceType, Float> minimalDemand;
 
-  //demands maps should use ResourceType.getDemandResourcesTypes() to get their keys
+  public SexProfile() {
+    name = "default";
+    population = 0;
+    optimalDemand = new HashMap<>();
+    minimalDemand = new HashMap<>();
+    ResourceType[] types = ResourceType.getDemandResourcesTypes();
+    for (ResourceType type : types) {
+      optimalDemand.put(type, 0f);
+      minimalDemand.put(type, 0f);
+    }
+  }
 
   void changePopulation(int amount) {
-
+    population += amount;
   }
 }

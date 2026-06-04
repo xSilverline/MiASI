@@ -1,7 +1,9 @@
 package miasi.backend.domains.configuration.modules;
 
-import javafx.util.Pair;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.enums.ModuleState;
 
@@ -9,10 +11,16 @@ import miasi.backend.enums.ModuleState;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-@NoArgsConstructor
 public class Module {
   String name;
-  Pair<Float, Float> resourcesAmount;
   ModuleState status;
   ModuleType type;
+  float weight;
+
+  public Module() {
+    name = "default_laboratory";
+    status = ModuleState.ACTIVE;
+    type = ModuleType.genSample();
+    weight = 2137;
+  }
 }
