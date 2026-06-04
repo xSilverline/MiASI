@@ -1,9 +1,12 @@
-package miasi.backend.domains.configuration.modules;
+package miasi.backend.database;
 
 import lombok.AccessLevel;
 import lombok.Synchronized;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.database.JsonFileStorage;
+import miasi.backend.domains.configuration.modules.Module;
+import miasi.backend.domains.configuration.modules.ModuleCatalog;
+import miasi.backend.domains.configuration.modules.ModuleType;
+import miasi.backend.domains.configuration.ports.IModuleRepositoryPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import tools.jackson.core.type.TypeReference;
@@ -14,7 +17,7 @@ import java.util.List;
 
 @Repository
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public final class ModuleRepository {
+public final class ModuleRepository implements IModuleRepositoryPort {
   final ModuleRecordList<Module> modules;
   final ModuleRecordList<ModuleType> types;
 

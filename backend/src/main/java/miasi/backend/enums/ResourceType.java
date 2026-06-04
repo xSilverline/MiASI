@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.ToString;
 
 @AllArgsConstructor
-@ToString
+//@ToString
 public enum ResourceType {
   FOOD(0.5f),
   OXYGEN(1f),

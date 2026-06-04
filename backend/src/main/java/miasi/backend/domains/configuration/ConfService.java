@@ -2,20 +2,21 @@ package miasi.backend.domains.configuration;
 
 import lombok.RequiredArgsConstructor;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
-import miasi.backend.domains.configuration.missionPlan.MissionPlansRepository;
 import miasi.backend.domains.configuration.modules.Module;
 import miasi.backend.domains.configuration.modules.ModuleCatalog;
-import miasi.backend.domains.configuration.modules.ModuleRepository;
 import miasi.backend.domains.configuration.modules.ModuleType;
+import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
+import miasi.backend.domains.configuration.ports.IConfigurationEventPublisherPort;
+import miasi.backend.domains.configuration.ports.IModuleRepositoryPort;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class ConfService {
 
-  private final MissionPlansRepository missionPlansRepository;
-  private final ModuleRepository moduleRepository;
-
+  private final IMissionPlanRepositoryPort missionPlansRepository;
+  private final IModuleRepositoryPort moduleRepository;
+  private final IConfigurationEventPublisherPort eventPublisher;
   public MissionPlan getDefaultMissionPlan() {
     return new MissionPlan();
   }
@@ -29,7 +30,11 @@ public class ConfService {
   }
 
   public int saveMissionPlan(MissionPlan missionPlan) {
-    return missionPlansRepository.save(missionPlan);
+    // serwis zapisuje do bazy
+    int id = missionPlansRepository.save(missionPlan);
+    eventPublisher.publishMissionPlanCreated(missionPlan);
+
+    return id;
   }
 
   public int addModule(Module module) {

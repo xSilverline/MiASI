@@ -1,9 +1,8 @@
-package miasi.backend.domains.configuration.modules;
+package miasi.backend.database;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.database.JsonFileStorage;
 
 import java.util.ArrayList;
 import java.util.List;

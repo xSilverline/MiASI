@@ -1,6 +1,8 @@
-package miasi.backend.domains.configuration.missionPlan;
+package miasi.backend.database;
 
 import miasi.backend.database.JsonFileStorage;
+import miasi.backend.domains.configuration.missionPlan.MissionPlan;
+import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
 import miasi.backend.events.MissionPlanCreatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,14 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class MissionPlansRepository {
+public class MissionPlansRepository implements IMissionPlanRepositoryPort {
   private List<MissionPlan> plans = new ArrayList<>();
   private final String filePath;
 
   JsonFileStorage database = new JsonFileStorage();
 
   @Autowired
-  private ApplicationEventPublisher applicationEventPublisher;
+ // private ApplicationEventPublisher applicationEventPublisher;
 
   public MissionPlansRepository(
       @Value("${database.filename.missions}") String filePath
@@ -34,7 +36,7 @@ public class MissionPlansRepository {
       plans = plansTemp;
     this.filePath = filePath;
   }
-
+  @Override
   public MissionPlan findById(int missionId) {
     try {
       return plans.get(missionId);
@@ -42,19 +44,20 @@ public class MissionPlansRepository {
       return null;
     }
   }
-
+  @Override
   public int save(MissionPlan plan) {
     plans.add(plan);
     database.saveToFile(plans, filePath);
-    this.throwCreatedEvent();
+    //this.throwCreatedEvent(); -> przeniesione do confService
     return plans.size() - 1;
   }
 
+  @Override
   public void delete(int missionId) {
     plans.remove(missionId);
   }
-
+/*
   public void throwCreatedEvent() {
     applicationEventPublisher.publishEvent(new MissionPlanCreatedEvent(plans.getLast()));
-  }
+  }*/
 }
