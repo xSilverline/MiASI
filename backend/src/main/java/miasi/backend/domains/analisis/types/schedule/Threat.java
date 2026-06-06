@@ -11,10 +11,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public class Threat {
-    int sol;
-    int durationSols;
-    ImpactType type;
-    ImpactTarget target;
-    String targetIdentifier; // np. nazwa modułu ("Farma") lub typ surowca
-    float impactValue;
+  int sol;
+  int durationSols;
+  ImpactType type;
+  ImpactTarget target;
+  String targetIdentifier; // np. nazwa modułu ("Farma") lub typ surowca
+  float impactValue;
 }
