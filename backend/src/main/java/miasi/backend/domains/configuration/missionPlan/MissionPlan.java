@@ -1,9 +1,6 @@
 package miasi.backend.domains.configuration.missionPlan;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.configuration.modules.Module;
 import miasi.backend.domains.configuration.other.Resources;
@@ -17,6 +14,7 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@EqualsAndHashCode
 public class MissionPlan {
   List<SexProfile> crew;
   int missionDurationSols;
