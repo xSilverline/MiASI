@@ -1,7 +1,6 @@
 package miasi.backend.enums;
 
 import lombok.AllArgsConstructor;
-import lombok.ToString;
 
 @AllArgsConstructor
 //@ToString

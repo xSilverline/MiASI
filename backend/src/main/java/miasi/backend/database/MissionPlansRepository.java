@@ -1,12 +1,9 @@
 package miasi.backend.database;
 
-import miasi.backend.database.JsonFileStorage;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
-import miasi.backend.events.MissionPlanCreatedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Repository;
 import tools.jackson.core.type.TypeReference;
 
@@ -21,7 +18,7 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
   JsonFileStorage database = new JsonFileStorage();
 
   @Autowired
- // private ApplicationEventPublisher applicationEventPublisher;
+  // private ApplicationEventPublisher applicationEventPublisher;
 
   public MissionPlansRepository(
       @Value("${database.filename.missions}") String filePath
@@ -29,13 +26,14 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
     List<MissionPlan> plansTemp =
         database.loadFromFile(
             filePath,
-            new TypeReference<List<MissionPlan>>() {
+            new TypeReference<>() {
             }
         );
     if (plansTemp != null)
       plans = plansTemp;
     this.filePath = filePath;
   }
+
   @Override
   public MissionPlan findById(int missionId) {
     try {
@@ -44,6 +42,7 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
       return null;
     }
   }
+
   @Override
   public int save(MissionPlan plan) {
     plans.add(plan);

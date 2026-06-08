@@ -1,9 +1,6 @@
 package miasi.backend.domains.configuration.modules;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.enums.ModuleState;
 
@@ -11,6 +8,7 @@ import miasi.backend.enums.ModuleState;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@EqualsAndHashCode
 public class Module {
   String name;
   ModuleState status;
