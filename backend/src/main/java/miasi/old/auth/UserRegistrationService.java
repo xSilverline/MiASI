@@ -1,8 +1,13 @@
-package miasi.backend.domains.authorization;
+// NIE UWZGLĘDNIAMY W OFICJALNYM PROJEKCIE
+
+package miasi.old.auth;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import miasi.backend.domains.authorization.IUserRepository;
+import miasi.backend.domains.authorization.Identity;
+import miasi.old.auth.IUserManagementRepository;
 import org.mindrot.jbcrypt.BCrypt;
 
 @AllArgsConstructor

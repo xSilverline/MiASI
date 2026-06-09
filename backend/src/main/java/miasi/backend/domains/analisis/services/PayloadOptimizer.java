@@ -1,7 +1,7 @@
 package miasi.backend.domains.analisis.services;
 
 import lombok.RequiredArgsConstructor;
-import miasi.backend.domains.analisis.shared.TimelineSimulator;
+import miasi.backend.domains.analisis.services.TimelineSimulator;
 import miasi.backend.domains.analisis.types.core.Resource;
 import miasi.backend.domains.analisis.types.input.MissionManifest;
 import miasi.backend.domains.analisis.types.modules.Module;

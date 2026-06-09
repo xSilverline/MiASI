@@ -7,60 +7,70 @@ import miasi.backend.api.jsons.LoginRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import miasi.backend.domains.authorization.Authorization;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Random;
 
-@CrossOrigin(origins = "http://localhost:*")// TODO: do zmiany gdy będą znane porty frontendu
+@CrossOrigin(origins = "http://localhost:*") // TODO: change when frontend ports are known
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Operacja zakończona sukcesem"),
-    @ApiResponse(responseCode = "400", description = "Nieprawidłowe dane wejściowe")
+    @ApiResponse(responseCode = "200", description = "Operation successful"),
+    @ApiResponse(responseCode = "400", description = "Invalid input data")
 })
 public class AuthController {
+
+  // spring automatically injects the domain
+  private final Authorization authService;
+
+
   @PostMapping("/login")
-  @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+  @ApiResponse(responseCode = "401", description = "Unauthorized access")
   public ResponseEntity<BasicResponseEntity> login(
-      @RequestBody LoginRequest request
+
+          @RequestBody LoginRequest request
   ) {
-    Random rnd = new Random();
-    if (rnd.nextBoolean()) {// sprawdzanie "request" w bazie
+    try {
+      // verify password and generate UUID
+      String token = authService.login(request.login(), request.passwordHash());
+
+      return ResponseEntity.ok(BasicResponseEntity.success(token));
+    } catch (Exception e) {
       return ResponseEntity
-          .status(HttpStatus.UNAUTHORIZED)
-          .body(BasicResponseEntity.error("Nieprawidłowy login lub hasło"));
-    } else {
-      return ResponseEntity
-          .ok(BasicResponseEntity.success("Zalogowano " + request.login()));
+              .status(HttpStatus.UNAUTHORIZED)
+              .body(BasicResponseEntity.error(e.getMessage()));
     }
   }
 
   @PostMapping("/{sessionToken}/verify")
-  @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+  @ApiResponse(responseCode = "401", description = "Unauthorized access")
   public ResponseEntity<BasicResponseEntity> tokenVerify(
-      @PathVariable String sessionToken
+          @PathVariable String sessionToken
   ) {
-    if (sessionToken.endsWith("a")) {// sprawdzanie "sessionToken"
-      return ResponseEntity
-          .status(HttpStatus.UNAUTHORIZED)
-          .body(BasicResponseEntity.error("Sesja wygasła lub token jest nieprawidłowy"));
+    // ask if an active session with this token exists
+    if (authService.isAuthenticated(sessionToken)) {
+      return ResponseEntity.ok(BasicResponseEntity.success("true"));
     } else {
       return ResponseEntity
-          .ok(BasicResponseEntity.success("true"));
+              .status(HttpStatus.UNAUTHORIZED)
+              .body(BasicResponseEntity.error("Session expired or token is invalid"));
     }
   }
 
   @PostMapping("/{sessionToken}/logout")
-  @ApiResponse(responseCode = "401", description = "Nieautoryzowany dostęp")
+  @ApiResponse(responseCode = "401", description = "Unauthorized access")
   public ResponseEntity<BasicResponseEntity> logout(
-      @PathVariable String sessionToken
+          @PathVariable String sessionToken
   ) {
-    if (sessionToken.endsWith("a")) {// wylogowywanie
+    try {
+      // remove the session from RAM
+      authService.logout(sessionToken);
+      return ResponseEntity.ok(BasicResponseEntity.success("Session ended successfully"));
+    } catch (Exception e) {
       return ResponseEntity
-          .status(HttpStatus.UNAUTHORIZED)
-          .body(BasicResponseEntity.error("Sesja wygasła lub token jest nieprawidłowy"));
-    } else {
-      return ResponseEntity
-          .ok(BasicResponseEntity.success("Sesja została zakonczona"));
+              .status(HttpStatus.UNAUTHORIZED)
+              .body(BasicResponseEntity.error(e.getMessage()));
     }
   }
 }

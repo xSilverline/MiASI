@@ -1,5 +1,8 @@
-package miasi.backend.domains.authorization;
+// NIE UWZGLĘDNIAMY W OFICJALNYM PROJEKCIE
 
+package miasi.old.auth;
+
+import org.mindrot.jbcrypt.BCrypt;
 import java.util.Scanner;
 
 public class RegistrationDemo {
@@ -7,17 +10,13 @@ public class RegistrationDemo {
   public static void main(String[] args) {
     Scanner scanner = new Scanner(System.in);
 
-    CsvUserRepository csvRepository = new CsvUserRepository();
-
-    UserRegistrationService regService = new UserRegistrationService(csvRepository, csvRepository);
-
 
     while (true) {
-      System.out.print("Do you want to register a new commander? (y/n): ");
+      System.out.print("Do you want to generate a new commander for JSON? (y/n): ");
       String answer = scanner.nextLine().trim().toLowerCase();
 
       if (answer.equals("n")) {
-        System.out.println("Exiting Registration Tool. Data saved to CSV.");
+        System.out.println("Exiting Registration Tool.");
         break;
       } else if (answer.equals("y")) {
         System.out.print("Enter new login: ");
@@ -27,12 +26,20 @@ public class RegistrationDemo {
         String newPass = scanner.nextLine();
 
         try {
-          regService.register(newLogin, newPass);
-          System.out.println("SUCCESS: Commander [" + newLogin + "] registered and encrypted.");
+          String hash = BCrypt.hashpw(newPass, BCrypt.gensalt());
+
+          System.out.println("\nSUCCESS: Commander [" + newLogin + "] encrypted.");
+          System.out.println("Copy this and add to users.json:\n");
+
+          System.out.println("  {");
+          System.out.println("    \"login\": \"" + newLogin + "\",");
+          System.out.println("    \"passwordHash\": \"" + hash + "\"");
+          System.out.println("  }");
+          System.out.println();
+
         } catch (Exception e) {
           System.out.println("REGISTRATION ERROR: " + e.getMessage());
         }
-        System.out.println();
       } else {
         System.out.println("Please type 'y' or 'n'.");
       }

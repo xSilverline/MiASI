@@ -1,4 +1,9 @@
-package miasi.backend.domains.authorization;
+// NIE UWZGLĘDNIAMY W OFICJALNYM PROJEKCIE
+
+package miasi.old.auth;
+
+import miasi.backend.domains.authorization.Authorization;
+import miasi.backend.domains.authorization.IUserRepository;
 
 import java.util.Scanner;
 

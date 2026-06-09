@@ -1,4 +1,9 @@
-package miasi.backend.domains.authorization;
+// NIE UWZGLĘDNIAMY W OFICJALNYM PROJEKCIE
+
+package miasi.old.auth;
+
+import miasi.backend.domains.authorization.IUserRepository;
+import miasi.backend.domains.authorization.Identity;
 
 import java.io.BufferedReader;
 import java.io.IOException;

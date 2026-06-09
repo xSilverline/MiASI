@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.domains.analisis.types.core.ConsumptionProfile;
+import miasi.backend.domains.analisis.types.crew.ConsumptionProfile;
 import miasi.backend.domains.analisis.types.core.Resource;
 
 import java.util.List;

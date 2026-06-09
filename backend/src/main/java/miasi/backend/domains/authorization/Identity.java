@@ -4,13 +4,16 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 @Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 
 public class Identity {
-  private final String login;
-  private final String passwordHash;
+  String login;
+  String passwordHash;
 
 }

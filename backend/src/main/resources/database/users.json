@@ -1,0 +1,10 @@
+[
+  {
+    "login": "admin",
+    "passwordHash": "$2a$10$VQ0nqfFuwuAT6j.xEV36kOXaPjyfzbznKnlAH1VcrX/DheF0XCt0W"
+  },
+  {
+    "login": "user",
+    "passwordHash": "$2a$10$aeyMqOxAQcCRLqCiAAxrLedW4dRnruo0jmSP8i3DPFuObjs3UJyEu"
+  }
+]
