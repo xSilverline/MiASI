@@ -1,5 +1,6 @@
 package miasi.backend.api;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.api.jsons.BasicResponseEntity;
 import miasi.backend.domains.configuration.ConfService;
@@ -28,6 +29,10 @@ public class ConfController {
   }
 
   @GetMapping("/{missionId}/plan")
+  @Operation(
+      summary = "Pobiera plan misji o podanym id",
+      description = "Plany misji mają id w przedziale [0;X), gdzie X to wynik zapytania /api/conf/plans-count"
+  )
   public ResponseEntity<MissionPlan> getMissionPlan(@PathVariable int missionId) {
     MissionPlan plan = confService.getMissionPlan(missionId);
     return plan != null ? ResponseEntity.ok(plan) : ResponseEntity.notFound().build();
@@ -38,18 +43,47 @@ public class ConfController {
     return ResponseEntity.ok(confService.getModuleCatalog());
   }
 
+  @Operation(
+      summary = "Wysyła do bazy danych nowy plan misji",
+      description = "Jeżeli parametr 'override' jest ustawiony, to plan nadpisze istniejacy plan na podanym id." +
+          " Jeżeli podano błedne id, zwrócony zostaje komunikat NOT FOUND." +
+          " Zwraca id utworzonego/nadpisanego planu jako 'message'"
+  )
   @PostMapping("/plan")
   public ResponseEntity<BasicResponseEntity> postMissionPlan(
-      @RequestBody MissionPlan missionPlan
+      @RequestBody MissionPlan missionPlan,
+      @RequestParam(required = false) Integer override
   ) {
-    int id = confService.saveMissionPlan(missionPlan);
+    Integer id;
+    if (override != null) {
+      id = confService.overrideMissionPlan(override, missionPlan);
+      if (id == null) {
+        return ResponseEntity.notFound().build();
+      }
+    } else {
+      id = confService.saveMissionPlan(missionPlan);
+    }
 
     return ResponseEntity
         .created(URI.create("/api/conf/%d/plan".formatted(id)))
         .body(BasicResponseEntity.success(Integer.toString(id)));
   }
 
+
+  @GetMapping("plans-count")
+  @Operation(
+      description = "Zwraca ilość planów misji w bazie danych w polu 'message'"
+  )
+  public ResponseEntity<BasicResponseEntity> getMissionsCount() {
+    return ResponseEntity.ok()
+        .body(BasicResponseEntity.success(Integer.toString(confService.getPlansCount())));
+  }
+
   @PostMapping("/module")
+  @Operation(
+      description = "Dodaje moduł do bazy danych, jeżeli nazwa będzie taka sama," +
+          " jak element w bazie, zostanie on nadpisany"
+  )
   public ResponseEntity<BasicResponseEntity> postModule(
       @RequestBody Module module
   ) {
@@ -61,6 +95,10 @@ public class ConfController {
   }
 
   @PostMapping("/module-type")
+  @Operation(
+      description = "Dodaje typ moduły do bazy danych, jeżeli nazwa będzie taka sama," +
+          " jak element w bazie, zostanie on nadpisany"
+  )
   public ResponseEntity<BasicResponseEntity> postModuleType(
       @RequestBody ModuleType type
   ) {

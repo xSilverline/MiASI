@@ -55,6 +55,11 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
   public void delete(int missionId) {
     plans.remove(missionId);
   }
+
+  @Override
+  public int getPlansCount() {
+    return plans.size();
+  }
 /*
   public void throwCreatedEvent() {
     applicationEventPublisher.publishEvent(new MissionPlanCreatedEvent(plans.getLast()));

@@ -14,6 +14,7 @@ import tools.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -27,7 +28,7 @@ public final class ModuleRepository implements IModuleRepositoryPort {
   ) throws IOException {
     JsonFileStorage f1 = new JsonFileStorage();
     this.modules = new ModuleRecordList<>(
-        this.loadFile(f1, filePath1, new TypeReference<List<Module>>() {
+        this.loadFile(f1, filePath1, new TypeReference<>() {
         }),
         filePath1,
         f1
@@ -35,7 +36,7 @@ public final class ModuleRepository implements IModuleRepositoryPort {
 
     JsonFileStorage f2 = new JsonFileStorage();
     this.types = new ModuleRecordList<>(
-        this.loadFile(f2, filePath2, new TypeReference<List<ModuleType>>() {
+        this.loadFile(f2, filePath2, new TypeReference<>() {
         }),
         filePath2,
         f2
@@ -44,6 +45,10 @@ public final class ModuleRepository implements IModuleRepositoryPort {
 
   @Synchronized
   public int add(Module module) {
+    modules.getObjects()
+        .stream()
+        .filter(module1 -> Objects.equals(module1.getName(), module.getName()))
+        .findFirst().ifPresent(this::remove);
     modules.add(module);
     save();
     return modules.getObjects().size() - 1;
@@ -51,6 +56,10 @@ public final class ModuleRepository implements IModuleRepositoryPort {
 
   @Synchronized
   public int add(ModuleType type) {
+    types.getObjects()
+        .stream()
+        .filter(type1 -> Objects.equals(type1.getName(), type.getName()))
+        .findFirst().ifPresent(this::remove);
     types.add(type);
     save();
     return types.getObjects().size() - 1;
