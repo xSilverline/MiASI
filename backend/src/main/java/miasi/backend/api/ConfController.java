@@ -1,6 +1,9 @@
 package miasi.backend.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.api.jsons.BasicResponseEntity;
 import miasi.backend.domains.configuration.ConfService;
@@ -29,6 +32,17 @@ public class ConfController {
   }
 
   @GetMapping("/{missionId}/plan")
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "200",
+          description = "Plan misji został znaleziony"
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Nie znaleziono planu misji o podanym id",
+          content = @Content
+      )
+  })
   @Operation(
       summary = "Pobiera plan misji o podanym id",
       description = "Plany misji mają id w przedziale [0;X), gdzie X to wynik zapytania /api/conf/plans-count"
@@ -49,6 +63,17 @@ public class ConfController {
           " Jeżeli podano błedne id, zwrócony zostaje komunikat NOT FOUND." +
           " Zwraca id utworzonego/nadpisanego planu jako 'message'"
   )
+  @ApiResponses({
+      @ApiResponse(
+          responseCode = "201",
+          description = "Plan został utworzony"
+      ),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Nie znaleziono planu do nadpisania",
+          content = @Content
+      )
+  })
   @PostMapping("/plan")
   public ResponseEntity<BasicResponseEntity> postMissionPlan(
       @RequestBody MissionPlan missionPlan,
@@ -80,6 +105,9 @@ public class ConfController {
   }
 
   @PostMapping("/module")
+  @ApiResponses({
+      @ApiResponse(responseCode = "201", description = "Moduł został dodany")
+  })
   @Operation(
       description = "Dodaje moduł do bazy danych, jeżeli nazwa będzie taka sama," +
           " jak element w bazie, zostanie on nadpisany"
@@ -95,6 +123,9 @@ public class ConfController {
   }
 
   @PostMapping("/module-type")
+  @ApiResponses({
+      @ApiResponse(responseCode = "201", description = "Typ modułu został dodany")
+  })
   @Operation(
       description = "Dodaje typ moduły do bazy danych, jeżeli nazwa będzie taka sama," +
           " jak element w bazie, zostanie on nadpisany"
