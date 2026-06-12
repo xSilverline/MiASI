@@ -43,12 +43,12 @@ public class ConfService {
   }
 
   public Integer overrideMissionPlan(int id, MissionPlan missionPlan) {
-    if (missionPlansRepository.findById(id) == null) {
-      return null;
-    } else {
-      missionPlansRepository.delete(id);
-      return saveMissionPlan(missionPlan);
-    }
+
+    Integer output = missionPlansRepository.replace(id, missionPlan);
+    output = (output != -1) ? output : null;
+
+    eventPublisher.publishMissionPlanCreated(missionPlan);
+    return output;
   }
 
   public int addModule(Module module) {

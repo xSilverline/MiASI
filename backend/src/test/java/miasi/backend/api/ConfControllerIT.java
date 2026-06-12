@@ -239,4 +239,81 @@ class ConfControllerIT {
         .andExpect(status().isOk())
         .andExpect(content().json(expectedJson));
   }
+
+  @Test
+  void postMissionPlanWithOverride() throws Exception {
+    // Given
+    int overrideId = 0;
+
+    MissionPlan originalPlan = ctx.getMissionPlan(overrideId);
+
+    MissionPlan updatedPlan = new MissionPlan();
+    String requestJson = objectMapper.writeValueAsString(updatedPlan);
+
+    // When
+    ResultActions result = mvc.perform(
+        MockMvcRequestBuilders.post("/api/conf/plan")
+            .param("override", String.valueOf(overrideId))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestJson)
+    );
+
+    int returnedId = Integer.parseInt(
+        JsonPath.read(
+            result.andReturn().getResponse().getContentAsString(),
+            "$.message"
+        )
+    );
+
+    // Then
+    result
+        .andExpect(status().isCreated())
+        .andExpect(header().exists("Location"))
+        .andExpect(jsonPath("$.status").value("success"))
+        .andExpect(jsonPath("$.message").value(String.valueOf(overrideId)));
+
+    JSONAssert.assertEquals(
+        objectMapper.writeValueAsString(updatedPlan),
+        objectMapper.writeValueAsString(ctx.getMissionPlan(returnedId)),
+        true
+    );
+  }
+
+
+  @Test
+  void getMissionsCount() throws Exception {
+    // Given
+    int expectedCount = ctx.getPlansCount();
+
+    // When
+    ResultActions result = mvc.perform(
+        MockMvcRequestBuilders.get("/api/conf/plans-count")
+    );
+
+    // Then
+    result
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("success"))
+        .andExpect(jsonPath("$.message").value(String.valueOf(expectedCount)));
+  }
+
+  @Test
+  void postMissionPlanWithInvalidOverrideReturnsNotFound() throws Exception {
+    // Given
+    int invalidId = 999999;
+
+    MissionPlan missionPlan = new MissionPlan();
+
+    // When
+    ResultActions result = mvc.perform(
+        MockMvcRequestBuilders.post("/api/conf/plan")
+            .param("override", String.valueOf(invalidId))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(missionPlan))
+    );
+
+    // Then
+    result
+        .andExpect(status().isNotFound());
+  }
 }

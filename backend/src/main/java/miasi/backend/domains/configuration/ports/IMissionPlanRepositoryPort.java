@@ -7,6 +7,8 @@ public interface IMissionPlanRepositoryPort {
 
   int save(MissionPlan plan);
 
+  int replace(int id, MissionPlan plan);
+
   void delete(int missionId);
 
   int getPlansCount();

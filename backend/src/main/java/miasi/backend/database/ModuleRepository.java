@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 @Repository
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -44,37 +45,45 @@ public final class ModuleRepository implements IModuleRepositoryPort {
   }
 
   @Synchronized
+  @Override
   public int add(Module module) {
-    modules.getObjects()
-        .stream()
-        .filter(module1 -> Objects.equals(module1.getName(), module.getName()))
-        .findFirst().ifPresent(this::remove);
-    modules.add(module);
+    List<Module> list = modules.getObjects();
+
+    int index = IntStream.range(0, list.size())
+        .filter(i -> Objects.equals(list.get(i).getName(), module.getName()))
+        .findFirst()
+        .orElse(-1);
+
+    if (index != -1) {
+      list.set(index, module);
+    } else {
+      list.add(module);
+      index = list.size() - 1;
+    }
+
     save();
-    return modules.getObjects().size() - 1;
+    return index;
   }
 
   @Synchronized
+  @Override
   public int add(ModuleType type) {
-    types.getObjects()
-        .stream()
-        .filter(type1 -> Objects.equals(type1.getName(), type.getName()))
-        .findFirst().ifPresent(this::remove);
-    types.add(type);
-    save();
-    return types.getObjects().size() - 1;
-  }
+    List<ModuleType> list = types.getObjects();
 
-  @Synchronized
-  public void remove(Module module) {
-    modules.remove(module);
-    save();
-  }
+    int index = IntStream.range(0, list.size())
+        .filter(i -> Objects.equals(list.get(i).getName(), type.getName()))
+        .findFirst()
+        .orElse(-1);
 
-  @Synchronized
-  public void remove(ModuleType moduleType) {
-    types.remove(moduleType);
+    if (index != -1) {
+      list.set(index, type);
+    } else {
+      list.add(type);
+      index = list.size() - 1;
+    }
+
     save();
+    return index;
   }
 
   @Synchronized
