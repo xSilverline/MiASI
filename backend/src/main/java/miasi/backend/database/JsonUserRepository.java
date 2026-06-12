@@ -3,14 +3,16 @@ package miasi.backend.database;
 import miasi.backend.domains.authorization.IUserRepository;
 import miasi.backend.domains.authorization.Identity;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Repository
 public class JsonUserRepository implements IUserRepository {
 
-  JsonFileStorage database = new JsonFileStorage();
+  JsonFileStorage<Identity> database = new JsonFileStorage<>(Identity.class);
 
   @Value("${database.filename.users}")
   String filePath;
@@ -26,8 +28,7 @@ public class JsonUserRepository implements IUserRepository {
   @Override
   public Collection<Identity> findAll() {
 
-    List<Identity> identities = database.loadFromFile(filePath);
-
+    List<Identity> identities = database.loadListFromFile(filePath);
     if (identities == null)
       return new ArrayList<>();
 
