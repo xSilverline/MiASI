@@ -5,7 +5,6 @@ import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import tools.jackson.core.type.TypeReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +24,7 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
   ) {
     List<MissionPlan> plansTemp =
         database.loadFromFile(
-            filePath,
-            new TypeReference<>() {
-            }
+            filePath
         );
     if (plansTemp != null)
       plans = plansTemp;

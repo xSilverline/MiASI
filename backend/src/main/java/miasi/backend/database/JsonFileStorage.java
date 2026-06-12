@@ -14,7 +14,8 @@ public class JsonFileStorage {
         .writeValue(new File(filePath), data);
   }
 
-  public <T> T loadFromFile(String filePath, TypeReference<T> typeReference) {
-    return objectMapper.readValue(new File(filePath), typeReference);
+  public <T> T loadFromFile(String filePath) {
+    return objectMapper.readValue(new File(filePath), new TypeReference<T>() {
+    });
   }
 }

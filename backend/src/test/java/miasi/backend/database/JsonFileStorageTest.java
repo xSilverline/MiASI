@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import tools.jackson.core.type.TypeReference;
 
 import java.io.File;
 
@@ -42,9 +41,7 @@ class JsonFileStorageTest {
     File file = new File(realDbPath, FILE_NAME);
 
     TestData loaded = storage.loadFromFile(
-        file.getAbsolutePath(),
-        new TypeReference<TestData>() {
-        }
+        file.getAbsolutePath()
     );
 
     assertEquals("Jan", loaded.name());
