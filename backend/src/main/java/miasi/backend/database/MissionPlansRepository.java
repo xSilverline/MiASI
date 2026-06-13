@@ -5,7 +5,6 @@ import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import tools.jackson.core.type.TypeReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,7 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
   private List<MissionPlan> plans = new ArrayList<>();
   private final String filePath;
 
-  JsonFileStorage database = new JsonFileStorage();
+  JsonFileStorage<MissionPlan> database = new JsonFileStorage<>(MissionPlan.class);
 
   @Autowired
   // private ApplicationEventPublisher applicationEventPublisher;
@@ -24,10 +23,8 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
       @Value("${database.filename.missions}") String filePath
   ) {
     List<MissionPlan> plansTemp =
-        database.loadFromFile(
-            filePath,
-            new TypeReference<>() {
-            }
+        database.loadListFromFile(
+            filePath
         );
     if (plansTemp != null)
       plans = plansTemp;
@@ -46,7 +43,7 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
   @Override
   public int save(MissionPlan plan) {
     plans.add(plan);
-    database.saveToFile(plans, filePath);
+    database.saveListToFile(plans, filePath);
     //this.throwCreatedEvent(); -> przeniesione do confService
     return plans.size() - 1;
   }
