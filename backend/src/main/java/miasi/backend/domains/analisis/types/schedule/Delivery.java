@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.analisis.types.core.Resource;
+import miasi.backend.domains.analisis.types.modules.Module;
 
 import java.util.List;
 
