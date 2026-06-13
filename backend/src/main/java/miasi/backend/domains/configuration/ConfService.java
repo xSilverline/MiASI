@@ -18,6 +18,10 @@ public class ConfService {
   private final IModuleRepositoryPort moduleRepository;
   private final IConfigurationEventPublisherPort eventPublisher;
 
+  public int getPlansCount() {
+    return missionPlansRepository.getPlansCount();
+  }
+
   public MissionPlan getDefaultMissionPlan() {
     return new MissionPlan();
   }
@@ -36,6 +40,15 @@ public class ConfService {
     eventPublisher.publishMissionPlanCreated(missionPlan);
 
     return id;
+  }
+
+  public Integer overrideMissionPlan(int id, MissionPlan missionPlan) {
+
+    Integer output = missionPlansRepository.replace(id, missionPlan);
+    output = (output != -1) ? output : null;
+
+    eventPublisher.publishMissionPlanCreated(missionPlan);
+    return output;
   }
 
   public int addModule(Module module) {

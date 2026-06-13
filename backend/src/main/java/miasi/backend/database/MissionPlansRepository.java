@@ -2,10 +2,8 @@ package miasi.backend.database;
 
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import tools.jackson.core.type.TypeReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,19 +13,14 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
   private List<MissionPlan> plans = new ArrayList<>();
   private final String filePath;
 
-  JsonFileStorage database = new JsonFileStorage();
-
-  @Autowired
-  // private ApplicationEventPublisher applicationEventPublisher;
+  JsonFileStorage<MissionPlan> database = new JsonFileStorage<>(MissionPlan.class);
 
   public MissionPlansRepository(
       @Value("${database.filename.missions}") String filePath
   ) {
     List<MissionPlan> plansTemp =
-        database.loadFromFile(
-            filePath,
-            new TypeReference<>() {
-            }
+        database.loadListFromFile(
+            filePath
         );
     if (plansTemp != null)
       plans = plansTemp;
@@ -46,17 +39,27 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
   @Override
   public int save(MissionPlan plan) {
     plans.add(plan);
-    database.saveToFile(plans, filePath);
-    //this.throwCreatedEvent(); -> przeniesione do confService
+    database.saveListToFile(plans, filePath);
     return plans.size() - 1;
+  }
+
+  @Override
+  public int replace(int id, MissionPlan plan) {
+    if (id < getPlansCount()) {
+      plans.set(id, plan);
+      return id;
+    } else {
+      return -1;
+    }
   }
 
   @Override
   public void delete(int missionId) {
     plans.remove(missionId);
   }
-/*
-  public void throwCreatedEvent() {
-    applicationEventPublisher.publishEvent(new MissionPlanCreatedEvent(plans.getLast()));
-  }*/
+
+  @Override
+  public int getPlansCount() {
+    return plans.size();
+  }
 }

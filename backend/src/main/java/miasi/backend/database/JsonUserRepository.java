@@ -1,45 +1,42 @@
 package miasi.backend.database;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import miasi.backend.domains.authorization.IUserRepository;
 import miasi.backend.domains.authorization.Identity;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Repository
 public class JsonUserRepository implements IUserRepository {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+  JsonFileStorage<Identity> database = new JsonFileStorage<>(Identity.class);
 
-    @Override
-    public Identity findByLogin(String login) {
-        return findAll().stream()
-                .filter(i -> i.getLogin().equalsIgnoreCase(login))
-                .findFirst()
-                .orElse(null);
-    }
+  @Value("${database.filename.users}")
+  String filePath;
 
-    @Override
-    public Collection<Identity> findAll() {
-        try {
+  @Override
+  public Identity findByLogin(String login) {
+    return findAll().stream()
+        .filter(i -> i.getLogin().equalsIgnoreCase(login))
+        .findFirst()
+        .orElse(null);
+  }
 
-            File file = new ClassPathResource("database/users.json").getFile();
+  @Override
+  public Collection<Identity> findAll() {
 
-            return objectMapper.readValue(file, new TypeReference<List<Identity>>() {});
+    List<Identity> identities = database.loadListFromFile(filePath);
+    if (identities == null)
+      return new ArrayList<>();
 
-        } catch (IOException e) {
-            System.err.println("Cannot read users.json file." + e.getMessage());
-            return new ArrayList<>();
-        }
-    }
+    return identities;
+  }
 
-    @Override
-    public boolean exists(String login) {
-        return findByLogin(login) != null;
-    }
+  @Override
+  public boolean exists(String login) {
+    return findByLogin(login) != null;
+  }
 }
