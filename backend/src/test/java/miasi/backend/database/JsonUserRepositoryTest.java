@@ -98,8 +98,7 @@ class JsonUserRepositoryTest {
         .thenReturn(null);
 
     // when
-    var result =
-        repository.findAll();
+    var result = repository.findAll();
 
     // then
     assertNotNull(result);

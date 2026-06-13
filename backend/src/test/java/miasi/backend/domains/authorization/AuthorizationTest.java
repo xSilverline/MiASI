@@ -25,13 +25,9 @@ class AuthorizationTest {
   @BeforeEach
   void setUp() {
     repository = Mockito.mock(IUserRepository.class);
-
     String hash = BCrypt.hashpw(password, BCrypt.gensalt());
-
     identity = new Identity(login, hash);
-
     when(repository.findAll()).thenReturn(List.of(identity));
-
     authorization = new Authorization(repository);
   }
 
@@ -146,8 +142,7 @@ class AuthorizationTest {
     authorization.login(login, password);
 
     // then
-    verify(repository, never())
-        .findByLogin(login);
+    verify(repository, never()).findByLogin(login);
   }
 
 
@@ -155,16 +150,10 @@ class AuthorizationTest {
   void shouldLoadUserFromRepositoryWhenNotInCache() throws Exception {
     // given
     IUserRepository repo = Mockito.mock(IUserRepository.class);
-
     String hash = BCrypt.hashpw(password, BCrypt.gensalt());
     Identity newIdentity = new Identity("newUser", hash);
-
-    when(repo.findAll())
-        .thenReturn(List.of());
-
-    when(repo.findByLogin("newUser"))
-        .thenReturn(newIdentity);
-
+    when(repo.findAll()).thenReturn(List.of());
+    when(repo.findByLogin("newUser")).thenReturn(newIdentity);
     Authorization auth = new Authorization(repo);
 
     // when
