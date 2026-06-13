@@ -2,7 +2,6 @@ package miasi.backend.database;
 
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -15,9 +14,6 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
   private final String filePath;
 
   JsonFileStorage<MissionPlan> database = new JsonFileStorage<>(MissionPlan.class);
-
-  @Autowired
-  // private ApplicationEventPublisher applicationEventPublisher;
 
   public MissionPlansRepository(
       @Value("${database.filename.missions}") String filePath
@@ -44,16 +40,26 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
   public int save(MissionPlan plan) {
     plans.add(plan);
     database.saveListToFile(plans, filePath);
-    //this.throwCreatedEvent(); -> przeniesione do confService
     return plans.size() - 1;
+  }
+
+  @Override
+  public int replace(int id, MissionPlan plan) {
+    if (id < getPlansCount()) {
+      plans.set(id, plan);
+      return id;
+    } else {
+      return -1;
+    }
   }
 
   @Override
   public void delete(int missionId) {
     plans.remove(missionId);
   }
-/*
-  public void throwCreatedEvent() {
-    applicationEventPublisher.publishEvent(new MissionPlanCreatedEvent(plans.getLast()));
-  }*/
+
+  @Override
+  public int getPlansCount() {
+    return plans.size();
+  }
 }
