@@ -41,7 +41,7 @@ class ModuleRecordListTest {
 
     // then
     verify(database, times(1))
-        .saveToFile(recordList.getObjects(), "test.json");
+        .saveListToFile(recordList.getObjects(), "test.json");
   }
 
   @Test

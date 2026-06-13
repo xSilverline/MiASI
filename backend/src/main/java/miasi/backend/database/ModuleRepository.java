@@ -9,7 +9,6 @@ import miasi.backend.domains.configuration.modules.ModuleType;
 import miasi.backend.domains.configuration.ports.IModuleRepositoryPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import tools.jackson.core.type.TypeReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,18 +26,16 @@ public final class ModuleRepository implements IModuleRepositoryPort {
       @Value("${database.filename.modules}") String filePath1,
       @Value("${database.filename.module.types}") String filePath2
   ) throws IOException {
-    JsonFileStorage f1 = new JsonFileStorage();
+    JsonFileStorage<Module> f1 = new JsonFileStorage<>(Module.class);
     this.modules = new ModuleRecordList<>(
-        this.loadFile(f1, filePath1, new TypeReference<>() {
-        }),
+        this.loadFile(f1, filePath1),
         filePath1,
         f1
     );
 
-    JsonFileStorage f2 = new JsonFileStorage();
+    JsonFileStorage<ModuleType> f2 = new JsonFileStorage<>(ModuleType.class);
     this.types = new ModuleRecordList<>(
-        this.loadFile(f2, filePath2, new TypeReference<>() {
-        }),
+        this.loadFile(f2, filePath2),
         filePath2,
         f2
     );
@@ -103,12 +100,11 @@ public final class ModuleRepository implements IModuleRepositoryPort {
   }
 
   private <T> List<T> loadFile(
-      JsonFileStorage database,
-      String fileName,
-      TypeReference<List<T>> type
+      JsonFileStorage<T> database,
+      String fileName
   ) throws IOException {
 
-    List<T> loaded = database.loadFromFile(fileName, type);
+    List<T> loaded = database.loadListFromFile(fileName);
     return loaded != null ? loaded : new ArrayList<>();
   }
 

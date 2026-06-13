@@ -4,9 +4,10 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import tools.jackson.core.type.TypeReference;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,7 +20,7 @@ class JsonFileStorageTest {
   @Value("${database.path.realdb}")
   private String realDbPath;
 
-  private final JsonFileStorage storage = new JsonFileStorage();
+  private final JsonFileStorage<TestData> storage = new JsonFileStorage<>(TestData.class);
 
   private static final String FILE_NAME = "test.json";
 
@@ -30,8 +31,10 @@ class JsonFileStorageTest {
     file.getParentFile().mkdirs();
 
     TestData data = new TestData("Jan", 123);
+    List<TestData> list = new ArrayList<>();
+    list.add(data);
 
-    storage.saveToFile(data, file.getAbsolutePath());
+    storage.saveListToFile(list, file.getAbsolutePath());
 
     assertTrue(file.exists());
   }
@@ -41,14 +44,12 @@ class JsonFileStorageTest {
   void loadFile() {
     File file = new File(realDbPath, FILE_NAME);
 
-    TestData loaded = storage.loadFromFile(
-        file.getAbsolutePath(),
-        new TypeReference<TestData>() {
-        }
+    List<TestData> loaded = storage.loadListFromFile(
+        file.getAbsolutePath()
     );
 
-    assertEquals("Jan", loaded.name());
-    assertEquals(123, loaded.value());
+    assertEquals("Jan", loaded.getFirst().name());
+    assertEquals(123, loaded.getFirst().value());
   }
 
   @AfterAll
