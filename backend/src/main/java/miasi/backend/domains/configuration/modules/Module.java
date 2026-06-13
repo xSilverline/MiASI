@@ -9,6 +9,7 @@ import miasi.backend.enums.ModuleState;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @EqualsAndHashCode
+@Builder(toBuilder = true)
 public class Module {
   String name;
   ModuleState status;
