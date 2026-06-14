@@ -9,15 +9,17 @@ import miasi.backend.domains.analisis.types.crew.ConsumptionMode;
 import miasi.backend.domains.analisis.types.modules.Module;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public class DailyState {
-  int sol;                  // numer dnia na osi czasu symulacji
-  List<Resource> warehouse; // stan magazynu po uwzględnieniu dzisiejszego bilansu i dostaw
-  DailyBalance balance;     // zarejestrowany dzisiejszy bilans netto (produkcja - zużycie)
-  ConsumptionMode mode;     // Tryb konsumpcji aktywny w danym dniu
-  List<Module> modules;     // Stan maszyn w danym dniu (w tym ich statusy i sprawność)
+  int sol;                              // numer dnia na osi czasu symulacji
+  List<Resource> warehouse;             // stan magazynu po uwzględnieniu dzisiejszego bilansu i dostaw
+  DailyBalance balance;                 // zarejestrowany dzisiejszy bilans netto (produkcja - zużycie)
+  ConsumptionMode mode;                 // Tryb konsumpcji aktywny w danym dniu
+  List<Module> modules;                 // Stan maszyn w danym dniu (w tym ich statusy i sprawność)
+  Set<ObservationType> observations;   // Specjalne wydarzenia czytelne dla frontendu - !!!
 }

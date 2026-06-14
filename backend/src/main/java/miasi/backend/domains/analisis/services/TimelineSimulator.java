@@ -6,6 +6,7 @@ import miasi.backend.domains.analisis.simulation.Status;
 import miasi.backend.domains.analisis.simulation.VariantType;
 import miasi.backend.domains.analisis.types.core.DailyBalance;
 import miasi.backend.domains.analisis.types.core.DailyState;
+import miasi.backend.domains.analisis.types.core.ObservationType;
 import miasi.backend.domains.analisis.types.core.Resource;
 import miasi.backend.domains.analisis.types.crew.ConsumptionMode;
 import miasi.backend.domains.analisis.types.input.MissionManifest;
@@ -14,8 +15,10 @@ import miasi.backend.domains.analisis.types.schedule.Delivery;
 import miasi.backend.enums.ModuleState;
 import miasi.backend.enums.ResourceType;
 
+import javax.annotation.processing.AbstractProcessor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public class TimelineSimulator {
@@ -24,141 +27,92 @@ public class TimelineSimulator {
     private final ProductionCalculator productionCalculator;
     private final DeliveryProcessor deliveryProcessor;
     private final ThreatProcessor threatProcessor;
+    private final EnergyProcessor energyProcessor;
+    private final SurvivalPredictor survivalPredictor;
 
-    public SimulationVariant simulate(MissionManifest manifest, List<Module> activeModules, List<Resource> startingResources, VariantType variantType) {
+
+
+    public List<DailyState> simulate(MissionManifest manifest, List<Module> activeModules, List<Resource> startingResources) {
         List<Resource> warehouse = copyResources(startingResources);
         List<Module> currentModules = copyModules(activeModules);
+        List<DailyState> timeline = new ArrayList<>();
 
         int totalDays = manifest.getDurationSols() + manifest.getRescueSols();
-        SimulationVariant variantResult = new SimulationVariant(variantType, Status.IN_PROGRESS, new ArrayList<>());
 
+        ConsumptionMode previousMode = ConsumptionMode.OPTIMAL;
         for (int sol = 1; sol <= totalDays; sol++) {
-            // Logika pojedynczego dnia
-            DailyState dailyState = simulateSingleDay(sol, totalDays, warehouse, currentModules, manifest);
-            variantResult.getTimeline().add(dailyState);
-
-            // Sprawdzamy warunek przegranej
-            if (checkFailureConditions(warehouse)) {
-                variantResult.setStatus(Status.FAILURE);
-                break;
-            }
+            DailyState dailyState = simulateSingleDay(sol, totalDays, warehouse, currentModules, manifest, previousMode);
+            timeline.add(dailyState);
+            previousMode = dailyState.getMode();
         }
 
-        if (variantResult.getStatus() != Status.FAILURE) {
-            variantResult.setStatus(Status.SUCCESS);
-        }
-
-        return variantResult;
+        return timeline; // Zwracamy tylko czystą historię!
     }
 
-    private DailyState simulateSingleDay(int sol, int totalDays, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest) {
-        // KROK A: Zdarzenia zewnętrzne
+    private DailyState simulateSingleDay(int sol, int totalDays, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest, ConsumptionMode previousMode) {
+        Set<ObservationType> observations = new java.util.HashSet<>();
+        processExternalEvents(sol, warehouse, currentModules, manifest, observations);
+        processPowerGrid(warehouse, currentModules, observations);
+        ConsumptionMode currentMode = evaluateSurvivalAndMode(sol, totalDays, warehouse, currentModules, manifest, previousMode, observations);
+        DailyBalance todayBalance = calculateDailyBalance(currentModules, manifest, currentMode);
+        updateWarehouse(warehouse, todayBalance);
+
+        return new DailyState(sol, copyResources(warehouse), todayBalance, currentMode, copyModules(currentModules), observations);
+    }
+
+    private void processExternalEvents(int sol, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest, Set<ObservationType> observations) {
         deliveryProcessor.process(sol, manifest.getDeliveries(), currentModules, warehouse);
         threatProcessor.process(sol, manifest.getThreats(), currentModules, warehouse);
 
-        // KROK B: Reakcja bazy (Zarządzanie kryzysowe - Total Blackout)
-        checkPowerFailures(warehouse, currentModules);
-        ConsumptionMode currentMode = evaluateCrewConsumptionMode(sol, totalDays, warehouse, currentModules, manifest);
+        boolean hasDelivery = manifest.getDeliveries() != null &&
+                manifest.getDeliveries().stream().anyMatch(d -> d.getSol() == sol);
 
-        // KROK C: Akumulacja bilansu do Twojego mądrego obiektu DailyBalance
-        DailyBalance todayBalance = new DailyBalance();
+        if (hasDelivery) {
+            observations.add(ObservationType.DELIVERY_RECEIVED);
+        }
+    }
 
-        productionCalculator.calculateModulesProduction(currentModules)
-                .forEach(todayBalance::addProduction);
+    private void processPowerGrid(List<Resource> warehouse, List<Module> currentModules, Set<ObservationType> observations) {
+        float availableEnergy = getSpecificResourceAmount(warehouse, ResourceType.ENERGY);
 
-        demandCalculator.calculateCrewDemand(manifest.getCrew(), currentMode)
-                .forEach(todayBalance::addConsumption);
+        if (energyProcessor.process(availableEnergy, currentModules)) {
+            observations.add(ObservationType.TOTAL_BLACKOUT);
+        }
+    }
 
-        demandCalculator.calculateModulesDemand(currentModules)
-                .forEach(todayBalance::addConsumption);
+    private ConsumptionMode evaluateSurvivalAndMode(int sol, int totalDays, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest, ConsumptionMode previousMode, Set<ObservationType> observations) {
+        ConsumptionMode currentMode = survivalPredictor.evaluateCrewConsumptionMode(sol, totalDays, warehouse, currentModules, manifest);
 
-        // KROK D: Aktualizacja magazynu za pomocą logiki z DailyBalance
-        List<Resource> updatedWarehouse = todayBalance.applyTo(warehouse);
+        if (survivalPredictor.checkIfEvacuationIsNeeded(sol, totalDays, warehouse, currentModules, manifest)) {
+            observations.add(ObservationType.EVACUATION_ALERT);
+        }
+
+        if (currentMode == ConsumptionMode.MINIMAL && previousMode == ConsumptionMode.OPTIMAL) {
+            observations.add(ObservationType.MINIMAL_DEMAND_ACTIVATED);
+        } else if (currentMode == ConsumptionMode.OPTIMAL && previousMode == ConsumptionMode.MINIMAL) {
+            observations.add(ObservationType.OPTIMAL_DEMAND_ACTIVATED);
+        }
+
+        return currentMode;
+    }
+
+    private DailyBalance calculateDailyBalance(List<Module> currentModules, MissionManifest manifest, ConsumptionMode currentMode) {
+        DailyBalance balance = new DailyBalance();
+
+        productionCalculator.calculateModulesProduction(currentModules).forEach(balance::addProduction);
+        demandCalculator.calculateCrewDemand(manifest.getCrew(), currentMode).forEach(balance::addConsumption);
+        demandCalculator.calculateModulesDemand(currentModules).forEach(balance::addConsumption);
+
+        return balance;
+    }
+
+    private void updateWarehouse(List<Resource> warehouse, DailyBalance balance) {
+        List<Resource> updated = balance.applyTo(warehouse);
         warehouse.clear();
-        warehouse.addAll(updatedWarehouse);
-
-        // KROK E: Zwracamy pełny stan dnia
-        return new DailyState(sol, copyResources(warehouse), todayBalance, currentMode, copyModules(currentModules));
-    }
-
-    // --- LOGIKA ZARZĄDZANIA ENERGIĄ (TOTAL BLACKOUT) ---
-
-    private void checkPowerFailures(List<Resource> warehouse, List<Module> currentModules) {
-        float powerInWarehouse = getSpecificResourceAmount(warehouse, ResourceType.ENERGY);
-
-        float powerProduced = getSpecificResourceAmount(productionCalculator.calculateModulesProduction(currentModules), ResourceType.ENERGY);
-        float powerConsumed = getSpecificResourceAmount(demandCalculator.calculateModulesDemand(currentModules), ResourceType.ENERGY);
-
-        // Jeśli w magazynie jest debet LUB dzisiejsza produkcja razem z zapasami nie pokryje zużycia
-        if (powerInWarehouse < 0 || (powerProduced + powerInWarehouse < powerConsumed)) {
-            // Wyłączamy absolutnie wszystko
-            for (Module module : currentModules) {
-                module.setStatus(ModuleState.INACTIVE);
-            }
-        }
-    }
-
-    // --- LOGIKA RACJONOWANIA (DYNAMICZNA) ---
-
-    private ConsumptionMode evaluateCrewConsumptionMode(int currentSol, int totalDays, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest) {
-        List<Resource> optimalCrewDemand = demandCalculator.calculateCrewDemand(manifest.getCrew(), ConsumptionMode.OPTIMAL);
-        List<Resource> modulesDemand = demandCalculator.calculateModulesDemand(currentModules);
-        List<Resource> production = productionCalculator.calculateModulesProduction(currentModules);
-
-        for (Resource demand : optimalCrewDemand) {
-            ResourceType type = demand.getType();
-            if (type != ResourceType.OXYGEN && type != ResourceType.WATER && type != ResourceType.FOOD) continue;
-
-            float currentAmount = getSpecificResourceAmount(warehouse, type);
-            float dailyProd = getSpecificResourceAmount(production, type);
-            float dailyModDemand = getSpecificResourceAmount(modulesDemand, type);
-
-            float netBalance = dailyProd - (dailyModDemand + demand.getAmount());
-
-            if (netBalance >= 0) continue;
-
-            float dailyLoss = Math.abs(netBalance);
-            float daysLeftUntilEmpty = currentAmount / dailyLoss;
-
-            int nextDeliverySol = findNextDeliverySolForResource(currentSol, type, manifest.getDeliveries());
-            int targetSol = (nextDeliverySol != -1) ? nextDeliverySol : totalDays;
-            int daysUntilTarget = targetSol - currentSol + 1;
-
-            if (daysLeftUntilEmpty <= daysUntilTarget) {
-                return ConsumptionMode.MINIMAL;
-            }
-        }
-        return ConsumptionMode.OPTIMAL;
-    }
-
-    private int findNextDeliverySolForResource(int currentSol, ResourceType type, List<Delivery> deliveries) {
-        if (deliveries == null) return -1;
-        return deliveries.stream()
-                .filter(d -> d.getSol() > currentSol)
-                .filter(d -> containsResource(d.getResources(), type))
-                .map(Delivery::getSol)
-                .min(Integer::compareTo)
-                .orElse(-1);
-    }
-
-    private boolean containsResource(List<Resource> resources, ResourceType type) {
-        if (resources == null) return false;
-        return resources.stream().anyMatch(r -> r.getType() == type && r.getAmount() > 0);
+        warehouse.addAll(updated);
     }
 
     // --- METODY POMOCNICZE ---
-
-    private boolean checkFailureConditions(List<Resource> warehouse) {
-        for (Resource resource : warehouse) {
-            if ((resource.getType() == ResourceType.OXYGEN ||
-                    resource.getType() == ResourceType.WATER ||
-                    resource.getType() == ResourceType.FOOD) &&
-                    resource.getAmount() < 0) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private float getSpecificResourceAmount(List<Resource> resources, ResourceType type) {
         return resources.stream()
