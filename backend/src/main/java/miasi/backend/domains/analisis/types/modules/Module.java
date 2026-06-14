@@ -29,4 +29,24 @@ public class Module {
         // W przyszłości: przeliczenie production i consumption przez wartość efficiency (np. 0.8)
         return new DailyBalance(production, consumption);
     }
+
+    public Module copy() {
+        // deepcopy
+        List<Resource> productionCopy = this.production != null ?
+                this.production.stream().map(Resource::copy).toList() : new java.util.ArrayList<>();
+
+        List<Resource> consumptionCopy = this.consumption != null ?
+                this.consumption.stream().map(Resource::copy).toList() : new java.util.ArrayList<>();
+
+        return new Module(
+                this.name,
+                this.weight,
+                this.minCount,
+                this.maxCount,
+                productionCopy,
+                consumptionCopy,
+                this.status,
+                this.efficiency
+        );
+    }
 }

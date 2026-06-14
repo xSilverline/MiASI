@@ -25,4 +25,7 @@ public class Resource {
         this.weight = this.amount * this.type.getWeightRatio();
     }
 
+    public Resource copy() {
+        return new Resource(this.type, this.amount);
+    }
 }

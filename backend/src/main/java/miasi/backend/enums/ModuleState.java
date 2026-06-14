@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum ModuleState {
   ACTIVE(100),
   PARTIALLY_DAMAGED(50),
-  DESTROYED(0);
+  DESTROYED(0),
+  INACTIVE(0);
 
   private final int value;
 }
