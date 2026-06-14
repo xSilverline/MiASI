@@ -15,5 +15,6 @@ public class Threat extends ScheduledEvent {
   ThreatType threatType;
   String affectedElement;
   double impactValue;
+  int durationSols;
   String impactUnit;
 }
