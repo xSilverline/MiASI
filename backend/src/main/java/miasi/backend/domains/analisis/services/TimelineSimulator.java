@@ -1,9 +1,6 @@
 package miasi.backend.domains.analisis.services;
 
 import lombok.RequiredArgsConstructor;
-import miasi.backend.domains.analisis.simulation.SimulationVariant;
-import miasi.backend.domains.analisis.simulation.Status;
-import miasi.backend.domains.analisis.simulation.VariantType;
 import miasi.backend.domains.analisis.types.core.DailyBalance;
 import miasi.backend.domains.analisis.types.core.DailyState;
 import miasi.backend.domains.analisis.types.core.ObservationType;
@@ -11,11 +8,7 @@ import miasi.backend.domains.analisis.types.core.Resource;
 import miasi.backend.domains.analisis.types.crew.ConsumptionMode;
 import miasi.backend.domains.analisis.types.input.MissionManifest;
 import miasi.backend.domains.analisis.types.modules.Module;
-import miasi.backend.domains.analisis.types.schedule.Delivery;
-import miasi.backend.enums.ModuleState;
-import miasi.backend.enums.ResourceType;
 
-import javax.annotation.processing.AbstractProcessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -73,7 +66,7 @@ public class TimelineSimulator {
     }
 
     private void processPowerGrid(List<Resource> warehouse, List<Module> currentModules, Set<ObservationType> observations) {
-        float availableEnergy = getSpecificResourceAmount(warehouse, ResourceType.ENERGY);
+        float availableEnergy = energyProcessor.getEnergyAmount(warehouse);
 
         if (energyProcessor.process(availableEnergy, currentModules)) {
             observations.add(ObservationType.TOTAL_BLACKOUT);
@@ -113,14 +106,6 @@ public class TimelineSimulator {
     }
 
     // --- METODY POMOCNICZE ---
-
-    private float getSpecificResourceAmount(List<Resource> resources, ResourceType type) {
-        return resources.stream()
-                .filter(r -> r.getType() == type)
-                .map(Resource::getAmount)
-                .findFirst()
-                .orElse(0f);
-    }
 
     private List<Resource> copyResources(List<Resource> source) {
         if (source == null) return new ArrayList<>();

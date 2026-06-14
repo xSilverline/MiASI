@@ -8,7 +8,7 @@ import miasi.backend.enums.ResourceType;
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Resource {
-    ResourceType type;
+    final ResourceType type;
     float amount;      // current amount of resource
     float weight;      // weight [kg]
 

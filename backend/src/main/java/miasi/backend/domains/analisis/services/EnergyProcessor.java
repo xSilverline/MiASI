@@ -28,7 +28,7 @@ public class EnergyProcessor {
         return false;
     }
 
-    private float getEnergyAmount(List<Resource> resources) {
+    public float getEnergyAmount(List<Resource> resources) {
         if (resources == null) return 0f;
         return resources.stream()
                 .filter(r -> r.getType() == ResourceType.ENERGY)

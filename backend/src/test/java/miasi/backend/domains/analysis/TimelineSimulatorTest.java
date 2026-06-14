@@ -7,8 +7,8 @@ import miasi.backend.domains.analisis.types.core.ObservationType;
 import miasi.backend.domains.analisis.types.core.Resource;
 import miasi.backend.domains.analisis.types.crew.ConsumptionMode;
 import miasi.backend.domains.analisis.types.input.MissionManifest;
-import miasi.backend.domains.analisis.types.modules.Module;
 import miasi.backend.domains.analisis.types.result.SimulationOutcome;
+import miasi.backend.domains.analisis.types.schedule.Delivery;
 import miasi.backend.enums.ResourceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -103,6 +103,103 @@ class TimelineSimulatorTest {
                 expectedStatus, outcome.getStatus(), lastState.getSol(), finalOxygen);
 
         assertEquals(expectedStatus, outcome.getStatus(), errorMsg);
+    }
+
+    @Test
+    @DisplayName("Udany ratunek na styk (EVACUATION) - Zapas kończy się po przylocie rakiety")
+    void shouldResultInEvacuationWhenRescueArrivesJustInTime() {
+        // --- GIVEN ---
+        // Zapas tlenu: 3.5. Zużycie: 1.0/dzień.
+        // Sol 1: 2.5
+        // Sol 2: 1.5
+        // Sol 3: 0.5
+        // Sol 4: -0.5 (ŚMIERĆ!)
+        List<Resource> startingResources = List.of(new Resource(ResourceType.OXYGEN, 3.5f));
+
+        lenient().when(demandCalculator.calculateCrewDemand(any(), any()))
+                .thenReturn(List.of(new Resource(ResourceType.OXYGEN, 1.0f)));
+
+        // Predictor bije na alarm od razu w Sol 1 (Dni lotu rakiety ratunkowej = 2)
+        // Rakieta przyleci w Sol: 1 + 2 = 3.
+        when(survivalPredictor.checkIfEvacuationIsNeeded(anyInt(), anyInt(), any(), any(), any()))
+                .thenReturn(true);
+
+        // --- WHEN ---
+        List<DailyState> timeline = timelineSimulator.simulate(
+                mockManifest, new ArrayList<>(), startingResources
+        );
+
+        SimulationOutcomeEvaluator evaluator = new SimulationOutcomeEvaluator();
+        SimulationOutcome outcome = evaluator.evaluate(timeline, mockManifest);
+
+        // --- THEN ---
+        // Zgon nastąpiłby w Sol 4, ale ratunek przyszedł w Sol 3. Misja kończy się statusem EVACUATION!
+        assertEquals(Status.EVACUATION, outcome.getStatus(),
+                "Rakieta powinna zdążyć uratować załogę przed śmiercią z braku tlenu!");
+        assertEquals(4, outcome.getDeathSol(), "Śmierć teoretycznie nastąpiłaby w Sol 4");
+        assertEquals(3, outcome.getEvacuationSol(), "Ewakuacja powinna mieć miejsce w Sol 3");
+    }
+
+    @Test
+    @DisplayName("Prawidłowe przypinanie tagu DELIVERY_RECEIVED tylko w dniu dostawy")
+    void shouldTagDeliveryReceivedExactlyOnDeliveryDay() {
+        // --- GIVEN ---
+        // Manifest z dostawą ustaloną na Sol 3
+        Delivery delivery = new Delivery(3, List.of(new Resource(ResourceType.FOOD, 100f)), new ArrayList<>());
+        mockManifest.setDeliveries(List.of(delivery));
+
+        // --- WHEN ---
+        List<DailyState> timeline = timelineSimulator.simulate(
+                mockManifest, new ArrayList<>(), new ArrayList<>()
+        );
+
+        // --- THEN ---
+        DailyState sol1 = timeline.get(0); // Index 0 to Sol 1
+        DailyState sol2 = timeline.get(1);
+        DailyState sol3 = timeline.get(2); // Index 2 to Sol 3
+
+        assertTrue(sol1.getObservations().stream().noneMatch(o -> o == ObservationType.DELIVERY_RECEIVED),
+                "W Sol 1 nie powinno być dostawy");
+        assertTrue(sol2.getObservations().stream().noneMatch(o -> o == ObservationType.DELIVERY_RECEIVED),
+                "W Sol 2 nie powinno być dostawy");
+        assertTrue(sol3.getObservations().contains(ObservationType.DELIVERY_RECEIVED),
+                "Tag dostawy MUSI znajdować się w historii dla Sol 3!");
+    }
+
+    @Test
+    @DisplayName("Powrót do trybu OPTIMAL i nałożenie odpowiedniego tagu po zakończeniu kryzysu")
+    void shouldTagOptimalModeWhenRecoveringFromMinimal() {
+        // --- GIVEN ---
+        // Mockujemy zachowanie wróżki przetrwania (Predictora), by symulować falujący kryzys
+        // Sol 1: Oszczędzamy (MINIMAL)
+        // Sol 2: Nadal oszczędzamy (MINIMAL)
+        // Sol 3: Dostawa uratowała sytuację, wracamy do normy (OPTIMAL)
+        when(survivalPredictor.evaluateCrewConsumptionMode(anyInt(), anyInt(), any(), any(), any()))
+                .thenReturn(ConsumptionMode.MINIMAL)  // Sol 1
+                .thenReturn(ConsumptionMode.MINIMAL)  // Sol 2
+                .thenReturn(ConsumptionMode.OPTIMAL); // Sol 3 i dalej
+
+        // --- WHEN ---
+        List<DailyState> timeline = timelineSimulator.simulate(
+                mockManifest, new ArrayList<>(), new ArrayList<>()
+        );
+
+        // --- THEN ---
+        DailyState sol1 = timeline.get(0);
+        DailyState sol2 = timeline.get(1);
+        DailyState sol3 = timeline.get(2);
+
+        // Zmiana OPTIMAL (startowy) -> MINIMAL
+        assertTrue(sol1.getObservations().contains(ObservationType.MINIMAL_DEMAND_ACTIVATED),
+                "W Sol 1 powinien być tag przejścia na MINIMAL");
+
+        // Brak zmiany (MINIMAL -> MINIMAL) - nie spamujemy tagami!
+        assertTrue(sol2.getObservations().isEmpty(),
+                "W Sol 2 tryb się nie zmienił, Dziennik Zdarzeń powinien być czysty (brak spamu)");
+
+        // Zmiana MINIMAL -> OPTIMAL
+        assertTrue(sol3.getObservations().contains(ObservationType.OPTIMAL_DEMAND_ACTIVATED),
+                "W Sol 3 powinien być tag powrotu do trybu OPTIMAL");
     }
 
     @Test

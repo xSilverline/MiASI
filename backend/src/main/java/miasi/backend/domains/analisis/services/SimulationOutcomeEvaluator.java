@@ -2,6 +2,7 @@ package miasi.backend.domains.analisis.services;
 
 import miasi.backend.domains.analisis.simulation.Status;
 import miasi.backend.domains.analisis.types.core.DailyState;
+import miasi.backend.domains.analisis.types.core.ObservationType;
 import miasi.backend.domains.analisis.types.core.Resource;
 import miasi.backend.domains.analisis.types.crew.ConsumptionMode;
 import miasi.backend.domains.analisis.types.input.MissionManifest;
@@ -22,8 +23,8 @@ public class SimulationOutcomeEvaluator {
                 deathSol = state.getSol();
             }
 
-            // 2. Szukamy dnia wezwania SOS (pierwszy dzień przejścia na MINIMAL)
-            if (sosCalledSol == null && state.getMode() == ConsumptionMode.MINIMAL) {
+            // 2. Szukamy dnia wezwania SOS
+            if (sosCalledSol == null && state.getObservations().contains(ObservationType.EVACUATION_ALERT)) {
                 sosCalledSol = state.getSol();
             }
         }
