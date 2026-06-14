@@ -1,13 +1,16 @@
 package miasi.backend.enums;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor
+@Getter
 //@ToString
 public enum ResourceType {
+
   FOOD(0.5f),
-  OXYGEN(1f),
-  WATER(1f),
+  OXYGEN(1.2f),
+  WATER(1.1f),
   ENERGY(0f);
 
   private final float weightRatio;
