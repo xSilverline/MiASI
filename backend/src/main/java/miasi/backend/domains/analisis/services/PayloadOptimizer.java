@@ -7,7 +7,7 @@ import miasi.backend.domains.analisis.types.modules.Module;
 import miasi.backend.domains.analisis.types.result.OptimalConfiguration;
 
 import java.util.List;
-
+ 
 @RequiredArgsConstructor
 public class PayloadOptimizer {
 

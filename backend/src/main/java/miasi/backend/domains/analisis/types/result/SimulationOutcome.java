@@ -5,7 +5,7 @@ import miasi.backend.domains.analisis.simulation.Status;
 
 @Value
 public class SimulationOutcome {
-    Status status;
-    Integer deathSol;
-    Integer evacuationSol;
+  Status status;
+  Integer deathSol;
+  Integer evacuationSol;
 }

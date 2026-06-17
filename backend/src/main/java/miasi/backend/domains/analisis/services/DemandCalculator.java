@@ -6,6 +6,7 @@ import miasi.backend.domains.analisis.types.crew.CrewGroup;
 import miasi.backend.domains.analisis.types.modules.Module;
 import miasi.backend.enums.ModuleState;
 import miasi.backend.enums.ResourceType;
+
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -13,51 +14,51 @@ import java.util.stream.Collectors;
 
 public class DemandCalculator {
 
-    // sum up the requirements of each crew group depending on the selected rationing mode
-    public List<Resource> calculateCrewDemand(List<CrewGroup> crewGroups, ConsumptionMode mode) {
-        Map<ResourceType, Float> dailyCrewDemand = new EnumMap<>(ResourceType.class);
+  // sum up the requirements of each crew group depending on the selected rationing mode
+  public List<Resource> calculateCrewDemand(List<CrewGroup> crewGroups, ConsumptionMode mode) {
+    Map<ResourceType, Float> dailyCrewDemand = new EnumMap<>(ResourceType.class);
 
-        for (CrewGroup group : crewGroups) {
+    for (CrewGroup group : crewGroups) {
 
-            // Get the required resources per person based on the mode (OPTIMAL or MINIMAL)
-            List<Resource> perPersonDemand = group.getDailyDemand(mode);
+      // Get the required resources per person based on the mode (OPTIMAL or MINIMAL)
+      List<Resource> perPersonDemand = group.getDailyDemand(mode);
 
-            int peopleCount = group.getCount();
+      int peopleCount = group.getCount();
 
-            for (Resource res : perPersonDemand) {
-                float totalAmount = res.getAmount() * peopleCount;
+      for (Resource res : perPersonDemand) {
+        float totalAmount = res.getAmount() * peopleCount;
 
-                // Merge into the total daily crew demand map
-                dailyCrewDemand.merge(res.getType(), totalAmount, Float::sum);
-            }
-        }
-
-        return dailyCrewDemand.entrySet().stream()
-                .map(entry -> new Resource(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+        // Merge into the total daily crew demand map
+        dailyCrewDemand.merge(res.getType(), totalAmount, Float::sum);
+      }
     }
 
-    // Sum up the resources consumed only by currently ACTIVE modules
-    public List<Resource> calculateModulesDemand(List<Module> currentModules) {
-        Map<ResourceType, Float> dailyModulesDemand = new EnumMap<>(ResourceType.class);
+    return dailyCrewDemand.entrySet().stream()
+        .map(entry -> new Resource(entry.getKey(), entry.getValue()))
+        .collect(Collectors.toList());
+  }
 
-        for (Module module : currentModules) {
+  // Sum up the resources consumed only by currently ACTIVE modules
+  public List<Resource> calculateModulesDemand(List<Module> currentModules) {
+    Map<ResourceType, Float> dailyModulesDemand = new EnumMap<>(ResourceType.class);
 
-            if (module.getStatus() == ModuleState.ACTIVE) {
+    for (Module module : currentModules) {
 
-                for (Resource res : module.getConsumption()) {
+      if (module.getStatus() == ModuleState.ACTIVE) {
 
-                    // Multiply by efficiency
-                    float actualAmount = res.getAmount() * module.getEfficiency();
+        for (Resource res : module.getConsumption()) {
 
-                    dailyModulesDemand.merge(res.getType(), actualAmount, Float::sum);
-                }
-            }
+          // Multiply by efficiency
+          float actualAmount = res.getAmount() * module.getEfficiency();
+
+          dailyModulesDemand.merge(res.getType(), actualAmount, Float::sum);
         }
-
-        // Convert the map with sums back into a List of Resources
-        return dailyModulesDemand.entrySet().stream()
-                .map(entry -> new Resource(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+      }
     }
+
+    // Convert the map with sums back into a List of Resources
+    return dailyModulesDemand.entrySet().stream()
+        .map(entry -> new Resource(entry.getKey(), entry.getValue()))
+        .collect(Collectors.toList());
+  }
 }
