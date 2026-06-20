@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.analisis.types.core.DailyState;
+import miasi.backend.enums.Status;
+import miasi.backend.enums.VariantType;
 
 import java.util.List;
 
@@ -12,15 +14,15 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SimulationVariant {
-    VariantType type;
-    Status status;
-    List<DailyState> timeline;
-    Integer deathSol;
-    Integer evacuationSol;
+  VariantType type;
+  Status status;
+  List<DailyState> timeline;
+  Integer deathSol;
+  Integer evacuationSol;
 
-    public SimulationVariant(VariantType type, Status status, List<DailyState> timeline) {
-        this.type = type;
-        this.status = status;
-        this.timeline = timeline;
-    }
+  public SimulationVariant(VariantType type, Status status, List<DailyState> timeline) {
+    this.type = type;
+    this.status = status;
+    this.timeline = timeline;
+  }
 }

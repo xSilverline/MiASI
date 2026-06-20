@@ -1,7 +1,7 @@
 package miasi.backend.domains.analisis.types.result;
 
 import lombok.Value;
-import miasi.backend.domains.analisis.simulation.Status;
+import miasi.backend.enums.Status;
 
 @Value
 public class SimulationOutcome {

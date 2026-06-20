@@ -1,4 +1,4 @@
-package miasi.backend.domains.configuration;
+package miasi.backend.api.config;
 
 import lombok.RequiredArgsConstructor;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;

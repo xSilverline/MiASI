@@ -1,6 +1,6 @@
 package miasi.backend.eventListners;
 
-import miasi.backend.domains.configuration.ConfService;
+import miasi.backend.api.config.ConfService;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.events.MissionPlanCreatedEvent;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.verify;
 @SpringBootTest
 @ActiveProfiles("test")
 class MissionPlanCreatedListenerTest {
-  
+
   @Autowired
   private ConfService confService;
 

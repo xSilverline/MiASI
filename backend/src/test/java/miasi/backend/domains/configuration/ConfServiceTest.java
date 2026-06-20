@@ -1,5 +1,6 @@
 package miasi.backend.domains.configuration;
 
+import miasi.backend.api.config.ConfService;
 import miasi.backend.database.MissionPlansRepository;
 import miasi.backend.database.ModuleRepository;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;

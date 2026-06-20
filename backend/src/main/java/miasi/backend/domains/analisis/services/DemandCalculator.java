@@ -1,9 +1,9 @@
 package miasi.backend.domains.analisis.services;
 
 import miasi.backend.domains.analisis.types.core.Resource;
-import miasi.backend.domains.analisis.types.crew.ConsumptionMode;
 import miasi.backend.domains.analisis.types.crew.CrewGroup;
 import miasi.backend.domains.analisis.types.modules.Module;
+import miasi.backend.enums.ConsumptionMode;
 import miasi.backend.enums.ModuleState;
 import miasi.backend.enums.ResourceType;
 

@@ -1,15 +1,22 @@
 package miasi.backend.domains.analysis;
 
-import miasi.backend.domains.analisis.services.*;
-import miasi.backend.domains.analisis.simulation.Status;
+import miasi.backend.domains.analisis.services.DeliveryProcessor;
+import miasi.backend.domains.analisis.services.DemandCalculator;
+import miasi.backend.domains.analisis.services.EnergyProcessor;
+import miasi.backend.domains.analisis.services.ProductionCalculator;
+import miasi.backend.domains.analisis.services.SimulationOutcomeEvaluator;
+import miasi.backend.domains.analisis.services.SurvivalPredictor;
+import miasi.backend.domains.analisis.services.ThreatProcessor;
+import miasi.backend.domains.analisis.services.TimelineSimulator;
 import miasi.backend.domains.analisis.types.core.DailyState;
-import miasi.backend.domains.analisis.types.core.ObservationType;
 import miasi.backend.domains.analisis.types.core.Resource;
-import miasi.backend.domains.analisis.types.crew.ConsumptionMode;
 import miasi.backend.domains.analisis.types.input.MissionManifest;
 import miasi.backend.domains.analisis.types.result.SimulationOutcome;
 import miasi.backend.domains.analisis.types.schedule.Delivery;
+import miasi.backend.enums.ConsumptionMode;
+import miasi.backend.enums.ObservationType;
 import miasi.backend.enums.ResourceType;
+import miasi.backend.enums.Status;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
