@@ -1,15 +1,17 @@
 package miasi.backend.domains.schedule;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import miasi.backend.enums.DifficultyLevel;
+import miasi.backend.enums.EventType;
+import miasi.backend.enums.ScenarioGenerationMode;
+import miasi.backend.enums.ScheduleStatus;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import miasi.backend.enums.DifficultyLevel;
-import miasi.backend.enums.EventType;
-import miasi.backend.enums.ScheduleStatus;
-import miasi.backend.enums.ScenarioGenerationMode;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ScenarioDraftTest {
 
@@ -60,5 +62,25 @@ class ScenarioDraftTest {
 
   private ScheduledEvent event(String id, EventType type, int sol) {
     return new ScheduledEvent(id, type, sol, "description");
+  }
+
+  @Test
+  void approve_exceptionsThrowTest() {
+    // Given
+    ScenarioDraft draft = draftWithEvents(new ArrayList<>(List.of()));
+
+    // When - Then A
+    assertDoesNotThrow(() -> {
+      draft.approve();
+    });
+
+    // When - Then B
+    draft.setMissionPlanId("");
+    assertThrows(IllegalArgumentException.class, draft::approve);
+
+    // When - Then C
+    draft.setMissionPlanId("adam");
+    draft.setDurationSols(0);
+    assertThrows(IllegalArgumentException.class, draft::approve);
   }
 }

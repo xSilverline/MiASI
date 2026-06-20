@@ -1,26 +1,56 @@
 package miasi.backend.domains.schedule;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import miasi.backend.enums.EventType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import miasi.backend.enums.EventType;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MissionTimelineTest {
 
+  private MissionTimeline timeline;
+  private ScheduledEvent threat;
+  private ScheduledEvent secondThreat;
+
+  @BeforeEach
+  void setUp() {
+    threat = event("event-1", EventType.THREAT, 1);
+    ScheduledEvent delivery = event("event-2", EventType.SUPPLY_DELIVERY, 2);
+    secondThreat = event("event-3", EventType.THREAT, 3);
+    timeline = new MissionTimeline(List.of(threat, delivery, secondThreat));
+  }
+
   @Test
   void filterByType_shouldReturnOnlyEventsOfSelectedType() {
-    ScheduledEvent threat = event("event-1", EventType.THREAT, 1);
-    ScheduledEvent delivery = event("event-2", EventType.SUPPLY_DELIVERY, 2);
-    ScheduledEvent secondThreat = event("event-3", EventType.THREAT, 3);
-    MissionTimeline timeline = new MissionTimeline(List.of(threat, delivery, secondThreat));
-
+    // When
     MissionTimeline filtered = timeline.filterByType(EventType.THREAT);
 
+    // Then
     assertEquals(List.of(threat, secondThreat), filtered.getEventsSortedBySol());
   }
 
   private ScheduledEvent event(String id, EventType type, int sol) {
     return new ScheduledEvent(id, type, sol, "description");
   }
+
+  @Test
+  void filterByType_exceptionsThrowTest() {
+    // When - Then A
+    assertDoesNotThrow(() -> {
+      timeline.filterByType(EventType.THREAT);
+    });
+
+    // When - Then B
+    assertThrows(IllegalArgumentException.class, () ->
+        timeline.filterByType(null));
+
+    // When - Then C
+    timeline.setEventsSortedBySol(null);
+    assertEquals(0, timeline.filterByType(EventType.THREAT).getEventsSortedBySol().size());
+  }
 }
+
