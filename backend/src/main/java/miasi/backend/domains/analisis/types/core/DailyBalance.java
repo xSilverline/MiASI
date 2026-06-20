@@ -7,11 +7,12 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.enums.ResourceType;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.EnumMap;
+
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -24,6 +25,7 @@ public class DailyBalance {
     this.produced = new ArrayList<>();
     this.consumed = new ArrayList<>();
   }
+
   public void addProduction(Resource resource) {
     // find stock in produced by type:
     // if there is -> add amount
@@ -83,7 +85,7 @@ public class DailyBalance {
     }
 
     return newInventoryMap.entrySet().stream()
-            .map(entry -> new Resource(entry.getKey(), entry.getValue()))
-            .collect(Collectors.toList());
+        .map(entry -> new Resource(entry.getKey(), entry.getValue()))
+        .collect(Collectors.toList());
   }
 }
