@@ -79,7 +79,7 @@ class ScenarioDraftTest {
     assertThrows(IllegalArgumentException.class, draft::approve);
 
     // When - Then C
-    draft.setMissionPlanId("adam");
+    draft.setMissionPlanId("Adam");
     draft.setDurationSols(0);
     assertThrows(IllegalArgumentException.class, draft::approve);
   }

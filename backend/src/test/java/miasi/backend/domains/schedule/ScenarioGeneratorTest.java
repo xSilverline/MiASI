@@ -4,6 +4,7 @@ import miasi.backend.enums.DifficultyLevel;
 import miasi.backend.enums.EventType;
 import miasi.backend.enums.ScenarioGenerationMode;
 import miasi.backend.enums.ThreatType;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -21,6 +22,22 @@ class ScenarioGeneratorTest {
 
   @Test
   void generate_shouldCreateScenarioDraftWithThreatsForDifficultyAndDeliveries() {
+    ScenarioGenerator generator = getScenarioGenerator();
+
+    ScenarioDraft draft = generator.generate("plan-1", 90, DifficultyLevel.LEVEL_II);
+
+    assertEquals(ScenarioGenerationMode.AUTOMATIC, draft.getMode());
+    assertEquals(DifficultyLevel.LEVEL_II, draft.getDifficulty());
+    assertFalse(draft.getProposedEvents().isEmpty());
+    assertEquals(1, draft.getProposedEvents().stream().filter(Threat.class::isInstance).count());
+    assertEquals(
+        3,
+        draft.getProposedEvents().stream()
+            .filter(event -> event.getType() == EventType.SUPPLY_DELIVERY)
+            .count());
+  }
+
+  private static @NonNull ScenarioGenerator getScenarioGenerator() {
     ThreatDefinition matching =
         new ThreatDefinition(
             ThreatType.DUST_STORM,
@@ -37,23 +54,10 @@ class ScenarioGeneratorTest {
             5.0,
             8.0,
             "kg");
-    ScenarioGenerator generator =
-        new ScenarioGenerator(
-            "plan-1",
-            new ThreatDictionary(List.of(matching, otherDifficulty)),
-            new Random(0));
-
-    ScenarioDraft draft = generator.generate("plan-1", 90, DifficultyLevel.LEVEL_II);
-
-    assertEquals(ScenarioGenerationMode.AUTOMATIC, draft.getMode());
-    assertEquals(DifficultyLevel.LEVEL_II, draft.getDifficulty());
-    assertFalse(draft.getProposedEvents().isEmpty());
-    assertEquals(1, draft.getProposedEvents().stream().filter(Threat.class::isInstance).count());
-    assertEquals(
-        3,
-        draft.getProposedEvents().stream()
-            .filter(event -> event.getType() == EventType.SUPPLY_DELIVERY)
-            .count());
+    return new ScenarioGenerator(
+        "plan-1",
+        new ThreatDictionary(List.of(matching, otherDifficulty)),
+        new Random(0));
   }
 
   @Test
@@ -101,12 +105,10 @@ class ScenarioGeneratorTest {
     method.setAccessible(true);
 
     // When + Then
-    assertThrows(InvocationTargetException.class, () -> {
-      method.invoke(generator, (Object) null);
-    });
-    assertThrows(InvocationTargetException.class, () -> {
-      method.invoke(generator, invalid);
-    });
+    assertThrows(InvocationTargetException.class, () ->
+        method.invoke(generator, (Object) null));
+    assertThrows(InvocationTargetException.class, () ->
+        method.invoke(generator, invalid));
     assertDoesNotThrow(() -> {
       method.invoke(generator, valid);
     });
