@@ -9,11 +9,12 @@ import miasi.backend.domains.configuration.modules.ModuleType;
 import miasi.backend.domains.configuration.ports.IModuleRepositoryPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import tools.jackson.core.type.TypeReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 @Repository
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -25,47 +26,61 @@ public final class ModuleRepository implements IModuleRepositoryPort {
       @Value("${database.filename.modules}") String filePath1,
       @Value("${database.filename.module.types}") String filePath2
   ) throws IOException {
-    JsonFileStorage f1 = new JsonFileStorage();
+    JsonFileStorage<Module> f1 = new JsonFileStorage<>(Module.class);
     this.modules = new ModuleRecordList<>(
-        this.loadFile(f1, filePath1, new TypeReference<List<Module>>() {
-        }),
+        this.loadFile(f1, filePath1),
         filePath1,
         f1
     );
 
-    JsonFileStorage f2 = new JsonFileStorage();
+    JsonFileStorage<ModuleType> f2 = new JsonFileStorage<>(ModuleType.class);
     this.types = new ModuleRecordList<>(
-        this.loadFile(f2, filePath2, new TypeReference<List<ModuleType>>() {
-        }),
+        this.loadFile(f2, filePath2),
         filePath2,
         f2
     );
   }
 
   @Synchronized
+  @Override
   public int add(Module module) {
-    modules.add(module);
+    List<Module> list = modules.getObjects();
+
+    int index = IntStream.range(0, list.size())
+        .filter(i -> Objects.equals(list.get(i).getName(), module.getName()))
+        .findFirst()
+        .orElse(-1);
+
+    if (index != -1) {
+      list.set(index, module);
+    } else {
+      list.add(module);
+      index = list.size() - 1;
+    }
+
     save();
-    return modules.getObjects().size() - 1;
+    return index;
   }
 
   @Synchronized
+  @Override
   public int add(ModuleType type) {
-    types.add(type);
-    save();
-    return types.getObjects().size() - 1;
-  }
+    List<ModuleType> list = types.getObjects();
 
-  @Synchronized
-  public void remove(Module module) {
-    modules.remove(module);
-    save();
-  }
+    int index = IntStream.range(0, list.size())
+        .filter(i -> Objects.equals(list.get(i).getName(), type.getName()))
+        .findFirst()
+        .orElse(-1);
 
-  @Synchronized
-  public void remove(ModuleType moduleType) {
-    types.remove(moduleType);
+    if (index != -1) {
+      list.set(index, type);
+    } else {
+      list.add(type);
+      index = list.size() - 1;
+    }
+
     save();
+    return index;
   }
 
   @Synchronized
@@ -85,12 +100,11 @@ public final class ModuleRepository implements IModuleRepositoryPort {
   }
 
   private <T> List<T> loadFile(
-      JsonFileStorage database,
-      String fileName,
-      TypeReference<List<T>> type
+      JsonFileStorage<T> database,
+      String fileName
   ) throws IOException {
 
-    List<T> loaded = database.loadFromFile(fileName, type);
+    List<T> loaded = database.loadListFromFile(fileName);
     return loaded != null ? loaded : new ArrayList<>();
   }
 

@@ -25,7 +25,7 @@ public class ModuleRecordList<T> {
   }
 
   public void save() {
-    database.saveToFile(objects, fileName);
+    database.saveListToFile(objects, fileName);
   }
 
   public void remove(T object) {
