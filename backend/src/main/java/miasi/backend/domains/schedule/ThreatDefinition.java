@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import miasi.backend.enums.DifficultyLevel;
 import miasi.backend.enums.ThreatType;
 
 @Getter
@@ -13,6 +14,7 @@ import miasi.backend.enums.ThreatType;
 @AllArgsConstructor
 public class ThreatDefinition {
   ThreatType type;
+  DifficultyLevel difficulty;
   String affectedElement;
   double minImpactValue;
   double maxImpactValue;
