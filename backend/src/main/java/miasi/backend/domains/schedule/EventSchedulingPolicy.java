@@ -1,6 +1,16 @@
 package miasi.backend.domains.schedule;
 
 public class EventSchedulingPolicy {
+  private final boolean manyEventsInSameSolAllowed;
+
+  public EventSchedulingPolicy() {
+    this(true);
+  }
+
+  EventSchedulingPolicy(boolean manyEventsInSameSolAllowed) {
+    this.manyEventsInSameSolAllowed = manyEventsInSameSolAllowed;
+  }
+
   public void validateSolWithinMission(ScheduledEvent event, int durationSols) {
     if (event == null) {
       throw new IllegalArgumentException("Scheduled event is required");
@@ -38,6 +48,33 @@ public class EventSchedulingPolicy {
   }
 
   public boolean allowManyEventsInSameSol(ScheduledEvent event, MissionSchedule schedule) {
-    return true;
+    if (event == null) {
+      throw new IllegalArgumentException("Scheduled event is required");
+    }
+    if (schedule == null) {
+      throw new IllegalArgumentException("Mission schedule is required");
+    }
+    if (schedule.getEvents() == null) {
+      return true;
+    }
+
+    boolean hasAnotherEventInSameSol =
+        schedule.getEvents().stream()
+            .filter(existingEvent -> existingEvent != null)
+            .anyMatch(
+                existingEvent ->
+                    existingEvent.getSol() == event.getSol()
+                        && isDifferentEvent(existingEvent, event));
+
+    return manyEventsInSameSolAllowed || !hasAnotherEventInSameSol;
+  }
+
+  private boolean isDifferentEvent(ScheduledEvent scheduledEvent, ScheduledEvent event) {
+    String scheduledEventId = scheduledEvent.getId();
+    String eventId = event.getId();
+    if (scheduledEventId == null || eventId == null) {
+      return scheduledEvent != event;
+    }
+    return !scheduledEventId.equals(eventId);
   }
 }
