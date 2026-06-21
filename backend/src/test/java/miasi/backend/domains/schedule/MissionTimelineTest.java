@@ -18,6 +18,7 @@ class MissionTimelineTest {
 
   @BeforeEach
   void setUp() {
+    // Given - before each test
     threat = event("event-1", EventType.THREAT, 1);
     ScheduledEvent delivery = event("event-2", EventType.SUPPLY_DELIVERY, 2);
     secondThreat = event("event-3", EventType.THREAT, 3);
@@ -39,16 +40,16 @@ class MissionTimelineTest {
 
   @Test
   void filterByType_exceptionsThrowTest() {
-    // When - Then A
+    // When + Then (Valid data)
     assertDoesNotThrow(() -> {
       timeline.filterByType(EventType.THREAT);
     });
 
-    // When - Then B
+    // When + Then (Null as argument)
     assertThrows(IllegalArgumentException.class, () ->
         timeline.filterByType(null));
 
-    // When - Then C
+    // When + Then (Event list is null)
     timeline.setEventsSortedBySol(null);
     assertEquals(0, timeline.filterByType(EventType.THREAT).getEventsSortedBySol().size());
   }
