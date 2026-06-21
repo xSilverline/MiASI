@@ -9,9 +9,7 @@ import miasi.backend.enums.DifficultyLevel;
 import miasi.backend.enums.EventType;
 import miasi.backend.enums.ModuleState;
 import miasi.backend.enums.ThreatType;
-import org.springframework.stereotype.Service;
 
-@Service
 public class ScheduleService {
 
   private final Map<String, MissionSchedule> schedules = new ConcurrentHashMap<>();
