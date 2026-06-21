@@ -1,13 +1,12 @@
 package miasi.backend.domains.schedule;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.enums.DifficultyLevel;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -17,6 +16,15 @@ public class ThreatDictionary {
   List<ThreatDefinition> definitions;
 
   public List<ThreatDefinition> findForDifficulty(DifficultyLevel difficulty) {
-    return null;
+    if (difficulty == null) {
+      throw new IllegalArgumentException("Difficulty level is required");
+    }
+    if (definitions == null) {
+      return List.of();
+    }
+
+    return definitions.stream()
+        .filter(definition -> difficulty.equals(definition.getDifficulty()))
+        .toList();
   }
 }
