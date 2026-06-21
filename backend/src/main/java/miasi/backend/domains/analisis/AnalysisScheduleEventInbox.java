@@ -2,9 +2,7 @@ package miasi.backend.domains.analisis;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import org.springframework.stereotype.Component;
 
-@Component
 public class AnalysisScheduleEventInbox {
   private final List<Object> receivedEvents = new CopyOnWriteArrayList<>();
 
