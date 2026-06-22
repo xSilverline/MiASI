@@ -1,7 +1,7 @@
 package miasi.backend.configuration.application.port.in;
 
-import miasi.backend.domains.configuration.modules.Module;
-import miasi.backend.domains.configuration.modules.ModuleType;
+import miasi.backend.configuration.domain.model.Module;
+import miasi.backend.configuration.domain.model.ModuleType;
 
 public interface ManageModuleCatalogUseCase {
   int addModule(Module module);

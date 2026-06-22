@@ -18,15 +18,21 @@ class HexagonalArchitectureTest {
 
   private static final String BASE_PACKAGE = "miasi.backend";
 
-  private static final Set<String> FORBIDDEN_LEGACY_DOMAIN_DEPENDENCY_PACKAGES =
-      Set.of(
-          "org.springframework",
-          "miasi.backend.api",
-          "miasi.backend.database",
-          "miasi.backend.events");
+  private static final Set<String> BOUNDED_CONTEXTS =
+      Set.of("configuration", "schedule", "analysis", "authorization", "visualization");
 
-  private static final Set<String> DOCUMENTED_LEGACY_DOMAIN_EXCEPTIONS =
-      Set.of("miasi.backend.domains.schedule.MissionPlanEventInbox");
+  private static final Set<String> LEGACY_ROOT_PACKAGES =
+      Set.of(
+          "miasi.backend.adapter",
+          "miasi.backend.api",
+          "miasi.backend.bootstrap",
+          "miasi.backend.config",
+          "miasi.backend.database",
+          "miasi.backend.domains",
+          "miasi.backend.enums",
+          "miasi.backend.eventListeners",
+          "miasi.backend.events",
+          "miasi.backend.sharedkernel");
 
   private static final Pattern HEXAGONAL_DOMAIN_PACKAGE =
       Pattern.compile(
@@ -36,45 +42,52 @@ class HexagonalArchitectureTest {
       Pattern.compile(
           "^miasi\\.backend\\.(configuration|schedule|analysis|authorization|visualization)\\.application(\\..*)?$");
 
-  private static final Pattern HEXAGONAL_ADAPTER_PACKAGE =
+  private static final Pattern HEXAGONAL_INFRASTRUCTURE_PACKAGE =
       Pattern.compile(
-          "^miasi\\.backend\\.(configuration|schedule|analysis|authorization|visualization)\\.adapter(\\..*)?$");
+          "^miasi\\.backend\\.(configuration|schedule|analysis|authorization|visualization|common)\\.infrastructure(\\..*)?$");
 
   @Test
-  void globalEnumsPackageIsNotUsedAsSharedKernel() {
+  void productionCodeDoesNotUseLegacyRootPackages() {
     Set<String> actualViolations =
         productionClasses().stream()
             .map(JavaClass::getPackageName)
-            .filter(packageName -> packageName.equals(BASE_PACKAGE + ".enums"))
+            .filter(
+                packageName ->
+                    LEGACY_ROOT_PACKAGES.stream()
+                        .anyMatch(
+                            legacyPackage ->
+                                packageName.equals(legacyPackage)
+                                    || packageName.startsWith(legacyPackage + ".")))
             .collect(Collectors.toCollection(TreeSet::new));
 
     assertEquals(
         Set.of(),
         actualViolations,
-        "Use sharedkernel.model for stable shared types or a bounded-context domain package.");
+        "Production code must use context/domain/application/infrastructure/common packages, not legacy roots.");
   }
 
   @Test
-  void legacyDomainsHaveOnlyDocumentedFrameworkOrAdapterDependencies() {
+  void boundedContextClassesLiveUnderStandardLayerModules() {
     Set<String> actualViolations =
         productionClasses().stream()
-            .filter(javaClass -> javaClass.getPackageName().startsWith(BASE_PACKAGE + ".domains."))
+            .filter(HexagonalArchitectureTest::isBoundedContextClass)
             .filter(
                 javaClass ->
-                    dependsOnAny(
-                        javaClass,
-                        HexagonalArchitectureTest::isForbiddenLegacyDomainDependencyPackage))
+                    !javaClass
+                        .getPackageName()
+                        .matches(
+                            "^miasi\\.backend\\.(configuration|schedule|analysis|authorization|visualization)(\\.(domain|application|infrastructure)(\\..*)?)?$"))
             .map(JavaClass::getName)
             .collect(Collectors.toCollection(TreeSet::new));
 
     assertEquals(
-        new TreeSet<>(DOCUMENTED_LEGACY_DOMAIN_EXCEPTIONS),
+        Set.of(),
         actualViolations,
-        "Any legacy domain dependency on Spring/API/database/events must be explicit and temporary.");
+        "Bounded contexts must be organized as context/domain, context/application or context/infrastructure.");
   }
 
   @Test
-  void targetDomainPackagesDoNotDependOnApplicationOrAdapters() {
+  void targetDomainPackagesDoNotDependOnApplicationOrInfrastructure() {
     Set<String> actualViolations =
         productionClasses().stream()
             .filter(
@@ -85,18 +98,19 @@ class HexagonalArchitectureTest {
                         javaClass,
                         packageName ->
                             HEXAGONAL_APPLICATION_PACKAGE.matcher(packageName).matches()
-                                || HEXAGONAL_ADAPTER_PACKAGE.matcher(packageName).matches()))
+                                || HEXAGONAL_INFRASTRUCTURE_PACKAGE.matcher(packageName).matches()
+                                || packageName.startsWith("org.springframework")))
             .map(JavaClass::getName)
             .collect(Collectors.toCollection(TreeSet::new));
 
     assertEquals(
         Set.of(),
         actualViolations,
-        "Target hexagonal domain packages may not depend on application or adapter packages.");
+        "Domain packages may not depend on application, infrastructure or Spring packages.");
   }
 
   @Test
-  void targetApplicationPackagesDoNotDependOnAdapters() {
+  void targetApplicationPackagesDoNotDependOnInfrastructure() {
     Set<String> actualViolations =
         productionClasses().stream()
             .filter(
@@ -106,14 +120,15 @@ class HexagonalArchitectureTest {
                 javaClass ->
                     dependsOnAny(
                         javaClass,
-                        packageName -> HEXAGONAL_ADAPTER_PACKAGE.matcher(packageName).matches()))
+                        packageName ->
+                            HEXAGONAL_INFRASTRUCTURE_PACKAGE.matcher(packageName).matches()))
             .map(JavaClass::getName)
             .collect(Collectors.toCollection(TreeSet::new));
 
     assertEquals(
         Set.of(),
         actualViolations,
-        "Target hexagonal application packages may not depend on adapter packages.");
+        "Application packages may not depend on infrastructure packages.");
   }
 
   private static JavaClasses productionClasses() {
@@ -129,11 +144,12 @@ class HexagonalArchitectureTest {
         .anyMatch(packagePredicate);
   }
 
-  private static boolean isForbiddenLegacyDomainDependencyPackage(String packageName) {
-    return FORBIDDEN_LEGACY_DOMAIN_DEPENDENCY_PACKAGES.stream()
+  private static boolean isBoundedContextClass(JavaClass javaClass) {
+    String packageName = javaClass.getPackageName();
+    return BOUNDED_CONTEXTS.stream()
         .anyMatch(
-            forbiddenPackage ->
-                packageName.equals(forbiddenPackage)
-                    || packageName.startsWith(forbiddenPackage + "."));
+            context ->
+                packageName.equals(BASE_PACKAGE + "." + context)
+                    || packageName.startsWith(BASE_PACKAGE + "." + context + "."));
   }
 }

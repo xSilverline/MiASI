@@ -1,7 +1,7 @@
 package miasi.backend.configuration.application.port.in;
 
 import java.util.Optional;
-import miasi.backend.domains.configuration.missionPlan.MissionPlan;
+import miasi.backend.configuration.domain.model.MissionPlan;
 
 public interface GetMissionPlanUseCase {
   int getPlansCount();

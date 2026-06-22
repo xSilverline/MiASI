@@ -1,6 +1,6 @@
 package miasi.backend.schedule.application.port.in;
 
-import miasi.backend.domains.schedule.MissionSchedule;
+import miasi.backend.schedule.domain.model.MissionSchedule;
 
 public interface CreateScheduleUseCase {
   MissionSchedule createSchedule(String missionPlanId, int durationSols);

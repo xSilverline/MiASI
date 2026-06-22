@@ -1,8 +1,8 @@
 package miasi.backend.schedule.application.port.in;
 
-import miasi.backend.domains.schedule.MissionSchedule;
-import miasi.backend.domains.schedule.ScheduledEvent;
-import miasi.backend.sharedkernel.model.ModuleState;
+import miasi.backend.common.domain.model.ModuleState;
+import miasi.backend.schedule.domain.model.MissionSchedule;
+import miasi.backend.schedule.domain.model.ScheduledEvent;
 
 public interface ChangeScheduleEventsUseCase {
   MissionSchedule addEvent(String scheduleId, ScheduledEvent event);

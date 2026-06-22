@@ -7,15 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import miasi.backend.domains.schedule.MissionSchedule;
-import miasi.backend.domains.schedule.ModuleStateChange;
-import miasi.backend.domains.schedule.ScenarioDraft;
-import miasi.backend.domains.schedule.ScheduledEvent;
+import miasi.backend.common.domain.model.ModuleState;
 import miasi.backend.schedule.application.port.out.ScheduleEventPublisherPort;
-import miasi.backend.schedule.domain.DifficultyLevel;
-import miasi.backend.schedule.domain.EventType;
-import miasi.backend.schedule.domain.ScheduleStatus;
-import miasi.backend.sharedkernel.model.ModuleState;
+import miasi.backend.schedule.application.service.ScheduleApplicationService;
+import miasi.backend.schedule.domain.model.DifficultyLevel;
+import miasi.backend.schedule.domain.model.EventType;
+import miasi.backend.schedule.domain.model.MissionSchedule;
+import miasi.backend.schedule.domain.model.ModuleStateChange;
+import miasi.backend.schedule.domain.model.ScenarioDraft;
+import miasi.backend.schedule.domain.model.ScheduleStatus;
+import miasi.backend.schedule.domain.model.ScheduledEvent;
 import org.junit.jupiter.api.Test;
 
 class ScheduleApplicationServiceTest {

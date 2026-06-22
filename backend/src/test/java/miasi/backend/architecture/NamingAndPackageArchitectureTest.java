@@ -17,25 +17,25 @@ import org.springframework.web.bind.annotation.RestController;
 class NamingAndPackageArchitectureTest {
 
   private static final String BASE_PACKAGE = "miasi.backend";
-  private static final String API_PACKAGE = BASE_PACKAGE + ".api";
-  private static final String WEB_DTO_PACKAGE = BASE_PACKAGE + ".adapter.in.web.dto";
+  private static final String SHARED_WEB_DTO_PACKAGE =
+      BASE_PACKAGE + ".common.infrastructure.in.web.dto";
 
   @Test
-  void controllersShouldBeNamedAndLocatedInApiPackage() {
+  void controllersShouldBeNamedAndLocatedInInfrastructureInWebPackage() {
     Set<String> actualViolations =
         productionClasses().stream()
             .filter(NamingAndPackageArchitectureTest::isController)
             .filter(
                 javaClass ->
                     !javaClass.getSimpleName().endsWith("Controller")
-                        || !isInPackage(javaClass, API_PACKAGE))
+                        || !javaClass.getPackageName().endsWith(".infrastructure.in.web"))
             .map(JavaClass::getName)
             .collect(Collectors.toCollection(TreeSet::new));
 
     assertEquals(
         Set.of(),
         actualViolations,
-        "REST/MVC controllers should be named *Controller and live in miasi.backend.api.");
+        "REST/MVC controllers should be named *Controller and live in context.infrastructure.in.web.");
   }
 
   @Test
@@ -43,14 +43,29 @@ class NamingAndPackageArchitectureTest {
     Set<String> actualViolations =
         productionClasses().stream()
             .filter(NamingAndPackageArchitectureTest::isRestDto)
-            .filter(javaClass -> !isInPackage(javaClass, WEB_DTO_PACKAGE))
+            .filter(javaClass -> !isContextWebDto(javaClass) && !isSharedWebDto(javaClass))
             .map(JavaClass::getName)
             .collect(Collectors.toCollection(TreeSet::new));
 
     assertEquals(
         Set.of(),
         actualViolations,
-        "REST request/response DTOs should live in adapter.in.web.dto, not in API or domain packages.");
+        "REST request/response DTOs should live in a bounded-context infrastructure.in.web.dto package.");
+  }
+
+  @Test
+  void sharedWebDtoPackageShouldContainOnlyCrossCuttingResponses() {
+    Set<String> actualViolations =
+        productionClasses().stream()
+            .filter(javaClass -> isInPackage(javaClass, SHARED_WEB_DTO_PACKAGE))
+            .filter(javaClass -> !isSharedWebDto(javaClass))
+            .map(JavaClass::getName)
+            .collect(Collectors.toCollection(TreeSet::new));
+
+    assertEquals(
+        Set.of(),
+        actualViolations,
+        "Shared web DTO package should stay small and contain only cross-cutting responses.");
   }
 
   @Test
@@ -118,7 +133,19 @@ class NamingAndPackageArchitectureTest {
 
   private static boolean isRestDto(JavaClass javaClass) {
     return hasName(javaClass, name -> name.endsWith("Request") || name.endsWith("Response"))
-        || javaClass.getName().equals(WEB_DTO_PACKAGE + ".BasicResponseEntity");
+        || isSharedWebDto(javaClass);
+  }
+
+  private static boolean isContextWebDto(JavaClass javaClass) {
+    return javaClass.getPackageName().endsWith(".infrastructure.in.web.dto")
+        && !isInPackage(javaClass, SHARED_WEB_DTO_PACKAGE);
+  }
+
+  private static boolean isSharedWebDto(JavaClass javaClass) {
+    return Set.of(
+            SHARED_WEB_DTO_PACKAGE + ".BasicResponseEntity",
+            SHARED_WEB_DTO_PACKAGE + ".ErrorResponse")
+        .contains(javaClass.getName());
   }
 
   private static boolean hasName(JavaClass javaClass, Predicate<String> predicate) {

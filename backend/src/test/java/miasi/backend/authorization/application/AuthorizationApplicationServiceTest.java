@@ -10,19 +10,20 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import miasi.backend.authorization.application.exception.ActiveSessionAlreadyExistsException;
-import miasi.backend.authorization.application.exception.AuthenticationFailedException;
-import miasi.backend.authorization.application.exception.InvalidSessionTokenException;
+import miasi.backend.authorization.application.common.exception.ActiveSessionAlreadyExistsException;
+import miasi.backend.authorization.application.common.exception.AuthenticationFailedException;
+import miasi.backend.authorization.application.common.exception.InvalidSessionTokenException;
 import miasi.backend.authorization.application.port.out.PasswordVerifierPort;
-import miasi.backend.domains.authorization.IUserRepository;
-import miasi.backend.domains.authorization.Identity;
+import miasi.backend.authorization.application.port.out.UserRepositoryPort;
+import miasi.backend.authorization.application.service.AuthorizationApplicationService;
+import miasi.backend.authorization.domain.model.Identity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 class AuthorizationApplicationServiceTest {
 
-  private IUserRepository repository;
+  private UserRepositoryPort repository;
   private AuthorizationApplicationService authorization;
 
   private final String login = "testUser";
@@ -33,7 +34,7 @@ class AuthorizationApplicationServiceTest {
 
   @BeforeEach
   void setUp() {
-    repository = Mockito.mock(IUserRepository.class);
+    repository = Mockito.mock(UserRepositoryPort.class);
     identity = new Identity(login, hashFor(password));
     when(repository.findAll()).thenReturn(List.of(identity));
     authorization = new AuthorizationApplicationService(repository, passwordVerifier());
@@ -136,7 +137,7 @@ class AuthorizationApplicationServiceTest {
   @Test
   void shouldLoadUserFromRepositoryWhenNotInCache() {
     // given
-    IUserRepository repo = Mockito.mock(IUserRepository.class);
+    UserRepositoryPort repo = Mockito.mock(UserRepositoryPort.class);
     Identity newIdentity = new Identity("newUser", hashFor(password));
     when(repo.findAll()).thenReturn(List.of());
     when(repo.findByLogin("newUser")).thenReturn(newIdentity);

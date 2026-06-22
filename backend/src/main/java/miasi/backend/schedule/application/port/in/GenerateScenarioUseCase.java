@@ -1,7 +1,7 @@
 package miasi.backend.schedule.application.port.in;
 
-import miasi.backend.domains.schedule.ScenarioDraft;
-import miasi.backend.schedule.domain.DifficultyLevel;
+import miasi.backend.schedule.domain.model.DifficultyLevel;
+import miasi.backend.schedule.domain.model.ScenarioDraft;
 
 public interface GenerateScenarioUseCase {
   ScenarioDraft generateScenario(
