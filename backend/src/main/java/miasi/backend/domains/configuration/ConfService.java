@@ -35,19 +35,19 @@ public class ConfService {
   }
 
   public int saveMissionPlan(MissionPlan missionPlan) {
-    // serwis zapisuje do bazy
     int id = missionPlansRepository.save(missionPlan);
-    eventPublisher.publishMissionPlanCreated(missionPlan);
+    eventPublisher.publishMissionPlanCreated(id, missionPlan);
 
     return id;
   }
 
   public Integer overrideMissionPlan(int id, MissionPlan missionPlan) {
-
     Integer output = missionPlansRepository.replace(id, missionPlan);
     output = (output != -1) ? output : null;
 
-    eventPublisher.publishMissionPlanCreated(missionPlan);
+    if (output != null) {
+      eventPublisher.publishMissionPlanCreated(output, missionPlan);
+    }
     return output;
   }
 
