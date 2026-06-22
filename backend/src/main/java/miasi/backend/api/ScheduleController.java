@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import miasi.backend.api.jsons.BasicResponseEntity;
 import miasi.backend.api.jsons.CreateScheduleRequest;
 import miasi.backend.api.jsons.GenerateScenarioRequest;
+import miasi.backend.api.jsons.ScheduleModuleStateChangeRequest;
 import miasi.backend.domains.schedule.MissionSchedule;
 import miasi.backend.domains.schedule.MissionTimeline;
 import miasi.backend.domains.schedule.ScenarioDraft;
@@ -66,6 +67,20 @@ public class ScheduleController {
       @PathVariable String eventId,
       @RequestBody ScheduledEvent event) {
     MissionSchedule schedule = scheduleService.updateEvent(scheduleId, eventId, event);
+    return ResponseEntity.ok(schedule);
+  }
+
+  @PostMapping("/{scheduleId}/module-state-changes")
+  public ResponseEntity<MissionSchedule> scheduleModuleStateChange(
+      @PathVariable String scheduleId, @RequestBody ScheduleModuleStateChangeRequest request) {
+    MissionSchedule schedule =
+        scheduleService.scheduleModuleStateChange(
+            scheduleId,
+            request.id(),
+            request.sol(),
+            request.description(),
+            request.moduleId(),
+            request.newState());
     return ResponseEntity.ok(schedule);
   }
 

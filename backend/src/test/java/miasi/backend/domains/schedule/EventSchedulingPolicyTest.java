@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 class EventSchedulingPolicyTest {
 
@@ -60,14 +62,35 @@ class EventSchedulingPolicyTest {
 
   @Test
   void allowManyEventsInSameSol_shouldAllowMultipleEvents() {
-    // When + Then
-    assertTrue(
-        policy.allowManyEventsInSameSol(
-            eventAtSol(12), MissionSchedule.createDraft("plan-1", 120)));
+    // Given
+    MissionSchedule schedule = MissionSchedule.createDraft("plan-1", 120);
+    
+    // When
+    schedule.addEvent(event("event-1", 12));
+    
+    // Then
+    assertTrue(policy.allowManyEventsInSameSol(event("event-2", 12), schedule));
+  }
+
+  @Test
+  void allowManyEventsInSameSol_shouldRejectMultipleEventsWhenPolicyDisallowsThem() {
+    // Given
+    EventSchedulingPolicy strictPolicy = new EventSchedulingPolicy(false);
+    MissionSchedule schedule = MissionSchedule.createDraft("plan-1", 120);
+    
+    // When
+    schedule.addEvent(event("event-1", 12));
+
+    // Then
+    assertFalse(strictPolicy.allowManyEventsInSameSol(event("event-2", 12), schedule));
   }
 
   private ScheduledEvent eventAtSol(int sol) {
-    return new ScheduledEvent("event-" + sol, EventType.THREAT, sol, "description");
+    return event("event-" + sol, sol);
+  }
+
+  private ScheduledEvent event(String id, int sol) {
+    return new ScheduledEvent(id, EventType.THREAT, sol, "description");
   }
 
   private SupplyDelivery deliveryWithItems(List<DeliveryItem> items) {
