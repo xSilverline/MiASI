@@ -1,26 +1,27 @@
 package miasi.backend.domains.analysis.services;
 
+import java.util.List;
 import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.modules.Module;
 import miasi.backend.domains.analysis.types.schedule.Threat;
-import miasi.backend.enums.ModuleState;
-
-import java.util.List;
+import miasi.backend.sharedkernel.model.ModuleState;
 
 public class ThreatProcessor {
 
-  public void process(int currentSol, List<Threat> threats, List<Module> currentModules, List<Resource> warehouse) {
-    // find active failures in currentSol and apply their effects to modules (e.g. status change) or storage (e.g. leak)
+  public void process(
+      int currentSol, List<Threat> threats, List<Module> currentModules, List<Resource> warehouse) {
+    // find active failures in currentSol and apply their effects to modules (e.g. status change) or
+    // storage (e.g. leak)
     if (threats == null) return;
 
     for (Threat threat : threats) {
 
       // check if the threat is active on the current day
-      if (currentSol >= threat.getSol() && currentSol < threat.getSol() + threat.getDurationSols()) {
+      if (currentSol >= threat.getSol()
+          && currentSol < threat.getSol() + threat.getDurationSols()) {
 
         // apply effects based on ImpactType
         switch (threat.getType().name()) {
-
           case "QUANTITY_CHANGE":
             if (warehouse != null) {
               for (Resource res : warehouse) {

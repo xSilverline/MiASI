@@ -1,16 +1,15 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.crew.ConsumptionMode;
-import miasi.backend.domains.analysis.types.crew.CrewGroup;
-import miasi.backend.domains.analysis.types.modules.Module;
-import miasi.backend.enums.ModuleState;
-import miasi.backend.enums.ResourceType;
-
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import miasi.backend.domains.analysis.types.core.Resource;
+import miasi.backend.domains.analysis.types.crew.ConsumptionMode;
+import miasi.backend.domains.analysis.types.crew.CrewGroup;
+import miasi.backend.domains.analysis.types.modules.Module;
+import miasi.backend.sharedkernel.model.ModuleState;
+import miasi.backend.sharedkernel.model.ResourceType;
 
 public class DemandCalculator {
 

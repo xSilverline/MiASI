@@ -2,7 +2,7 @@ package miasi.backend.domains.configuration.modules;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.ModuleState;
+import miasi.backend.sharedkernel.model.ModuleState;
 
 @Getter
 @Setter

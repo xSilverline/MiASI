@@ -1,12 +1,11 @@
 package miasi.backend.domains.analysis.services;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.modules.Module;
-import miasi.backend.enums.ModuleState;
-import miasi.backend.enums.ResourceType;
-
-import java.util.List;
+import miasi.backend.sharedkernel.model.ModuleState;
+import miasi.backend.sharedkernel.model.ResourceType;
 
 @RequiredArgsConstructor
 public class EnergyProcessor {
@@ -16,7 +15,8 @@ public class EnergyProcessor {
 
   public boolean process(float availableEnergy, List<Module> currentModules) {
 
-    float powerProduced = getEnergyAmount(productionCalculator.calculateModulesProduction(currentModules));
+    float powerProduced =
+        getEnergyAmount(productionCalculator.calculateModulesProduction(currentModules));
     float powerConsumed = getEnergyAmount(demandCalculator.calculateModulesDemand(currentModules));
 
     if (availableEnergy < 0 || (powerProduced + availableEnergy < powerConsumed)) {

@@ -1,16 +1,14 @@
 package miasi.backend.domains.schedule;
 
-import miasi.backend.enums.DeliveryItemType;
-import miasi.backend.enums.EventType;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import miasi.backend.schedule.domain.DeliveryItemType;
+import miasi.backend.schedule.domain.EventType;
+import org.junit.jupiter.api.Test;
 
 class EventSchedulingPolicyTest {
 
@@ -53,8 +51,7 @@ class EventSchedulingPolicyTest {
   void validateDeliveryWeight_shouldThrowWhenWeightExceedsLimit() {
     // Given
     SupplyDelivery delivery =
-        deliveryWithItems(
-            List.of(new DeliveryItem("water", DeliveryItemType.RESOURCE, 3.0, 20.0)));
+        deliveryWithItems(List.of(new DeliveryItem("water", DeliveryItemType.RESOURCE, 3.0, 20.0)));
     // When + Then
     assertThrows(
         IllegalArgumentException.class, () -> policy.validateDeliveryWeight(delivery, 50.0));
@@ -64,10 +61,10 @@ class EventSchedulingPolicyTest {
   void allowManyEventsInSameSol_shouldAllowMultipleEvents() {
     // Given
     MissionSchedule schedule = MissionSchedule.createDraft("plan-1", 120);
-    
+
     // When
     schedule.addEvent(event("event-1", 12));
-    
+
     // Then
     assertTrue(policy.allowManyEventsInSameSol(event("event-2", 12), schedule));
   }
@@ -77,7 +74,7 @@ class EventSchedulingPolicyTest {
     // Given
     EventSchedulingPolicy strictPolicy = new EventSchedulingPolicy(false);
     MissionSchedule schedule = MissionSchedule.createDraft("plan-1", 120);
-    
+
     // When
     schedule.addEvent(event("event-1", 12));
 

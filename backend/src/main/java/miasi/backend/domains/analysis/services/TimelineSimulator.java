@@ -1,5 +1,8 @@
 package miasi.backend.domains.analysis.services;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.domains.analysis.types.core.DailyBalance;
 import miasi.backend.domains.analysis.types.core.DailyState;
@@ -8,10 +11,6 @@ import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.crew.ConsumptionMode;
 import miasi.backend.domains.analysis.types.input.MissionManifest;
 import miasi.backend.domains.analysis.types.modules.Module;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @RequiredArgsConstructor
 public class TimelineSimulator {
@@ -23,8 +22,8 @@ public class TimelineSimulator {
   private final EnergyProcessor energyProcessor;
   private final SurvivalPredictor survivalPredictor;
 
-
-  public List<DailyState> simulate(MissionManifest manifest, List<Module> activeModules, List<Resource> startingResources) {
+  public List<DailyState> simulate(
+      MissionManifest manifest, List<Module> activeModules, List<Resource> startingResources) {
     List<Resource> warehouse = copyResources(startingResources);
     List<Module> currentModules = copyModules(activeModules);
     List<DailyState> timeline = new ArrayList<>();
@@ -33,7 +32,8 @@ public class TimelineSimulator {
 
     ConsumptionMode previousMode = ConsumptionMode.OPTIMAL;
     for (int sol = 1; sol <= totalDays; sol++) {
-      DailyState dailyState = simulateSingleDay(sol, totalDays, warehouse, currentModules, manifest, previousMode);
+      DailyState dailyState =
+          simulateSingleDay(sol, totalDays, warehouse, currentModules, manifest, previousMode);
       timeline.add(dailyState);
       previousMode = dailyState.getMode();
     }
@@ -41,30 +41,51 @@ public class TimelineSimulator {
     return timeline; // Zwracamy tylko czystą historię!
   }
 
-  private DailyState simulateSingleDay(int sol, int totalDays, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest, ConsumptionMode previousMode) {
+  private DailyState simulateSingleDay(
+      int sol,
+      int totalDays,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest,
+      ConsumptionMode previousMode) {
     Set<ObservationType> observations = new java.util.HashSet<>();
     processExternalEvents(sol, warehouse, currentModules, manifest, observations);
     processPowerGrid(warehouse, currentModules, observations);
-    ConsumptionMode currentMode = evaluateSurvivalAndMode(sol, totalDays, warehouse, currentModules, manifest, previousMode, observations);
+    ConsumptionMode currentMode =
+        evaluateSurvivalAndMode(
+            sol, totalDays, warehouse, currentModules, manifest, previousMode, observations);
     DailyBalance todayBalance = calculateDailyBalance(currentModules, manifest, currentMode);
     updateWarehouse(warehouse, todayBalance);
 
-    return new DailyState(sol, copyResources(warehouse), todayBalance, currentMode, copyModules(currentModules), observations);
+    return new DailyState(
+        sol,
+        copyResources(warehouse),
+        todayBalance,
+        currentMode,
+        copyModules(currentModules),
+        observations);
   }
 
-  private void processExternalEvents(int sol, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest, Set<ObservationType> observations) {
+  private void processExternalEvents(
+      int sol,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest,
+      Set<ObservationType> observations) {
     deliveryProcessor.process(sol, manifest.getDeliveries(), currentModules, warehouse);
     threatProcessor.process(sol, manifest.getThreats(), currentModules, warehouse);
 
-    boolean hasDelivery = manifest.getDeliveries() != null &&
-        manifest.getDeliveries().stream().anyMatch(d -> d.getSol() == sol);
+    boolean hasDelivery =
+        manifest.getDeliveries() != null
+            && manifest.getDeliveries().stream().anyMatch(d -> d.getSol() == sol);
 
     if (hasDelivery) {
       observations.add(ObservationType.DELIVERY_RECEIVED);
     }
   }
 
-  private void processPowerGrid(List<Resource> warehouse, List<Module> currentModules, Set<ObservationType> observations) {
+  private void processPowerGrid(
+      List<Resource> warehouse, List<Module> currentModules, Set<ObservationType> observations) {
     float availableEnergy = energyProcessor.getEnergyAmount(warehouse);
 
     if (energyProcessor.process(availableEnergy, currentModules)) {
@@ -72,10 +93,20 @@ public class TimelineSimulator {
     }
   }
 
-  private ConsumptionMode evaluateSurvivalAndMode(int sol, int totalDays, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest, ConsumptionMode previousMode, Set<ObservationType> observations) {
-    ConsumptionMode currentMode = survivalPredictor.evaluateCrewConsumptionMode(sol, totalDays, warehouse, currentModules, manifest);
+  private ConsumptionMode evaluateSurvivalAndMode(
+      int sol,
+      int totalDays,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest,
+      ConsumptionMode previousMode,
+      Set<ObservationType> observations) {
+    ConsumptionMode currentMode =
+        survivalPredictor.evaluateCrewConsumptionMode(
+            sol, totalDays, warehouse, currentModules, manifest);
 
-    if (survivalPredictor.checkIfEvacuationIsNeeded(sol, totalDays, warehouse, currentModules, manifest)) {
+    if (survivalPredictor.checkIfEvacuationIsNeeded(
+        sol, totalDays, warehouse, currentModules, manifest)) {
       observations.add(ObservationType.EVACUATION_ALERT);
     }
 
@@ -88,11 +119,14 @@ public class TimelineSimulator {
     return currentMode;
   }
 
-  private DailyBalance calculateDailyBalance(List<Module> currentModules, MissionManifest manifest, ConsumptionMode currentMode) {
+  private DailyBalance calculateDailyBalance(
+      List<Module> currentModules, MissionManifest manifest, ConsumptionMode currentMode) {
     DailyBalance balance = new DailyBalance();
 
     productionCalculator.calculateModulesProduction(currentModules).forEach(balance::addProduction);
-    demandCalculator.calculateCrewDemand(manifest.getCrew(), currentMode).forEach(balance::addConsumption);
+    demandCalculator
+        .calculateCrewDemand(manifest.getCrew(), currentMode)
+        .forEach(balance::addConsumption);
     demandCalculator.calculateModulesDemand(currentModules).forEach(balance::addConsumption);
 
     return balance;

@@ -1,21 +1,41 @@
 package miasi.backend.events;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.ThreatType;
+import miasi.backend.schedule.domain.ThreatType;
+import miasi.backend.sharedkernel.events.EventEnvelope;
+import miasi.backend.sharedkernel.events.IntegrationEvent;
 
-@Getter
-@Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
-public class ThreatScheduled {
-  String scheduleId;
-  int sol;
-  ThreatType threatType;
-  String affectedElement;
-  double impactValue;
-  String impactUnit;
+public record ThreatScheduled(
+    EventEnvelope envelope,
+    String scheduleId,
+    int sol,
+    ThreatType threatType,
+    String affectedElement,
+    double impactValue,
+    int durationSols,
+    String impactUnit)
+    implements IntegrationEvent {
+
+  public static ThreatScheduled create(
+      String scheduleId,
+      int sol,
+      ThreatType threatType,
+      String affectedElement,
+      double impactValue,
+      int durationSols,
+      String impactUnit) {
+    return new ThreatScheduled(
+        EventEnvelope.initial(scheduleId),
+        scheduleId,
+        sol,
+        threatType,
+        affectedElement,
+        impactValue,
+        durationSols,
+        impactUnit);
+  }
+
+  @Override
+  public String eventType() {
+    return "ThreatScheduled";
+  }
 }

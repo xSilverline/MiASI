@@ -1,15 +1,19 @@
 package miasi.backend.domains.analysis.services;
 
+import java.util.List;
 import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.modules.Module;
 import miasi.backend.domains.analysis.types.schedule.Delivery;
 
-import java.util.List;
-
 public class DeliveryProcessor {
 
-  public void process(int currentSol, List<Delivery> deliveries, List<Module> currentModules, List<Resource> warehouse) {
-    // if there is a delivery due today: add its modules to currentModules and its stock to warehouse
+  public void process(
+      int currentSol,
+      List<Delivery> deliveries,
+      List<Module> currentModules,
+      List<Resource> warehouse) {
+    // if there is a delivery due today: add its modules to currentModules and its stock to
+    // warehouse
     if (deliveries == null) return;
     for (Delivery delivery : deliveries) {
 
@@ -29,7 +33,8 @@ public class DeliveryProcessor {
 
             for (Resource existingResource : warehouse) {
               if (existingResource.getType() == deliveredResource.getType()) {
-                existingResource.setAmount(existingResource.getAmount() + deliveredResource.getAmount());
+                existingResource.setAmount(
+                    existingResource.getAmount() + deliveredResource.getAmount());
                 resourceExists = true;
                 break;
               }
@@ -37,7 +42,8 @@ public class DeliveryProcessor {
 
             // if the base didn't have this resource before
             if (!resourceExists) {
-              warehouse.add(new Resource(deliveredResource.getType(), deliveredResource.getAmount()));
+              warehouse.add(
+                  new Resource(deliveredResource.getType(), deliveredResource.getAmount()));
             }
           }
         }

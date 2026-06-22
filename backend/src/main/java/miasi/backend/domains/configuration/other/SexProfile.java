@@ -1,14 +1,13 @@
 package miasi.backend.domains.configuration.other;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.ResourceType;
-
-import java.util.HashMap;
-import java.util.Map;
+import miasi.backend.sharedkernel.model.ResourceType;
 
 @Getter
 @Setter

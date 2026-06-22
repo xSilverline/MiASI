@@ -1,14 +1,13 @@
 package miasi.backend.domains.analysis.services;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.crew.ConsumptionMode;
 import miasi.backend.domains.analysis.types.input.MissionManifest;
 import miasi.backend.domains.analysis.types.modules.Module;
 import miasi.backend.domains.analysis.types.schedule.Delivery;
-import miasi.backend.enums.ResourceType;
-
-import java.util.List;
+import miasi.backend.sharedkernel.model.ResourceType;
 
 @RequiredArgsConstructor
 public class SurvivalPredictor {
@@ -17,20 +16,38 @@ public class SurvivalPredictor {
   private final ProductionCalculator productionCalculator;
 
   // Kiedy przechodzimy na MINIMAL? Kiedy OPTIMAL nas zabije przed dostawą.
-  public ConsumptionMode evaluateCrewConsumptionMode(int currentSol, int targetSol, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest) {
-    if (willDieBeforeTarget(currentSol, targetSol, warehouse, currentModules, manifest, ConsumptionMode.OPTIMAL)) {
+  public ConsumptionMode evaluateCrewConsumptionMode(
+      int currentSol,
+      int targetSol,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest) {
+    if (willDieBeforeTarget(
+        currentSol, targetSol, warehouse, currentModules, manifest, ConsumptionMode.OPTIMAL)) {
       return ConsumptionMode.MINIMAL;
     }
     return ConsumptionMode.OPTIMAL;
   }
 
   // Kiedy wzywamy SOS? Kiedy nawet MINIMAL nas zabije przed dostawą!
-  public boolean checkIfEvacuationIsNeeded(int currentSol, int targetSol, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest) {
-    return willDieBeforeTarget(currentSol, targetSol, warehouse, currentModules, manifest, ConsumptionMode.MINIMAL);
+  public boolean checkIfEvacuationIsNeeded(
+      int currentSol,
+      int targetSol,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest) {
+    return willDieBeforeTarget(
+        currentSol, targetSol, warehouse, currentModules, manifest, ConsumptionMode.MINIMAL);
   }
 
   // --- Silnik liczący przewidywaną śmierć ---
-  private boolean willDieBeforeTarget(int currentSol, int missionEndSol, List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest, ConsumptionMode modeToCheck) {
+  private boolean willDieBeforeTarget(
+      int currentSol,
+      int missionEndSol,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest,
+      ConsumptionMode modeToCheck) {
     List<Resource> demand = demandCalculator.calculateCrewDemand(manifest.getCrew(), modeToCheck);
     List<Resource> modulesDemand = demandCalculator.calculateModulesDemand(currentModules);
     List<Resource> production = productionCalculator.calculateModulesProduction(currentModules);
@@ -50,7 +67,8 @@ public class SurvivalPredictor {
 
       float daysLeftUntilEmpty = currentAmount / Math.abs(netBalance);
 
-      int nextDeliverySol = findNextDeliverySolForResource(currentSol, type, manifest.getDeliveries());
+      int nextDeliverySol =
+          findNextDeliverySolForResource(currentSol, type, manifest.getDeliveries());
 
       int daysUntilTarget;
       if (nextDeliverySol != -1) {
@@ -69,7 +87,8 @@ public class SurvivalPredictor {
     return false;
   }
 
-  private int findNextDeliverySolForResource(int currentSol, ResourceType type, List<Delivery> deliveries) {
+  private int findNextDeliverySolForResource(
+      int currentSol, ResourceType type, List<Delivery> deliveries) {
     if (deliveries == null) return -1;
     return deliveries.stream()
         .filter(d -> d.getSol() > currentSol)

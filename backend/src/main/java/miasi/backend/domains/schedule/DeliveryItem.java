@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.DeliveryItemType;
+import miasi.backend.schedule.domain.DeliveryItemType;
 
 @Getter
 @Setter

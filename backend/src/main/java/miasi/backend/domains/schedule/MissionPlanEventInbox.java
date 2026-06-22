@@ -1,22 +1,43 @@
 package miasi.backend.domains.schedule;
 
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import miasi.backend.events.MissionPlanCreatedEvent;
+import miasi.backend.events.MissionPlanCreated;
+import miasi.backend.events.MissionPlanUpdated;
+import miasi.backend.sharedkernel.events.EventInboxEntry;
+import miasi.backend.sharedkernel.events.InMemoryEventInbox;
 
 public class MissionPlanEventInbox {
-  private final List<MissionPlanCreatedEvent> missionPlanCreatedEvents =
-      new CopyOnWriteArrayList<>();
+  private final InMemoryEventInbox<MissionPlanCreated> missionPlanCreatedInbox =
+      new InMemoryEventInbox<>();
+  private final InMemoryEventInbox<MissionPlanUpdated> missionPlanUpdatedInbox =
+      new InMemoryEventInbox<>();
 
-  public void record(MissionPlanCreatedEvent event) {
-    missionPlanCreatedEvents.add(event);
+  public boolean record(MissionPlanCreated event) {
+    return missionPlanCreatedInbox.record(event);
   }
 
-  public List<MissionPlanCreatedEvent> getMissionPlanCreatedEvents() {
-    return List.copyOf(missionPlanCreatedEvents);
+  public boolean record(MissionPlanUpdated event) {
+    return missionPlanUpdatedInbox.record(event);
+  }
+
+  public List<MissionPlanCreated> getMissionPlanCreatedEvents() {
+    return missionPlanCreatedInbox.events();
+  }
+
+  public List<MissionPlanUpdated> getMissionPlanUpdatedEvents() {
+    return missionPlanUpdatedInbox.events();
+  }
+
+  public List<EventInboxEntry<MissionPlanCreated>> getMissionPlanCreatedEntries() {
+    return missionPlanCreatedInbox.entries();
+  }
+
+  public List<EventInboxEntry<MissionPlanUpdated>> getMissionPlanUpdatedEntries() {
+    return missionPlanUpdatedInbox.entries();
   }
 
   public void clear() {
-    missionPlanCreatedEvents.clear();
+    missionPlanCreatedInbox.clear();
+    missionPlanUpdatedInbox.clear();
   }
 }

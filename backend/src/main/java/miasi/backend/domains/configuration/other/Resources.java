@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import miasi.backend.enums.ResourceType;
+import miasi.backend.sharedkernel.model.ResourceType;
 
 @NoArgsConstructor
 @AllArgsConstructor

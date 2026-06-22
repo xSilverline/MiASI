@@ -1,22 +1,21 @@
 package miasi.backend.domains.schedule;
 
-import miasi.backend.enums.DifficultyLevel;
-import miasi.backend.enums.EventType;
-import miasi.backend.enums.ScenarioGenerationMode;
-import miasi.backend.enums.ThreatType;
-import org.jspecify.annotations.NonNull;
-import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.Random;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Random;
+import miasi.backend.schedule.domain.DifficultyLevel;
+import miasi.backend.schedule.domain.EventType;
+import miasi.backend.schedule.domain.ScenarioGenerationMode;
+import miasi.backend.schedule.domain.ThreatType;
+import org.jspecify.annotations.NonNull;
+import org.junit.jupiter.api.Test;
 
 class ScenarioGeneratorTest {
 
@@ -40,39 +39,21 @@ class ScenarioGeneratorTest {
   private static @NonNull ScenarioGenerator getScenarioGenerator() {
     ThreatDefinition matching =
         new ThreatDefinition(
-            ThreatType.DUST_STORM,
-            DifficultyLevel.LEVEL_II,
-            "solar-panels",
-            2.0,
-            5.0,
-            "days");
+            ThreatType.DUST_STORM, DifficultyLevel.LEVEL_II, "solar-panels", 2.0, 5.0, "days");
     ThreatDefinition otherDifficulty =
         new ThreatDefinition(
-            ThreatType.RESOURCE_LOSS,
-            DifficultyLevel.LEVEL_V,
-            "water",
-            5.0,
-            8.0,
-            "kg");
+            ThreatType.RESOURCE_LOSS, DifficultyLevel.LEVEL_V, "water", 5.0, 8.0, "kg");
     return new ScenarioGenerator(
-        "plan-1",
-        new ThreatDictionary(List.of(matching, otherDifficulty)),
-        new Random(0));
+        "plan-1", new ThreatDictionary(List.of(matching, otherDifficulty)), new Random(0));
   }
 
   @Test
   void generate_shouldKeepGeneratedValuesWithinMissionAndDefinitionRanges() {
     ThreatDefinition definition =
         new ThreatDefinition(
-            ThreatType.MODULE_FAILURE,
-            DifficultyLevel.LEVEL_III,
-            "habitat",
-            2.0,
-            4.0,
-            "days");
+            ThreatType.MODULE_FAILURE, DifficultyLevel.LEVEL_III, "habitat", 2.0, 4.0, "days");
     ScenarioGenerator generator =
-        new ScenarioGenerator(
-            "plan-1", new ThreatDictionary(List.of(definition)), new Random(1));
+        new ScenarioGenerator("plan-1", new ThreatDictionary(List.of(definition)), new Random(1));
 
     ScenarioDraft draft = generator.generate("plan-1", 60, DifficultyLevel.LEVEL_III);
 
@@ -94,24 +75,26 @@ class ScenarioGeneratorTest {
   @Test
   void validateThreatDefinition_exceptionsThrowTest() throws NoSuchMethodException {
     // Given
-    ThreatDefinition valid = new ThreatDefinition(
-        ThreatType.DUST_STORM, DifficultyLevel.LEVEL_I, "test", 2.0, 5.0, "days");
-    ThreatDefinition invalid = new ThreatDefinition(
-        ThreatType.DUST_STORM, DifficultyLevel.LEVEL_I, "test", 10.0, 5.0, "days");
-    ScenarioGenerator generator = new ScenarioGenerator(
-        "plan-1", new ThreatDictionary(List.of()), new Random(0));
-    java.lang.reflect.Method method = ScenarioGenerator.class.getDeclaredMethod(
-        "validateThreatDefinition", ThreatDefinition.class);
+    ThreatDefinition valid =
+        new ThreatDefinition(
+            ThreatType.DUST_STORM, DifficultyLevel.LEVEL_I, "test", 2.0, 5.0, "days");
+    ThreatDefinition invalid =
+        new ThreatDefinition(
+            ThreatType.DUST_STORM, DifficultyLevel.LEVEL_I, "test", 10.0, 5.0, "days");
+    ScenarioGenerator generator =
+        new ScenarioGenerator("plan-1", new ThreatDictionary(List.of()), new Random(0));
+    java.lang.reflect.Method method =
+        ScenarioGenerator.class.getDeclaredMethod(
+            "validateThreatDefinition", ThreatDefinition.class);
     method.setAccessible(true);
 
     // When + Then
-    assertThrows(InvocationTargetException.class, () ->
-        method.invoke(generator, (Object) null));
-    assertThrows(InvocationTargetException.class, () ->
-        method.invoke(generator, invalid));
-    assertDoesNotThrow(() -> {
-      method.invoke(generator, valid);
-    });
+    assertThrows(InvocationTargetException.class, () -> method.invoke(generator, (Object) null));
+    assertThrows(InvocationTargetException.class, () -> method.invoke(generator, invalid));
+    assertDoesNotThrow(
+        () -> {
+          method.invoke(generator, valid);
+        });
   }
 
   @Test
@@ -120,21 +103,20 @@ class ScenarioGeneratorTest {
     String planId = "0";
     int durationSols = 9;
     DifficultyLevel difficulty = DifficultyLevel.LEVEL_I;
-    ScenarioGenerator generator = new ScenarioGenerator(
-        "plan-1", new ThreatDictionary(List.of()), new Random(0));
+    ScenarioGenerator generator =
+        new ScenarioGenerator("plan-1", new ThreatDictionary(List.of()), new Random(0));
 
     // When + Then
-    assertThrows(IllegalArgumentException.class, () ->
-        generator.generate(null, durationSols, difficulty));
-    assertThrows(IllegalArgumentException.class, () ->
-        generator.generate(null, 0, difficulty));
-    assertThrows(IllegalArgumentException.class, () ->
-        generator.generate(planId, durationSols, null));
-    assertDoesNotThrow(() -> {
-      generator.generate(planId, durationSols, difficulty);
-    });
+    assertThrows(
+        IllegalArgumentException.class, () -> generator.generate(null, durationSols, difficulty));
+    assertThrows(IllegalArgumentException.class, () -> generator.generate(null, 0, difficulty));
+    assertThrows(
+        IllegalArgumentException.class, () -> generator.generate(planId, durationSols, null));
+    assertDoesNotThrow(
+        () -> {
+          generator.generate(planId, durationSols, difficulty);
+        });
   }
-
 
   @Test
   void constructor_shouldSetDefaultValues() {
@@ -149,8 +131,9 @@ class ScenarioGeneratorTest {
     // Then
     assertNotNull(generator.getThreatDictionary());
     assertNotNull(generator.getRandom());
-    assertDoesNotThrow(() -> {
-      generator.generate(planId, durationSols, difficulty);
-    });
+    assertDoesNotThrow(
+        () -> {
+          generator.generate(planId, durationSols, difficulty);
+        });
   }
 }

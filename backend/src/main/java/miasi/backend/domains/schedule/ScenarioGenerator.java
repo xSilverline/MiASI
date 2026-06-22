@@ -9,9 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.DifficultyLevel;
-import miasi.backend.enums.EventType;
-import miasi.backend.enums.ScenarioGenerationMode;
+import miasi.backend.schedule.domain.DifficultyLevel;
+import miasi.backend.schedule.domain.EventType;
+import miasi.backend.schedule.domain.ScenarioGenerationMode;
 
 @Getter
 @Setter

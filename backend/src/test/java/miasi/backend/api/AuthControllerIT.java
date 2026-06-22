@@ -1,7 +1,9 @@
 package miasi.backend.api;
 
-import miasi.backend.api.jsons.LoginRequest;
-import miasi.backend.domains.authorization.Authorization;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import miasi.backend.adapter.in.web.dto.LoginRequest;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -18,22 +20,14 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @AutoConfigureMockMvc
 @SpringBootTest
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AuthControllerIT {
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ObjectMapper objectMapper;
-
-  @Autowired
-  private Authorization ctx;
+  @Autowired private ObjectMapper objectMapper;
 
   @Value("${database.filename.users}")
   private String jsonPath;
@@ -48,17 +42,19 @@ class AuthControllerIT {
     LoginRequest credentials = new LoginRequest("user", "543");
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post(url)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(credentials))
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(credentials)));
 
     // Then
     result
         .andExpect(status().isUnauthorized())
-        .andExpect(jsonPath("$.status").value("error"))
-        .andExpect(jsonPath("$.message").exists());
+        .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
+        .andExpect(jsonPath("$.message").value("Login failed."))
+        .andExpect(jsonPath("$.path").value("/api/auth/login"))
+        .andExpect(jsonPath("$.timestamp").exists());
   }
 
   @Order(2)
@@ -69,26 +65,24 @@ class AuthControllerIT {
     LoginRequest credentials = new LoginRequest("user", "123");
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post(url)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(credentials))
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(credentials)));
 
     // Then
-    MvcResult mvcResult = result
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.status").value("success"))
-        .andExpect(jsonPath("$.message").exists())
-        .andReturn();
+    MvcResult mvcResult =
+        result
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status").value("success"))
+            .andExpect(jsonPath("$.message").exists())
+            .andReturn();
 
     // Save token for future tests
-    token = objectMapper
-        .readTree(mvcResult.getResponse().getContentAsString())
-        .get("message")
-        .asText();
+    token =
+        objectMapper.readTree(mvcResult.getResponse().getContentAsString()).get("message").asText();
   }
-
 
   @Order(3)
   @Test
@@ -97,9 +91,7 @@ class AuthControllerIT {
     String url = "/api/auth/" + token + "/verify";
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post(url)
-    );
+    ResultActions result = mvc.perform(MockMvcRequestBuilders.post(url));
 
     // Then
     result
@@ -116,15 +108,14 @@ class AuthControllerIT {
     String url = "/api/auth/6767/verify";
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post(url)
-    );
+    ResultActions result = mvc.perform(MockMvcRequestBuilders.post(url));
 
     // Then
     result
         .andExpect(status().isUnauthorized())
-        .andExpect(jsonPath("$.status").value("error"))
-        .andExpect(jsonPath("$.message").exists())
+        .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
+        .andExpect(jsonPath("$.message").value("Session expired or token is invalid"))
+        .andExpect(jsonPath("$.path").value("/api/auth/6767/verify"))
         .andReturn();
   }
 
@@ -135,15 +126,14 @@ class AuthControllerIT {
     String url = "/api/auth/6767/logout";
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post(url)
-    );
+    ResultActions result = mvc.perform(MockMvcRequestBuilders.post(url));
 
     // Then
     result
         .andExpect(status().isUnauthorized())
-        .andExpect(jsonPath("$.status").value("error"))
-        .andExpect(jsonPath("$.message").exists())
+        .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
+        .andExpect(jsonPath("$.message").value("Invalid session token."))
+        .andExpect(jsonPath("$.path").value("/api/auth/6767/logout"))
         .andReturn();
   }
 
@@ -154,9 +144,7 @@ class AuthControllerIT {
     String url = "/api/auth/" + token + "/logout";
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post(url)
-    );
+    ResultActions result = mvc.perform(MockMvcRequestBuilders.post(url));
 
     // Then
     result
@@ -173,15 +161,14 @@ class AuthControllerIT {
     String url = "/api/auth/" + token + "/logout";
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post(url)
-    );
+    ResultActions result = mvc.perform(MockMvcRequestBuilders.post(url));
 
     // Then
     result
         .andExpect(status().isUnauthorized())
-        .andExpect(jsonPath("$.status").value("error"))
-        .andExpect(jsonPath("$.message").exists())
+        .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
+        .andExpect(jsonPath("$.message").value("Invalid session token."))
+        .andExpect(jsonPath("$.path").value("/api/auth/" + token + "/logout"))
         .andReturn();
   }
 
@@ -192,15 +179,14 @@ class AuthControllerIT {
     String url = "/api/auth/" + token + "/verify";
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post(url)
-    );
+    ResultActions result = mvc.perform(MockMvcRequestBuilders.post(url));
 
     // Then
     result
         .andExpect(status().isUnauthorized())
-        .andExpect(jsonPath("$.status").value("error"))
-        .andExpect(jsonPath("$.message").exists())
+        .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
+        .andExpect(jsonPath("$.message").value("Session expired or token is invalid"))
+        .andExpect(jsonPath("$.path").value("/api/auth/" + token + "/verify"))
         .andReturn();
   }
 }

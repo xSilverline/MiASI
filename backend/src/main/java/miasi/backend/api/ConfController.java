@@ -4,19 +4,27 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
+import java.net.URI;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.OptionalInt;
 import lombok.RequiredArgsConstructor;
-import miasi.backend.api.jsons.BasicResponseEntity;
-import miasi.backend.domains.configuration.ConfService;
+import miasi.backend.adapter.in.web.dto.BasicResponseEntity;
+import miasi.backend.adapter.in.web.dto.ConfigurationRequestMapper;
+import miasi.backend.adapter.in.web.dto.MissionPlanRequest;
+import miasi.backend.adapter.in.web.dto.ModuleRequest;
+import miasi.backend.adapter.in.web.dto.ModuleTypeRequest;
+import miasi.backend.configuration.application.port.in.GetMissionPlanUseCase;
+import miasi.backend.configuration.application.port.in.GetModuleCatalogUseCase;
+import miasi.backend.configuration.application.port.in.ManageMissionPlanUseCase;
+import miasi.backend.configuration.application.port.in.ManageModuleCatalogUseCase;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
-import miasi.backend.domains.configuration.modules.Module;
 import miasi.backend.domains.configuration.modules.ModuleCatalog;
-import miasi.backend.domains.configuration.modules.ModuleType;
-import miasi.backend.enums.ModuleState;
-import miasi.backend.enums.ResourceType;
+import miasi.backend.sharedkernel.model.ModuleState;
+import miasi.backend.sharedkernel.model.ResourceType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
 
 @CrossOrigin(origins = "http://localhost:*") // TODO: do zmiany gdy będą znane porty frontendu
 @RestController
@@ -24,119 +32,103 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class ConfController {
 
-  private final ConfService confService;
+  private final GetMissionPlanUseCase getMissionPlanUseCase;
+  private final ManageMissionPlanUseCase manageMissionPlanUseCase;
+  private final GetModuleCatalogUseCase getModuleCatalogUseCase;
+  private final ManageModuleCatalogUseCase manageModuleCatalogUseCase;
 
   @GetMapping("/default/plan")
   public ResponseEntity<MissionPlan> getDefaultMissionPlan() {
-    return ResponseEntity.ok(confService.getDefaultMissionPlan());
+    return ResponseEntity.ok(getMissionPlanUseCase.getDefaultMissionPlan());
   }
 
   @GetMapping("/{missionId}/plan")
   @ApiResponses({
-      @ApiResponse(
-          responseCode = "200",
-          description = "Plan misji został znaleziony"
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Nie znaleziono planu misji o podanym id",
-          content = @Content
-      )
+    @ApiResponse(responseCode = "200", description = "Plan misji został znaleziony"),
+    @ApiResponse(
+        responseCode = "404",
+        description = "Nie znaleziono planu misji o podanym id",
+        content = @Content)
   })
   @Operation(
       summary = "Pobiera plan misji o podanym id",
-      description = "Plany misji mają id w przedziale [0;X), gdzie X to wynik zapytania /api/conf/plans-count"
-  )
+      description =
+          "Plany misji mają id w przedziale [0;X), gdzie X to wynik zapytania /api/conf/plans-count")
   public ResponseEntity<MissionPlan> getMissionPlan(@PathVariable int missionId) {
-    MissionPlan plan = confService.getMissionPlan(missionId);
-    return plan != null ? ResponseEntity.ok(plan) : ResponseEntity.notFound().build();
+    Optional<MissionPlan> plan = getMissionPlanUseCase.getMissionPlan(missionId);
+    return plan.map(ResponseEntity::ok)
+        .orElseThrow(() -> new NoSuchElementException("Mission plan not found: " + missionId));
   }
 
   @GetMapping("/module-catalog")
   public ResponseEntity<ModuleCatalog> getModuleCatalog() {
-    return ResponseEntity.ok(confService.getModuleCatalog());
+    return ResponseEntity.ok(getModuleCatalogUseCase.getModuleCatalog());
   }
 
   @Operation(
       summary = "Wysyła do bazy danych nowy plan misji",
-      description = "Jeżeli parametr 'override' jest ustawiony, to plan nadpisze istniejacy plan na podanym id." +
-          " Jeżeli podano błedne id, zwrócony zostaje komunikat NOT FOUND." +
-          " Zwraca id utworzonego/nadpisanego planu jako 'message'"
-  )
+      description =
+          "Jeżeli parametr 'override' jest ustawiony, to plan nadpisze istniejacy plan na podanym id."
+              + " Jeżeli podano błedne id, zwrócony zostaje komunikat NOT FOUND."
+              + " Zwraca id utworzonego/nadpisanego planu jako 'message'")
   @ApiResponses({
-      @ApiResponse(
-          responseCode = "201",
-          description = "Plan został utworzony"
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Nie znaleziono planu do nadpisania",
-          content = @Content
-      )
+    @ApiResponse(responseCode = "201", description = "Plan został utworzony"),
+    @ApiResponse(
+        responseCode = "404",
+        description = "Nie znaleziono planu do nadpisania",
+        content = @Content)
   })
   @PostMapping("/plan")
   public ResponseEntity<BasicResponseEntity> postMissionPlan(
-      @RequestBody MissionPlan missionPlan,
-      @RequestParam(required = false) Integer override
-  ) {
-    Integer id;
+      @Valid @RequestBody MissionPlanRequest request,
+      @RequestParam(required = false) Integer override) {
+    MissionPlan missionPlan = ConfigurationRequestMapper.toDomain(request);
+    int id;
     if (override != null) {
-      id = confService.overrideMissionPlan(override, missionPlan);
-      if (id == null) {
-        return ResponseEntity.notFound().build();
+      OptionalInt overrideId = manageMissionPlanUseCase.overrideMissionPlan(override, missionPlan);
+      if (overrideId.isEmpty()) {
+        throw new NoSuchElementException("Mission plan not found: " + override);
       }
+      id = overrideId.getAsInt();
     } else {
-      id = confService.saveMissionPlan(missionPlan);
+      id = manageMissionPlanUseCase.saveMissionPlan(missionPlan);
     }
 
-    return ResponseEntity
-        .created(URI.create("/api/conf/%d/plan".formatted(id)))
+    return ResponseEntity.created(URI.create("/api/conf/%d/plan".formatted(id)))
         .body(BasicResponseEntity.success(Integer.toString(id)));
   }
 
-
   @GetMapping("plans-count")
-  @Operation(
-      description = "Zwraca ilość planów misji w bazie danych w polu 'message'"
-  )
+  @Operation(description = "Zwraca ilość planów misji w bazie danych w polu 'message'")
   public ResponseEntity<BasicResponseEntity> getMissionsCount() {
     return ResponseEntity.ok()
-        .body(BasicResponseEntity.success(Integer.toString(confService.getPlansCount())));
+        .body(BasicResponseEntity.success(Integer.toString(getMissionPlanUseCase.getPlansCount())));
   }
 
   @PostMapping("/module")
-  @ApiResponses({
-      @ApiResponse(responseCode = "201", description = "Moduł został dodany")
-  })
+  @ApiResponses({@ApiResponse(responseCode = "201", description = "Moduł został dodany")})
   @Operation(
-      description = "Dodaje moduł do bazy danych, jeżeli nazwa będzie taka sama," +
-          " jak element w bazie, zostanie on nadpisany"
-  )
-  public ResponseEntity<BasicResponseEntity> postModule(
-      @RequestBody Module module
-  ) {
-    int id = confService.addModule(module);
+      description =
+          "Dodaje moduł do bazy danych, jeżeli nazwa będzie taka sama,"
+              + " jak element w bazie, zostanie on nadpisany")
+  public ResponseEntity<BasicResponseEntity> postModule(@Valid @RequestBody ModuleRequest request) {
+    int id = manageModuleCatalogUseCase.addModule(ConfigurationRequestMapper.toDomain(request));
 
-    return ResponseEntity
-        .created(URI.create("/api/conf/module-catalog"))
+    return ResponseEntity.created(URI.create("/api/conf/module-catalog"))
         .body(BasicResponseEntity.success(Integer.toString(id)));
   }
 
   @PostMapping("/module-type")
-  @ApiResponses({
-      @ApiResponse(responseCode = "201", description = "Typ modułu został dodany")
-  })
+  @ApiResponses({@ApiResponse(responseCode = "201", description = "Typ modułu został dodany")})
   @Operation(
-      description = "Dodaje typ moduły do bazy danych, jeżeli nazwa będzie taka sama," +
-          " jak element w bazie, zostanie on nadpisany"
-  )
+      description =
+          "Dodaje typ moduły do bazy danych, jeżeli nazwa będzie taka sama,"
+              + " jak element w bazie, zostanie on nadpisany")
   public ResponseEntity<BasicResponseEntity> postModuleType(
-      @RequestBody ModuleType type
-  ) {
-    int id = confService.addModuleType(type);
+      @Valid @RequestBody ModuleTypeRequest request) {
+    int id = manageModuleCatalogUseCase.addModuleType(ConfigurationRequestMapper.toDomain(request));
 
-    return ResponseEntity
-        .created(URI.create("/api/conf/module-catalog"))
+    return ResponseEntity.created(URI.create("/api/conf/module-catalog"))
         .body(BasicResponseEntity.success(Integer.toString(id)));
   }
 

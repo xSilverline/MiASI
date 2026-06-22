@@ -1,13 +1,12 @@
 package miasi.backend.domains.analysis.types.core;
 
-import miasi.backend.enums.ResourceType;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import miasi.backend.sharedkernel.model.ResourceType;
+import org.junit.jupiter.api.Test;
 
 class DailyBalanceTest {
 

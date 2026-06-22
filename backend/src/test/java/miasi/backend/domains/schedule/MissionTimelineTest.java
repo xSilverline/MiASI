@@ -1,14 +1,13 @@
 package miasi.backend.domains.schedule;
 
-import miasi.backend.enums.EventType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
+import miasi.backend.schedule.domain.EventType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class MissionTimelineTest {
 
@@ -41,17 +40,16 @@ class MissionTimelineTest {
   @Test
   void filterByType_exceptionsThrowTest() {
     // When + Then (Valid data)
-    assertDoesNotThrow(() -> {
-      timeline.filterByType(EventType.THREAT);
-    });
+    assertDoesNotThrow(
+        () -> {
+          timeline.filterByType(EventType.THREAT);
+        });
 
     // When + Then (Null as argument)
-    assertThrows(IllegalArgumentException.class, () ->
-        timeline.filterByType(null));
+    assertThrows(IllegalArgumentException.class, () -> timeline.filterByType(null));
 
     // When + Then (Event list is null)
     timeline.setEventsSortedBySol(null);
     assertEquals(0, timeline.filterByType(EventType.THREAT).getEventsSortedBySol().size());
   }
 }
-

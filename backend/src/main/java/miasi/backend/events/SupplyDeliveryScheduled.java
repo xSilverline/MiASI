@@ -1,18 +1,33 @@
 package miasi.backend.events;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldDefaults;
-import miasi.backend.domains.schedule.DeliveryContent;
+import java.util.List;
+import miasi.backend.schedule.domain.DeliveryItemType;
+import miasi.backend.sharedkernel.events.EventEnvelope;
+import miasi.backend.sharedkernel.events.IntegrationEvent;
 
-@Getter
-@Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
-public class SupplyDeliveryScheduled {
-  String scheduleId;
-  int sol;
-  DeliveryContent content;
+public record SupplyDeliveryScheduled(
+    EventEnvelope envelope,
+    String scheduleId,
+    int sol,
+    List<DeliveryItemSnapshot> items,
+    double totalWeight)
+    implements IntegrationEvent {
+
+  public static SupplyDeliveryScheduled create(
+      String scheduleId, int sol, List<DeliveryItemSnapshot> items, double totalWeight) {
+    return new SupplyDeliveryScheduled(
+        EventEnvelope.initial(scheduleId),
+        scheduleId,
+        sol,
+        items == null ? List.of() : List.copyOf(items),
+        totalWeight);
+  }
+
+  @Override
+  public String eventType() {
+    return "SupplyDeliveryScheduled";
+  }
+
+  public record DeliveryItemSnapshot(
+      String itemId, DeliveryItemType itemType, double quantity, double weight) {}
 }

@@ -1,16 +1,17 @@
 package miasi.backend.events;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.FieldDefaults;
+import miasi.backend.sharedkernel.events.EventEnvelope;
+import miasi.backend.sharedkernel.events.IntegrationEvent;
 
-@Getter
-@Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
-public class MissionScheduleCreated {
-  String scheduleId;
-  String missionPlanId;
+public record MissionScheduleCreated(
+    EventEnvelope envelope, String scheduleId, String missionPlanId) implements IntegrationEvent {
+
+  public static MissionScheduleCreated create(String scheduleId, String missionPlanId) {
+    return new MissionScheduleCreated(EventEnvelope.initial(scheduleId), scheduleId, missionPlanId);
+  }
+
+  @Override
+  public String eventType() {
+    return "MissionScheduleCreated";
+  }
 }

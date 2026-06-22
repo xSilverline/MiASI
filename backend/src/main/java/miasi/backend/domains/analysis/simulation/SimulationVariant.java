@@ -1,12 +1,11 @@
 package miasi.backend.domains.analysis.simulation;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.analysis.types.core.DailyState;
-
-import java.util.List;
 
 @Getter
 @Setter

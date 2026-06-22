@@ -1,5 +1,6 @@
 package miasi.backend.domains.analysis.types.modules;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +8,7 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.analysis.types.core.DailyBalance;
 import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.enums.ModuleState;
-
-import java.util.List;
+import miasi.backend.sharedkernel.model.ModuleState;
 
 @Getter
 @Setter
@@ -18,8 +17,8 @@ import java.util.List;
 public class Module {
   String name;
   float weight;
-  int minCount;       // Może być null jeśli wcale nie musi to być
-  Integer maxCount;   // Może być null dla braku limitu (np. panele słoneczne)
+  int minCount; // Może być null jeśli wcale nie musi to być
+  Integer maxCount; // Może być null dla braku limitu (np. panele słoneczne)
   List<Resource> production;
   List<Resource> consumption;
   ModuleState status;
@@ -32,11 +31,15 @@ public class Module {
 
   public Module copy() {
     // deepcopy
-    List<Resource> productionCopy = this.production != null ?
-        this.production.stream().map(Resource::copy).toList() : new java.util.ArrayList<>();
+    List<Resource> productionCopy =
+        this.production != null
+            ? this.production.stream().map(Resource::copy).toList()
+            : new java.util.ArrayList<>();
 
-    List<Resource> consumptionCopy = this.consumption != null ?
-        this.consumption.stream().map(Resource::copy).toList() : new java.util.ArrayList<>();
+    List<Resource> consumptionCopy =
+        this.consumption != null
+            ? this.consumption.stream().map(Resource::copy).toList()
+            : new java.util.ArrayList<>();
 
     return new Module(
         this.name,
@@ -46,7 +49,6 @@ public class Module {
         productionCopy,
         consumptionCopy,
         this.status,
-        this.efficiency
-    );
+        this.efficiency);
   }
 }

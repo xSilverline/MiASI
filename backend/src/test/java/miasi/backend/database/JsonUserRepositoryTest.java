@@ -1,24 +1,21 @@
 package miasi.backend.database;
 
-import miasi.backend.domains.authorization.Identity;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import miasi.backend.domains.authorization.Identity;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class JsonUserRepositoryTest {
 
   private JsonFileStorage<Identity> database;
   private JsonUserRepository repository;
 
-
   private Identity user1;
   private Identity user2;
-
 
   @BeforeEach
   void setUp() throws Exception {
@@ -34,12 +31,10 @@ class JsonUserRepositoryTest {
     user2 = new Identity("alice", "hash2");
   }
 
-
   @Test
   void findByLogin_shouldReturnUser() {
     // given
-    when(database.loadListFromFile("test.json"))
-        .thenReturn(List.of(user1, user2));
+    when(database.loadListFromFile("test.json")).thenReturn(List.of(user1, user2));
 
     // when
     Identity result = repository.findByLogin("john");
@@ -52,8 +47,7 @@ class JsonUserRepositoryTest {
   @Test
   void findByLogin_shouldIgnoreCase() {
     // given
-    when(database.loadListFromFile("test.json"))
-        .thenReturn(List.of(user1));
+    when(database.loadListFromFile("test.json")).thenReturn(List.of(user1));
 
     // when
     Identity result = repository.findByLogin("JOHN");
@@ -66,8 +60,7 @@ class JsonUserRepositoryTest {
   @Test
   void findByLogin_shouldReturnNullWhenMissing() {
     // given
-    when(database.loadListFromFile("test.json"))
-        .thenReturn(List.of(user1));
+    when(database.loadListFromFile("test.json")).thenReturn(List.of(user1));
 
     // when
     Identity result = repository.findByLogin("unknown");
@@ -79,8 +72,7 @@ class JsonUserRepositoryTest {
   @Test
   void findAll_shouldReturnUsers() {
     // given
-    when(database.loadListFromFile("test.json"))
-        .thenReturn(List.of(user1, user2));
+    when(database.loadListFromFile("test.json")).thenReturn(List.of(user1, user2));
 
     // when
     var result = repository.findAll();
@@ -94,8 +86,7 @@ class JsonUserRepositoryTest {
   @Test
   void findAll_shouldReturnEmptyListWhenDatabaseReturnsNull() {
     // given
-    when(database.loadListFromFile("test.json"))
-        .thenReturn(null);
+    when(database.loadListFromFile("test.json")).thenReturn(null);
 
     // when
     var result = repository.findAll();
@@ -108,8 +99,7 @@ class JsonUserRepositoryTest {
   @Test
   void exists_shouldReturnTrueWhenUserExists() {
     // given
-    when(database.loadListFromFile("test.json"))
-        .thenReturn(List.of(user1));
+    when(database.loadListFromFile("test.json")).thenReturn(List.of(user1));
 
     // when
     boolean result = repository.exists("john");
@@ -121,8 +111,7 @@ class JsonUserRepositoryTest {
   @Test
   void exists_shouldReturnFalseWhenUserMissing() {
     // given
-    when(database.loadListFromFile("test.json"))
-        .thenReturn(List.of(user1));
+    when(database.loadListFromFile("test.json")).thenReturn(List.of(user1));
 
     // when
     boolean result = repository.exists("bob");

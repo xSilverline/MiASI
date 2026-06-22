@@ -1,47 +1,26 @@
 package miasi.backend.database;
 
-import miasi.backend.domains.configuration.missionPlan.MissionPlan;
-import org.json.JSONException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import tools.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles("test")
+import java.nio.file.Path;
+import java.util.List;
+import miasi.backend.configuration.adapter.out.persistence.json.MissionPlansRepository;
+import miasi.backend.domains.configuration.missionPlan.MissionPlan;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
 class MissionPlansRepositoryTest {
-  @Value("${database.filename.missions}")
-  String path;
-
-  @Autowired
-  private ObjectMapper objectMapper;
-
+  @TempDir private Path tempDir;
+  private Path filePath;
   private MissionPlansRepository repository;
 
   @BeforeEach
   void setUp() {
-    repository = new MissionPlansRepository(path);
-  }
-
-  @AfterEach
-  void restoreFile(@Value("${database.path.hardcopy}") String hardCopy) throws IOException {
-    Path source = Paths.get(hardCopy + path.substring(path.lastIndexOf("/")));
-    Path target = Paths.get(path);
-
-    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+    filePath = tempDir.resolve("missionPlans.json");
+    new JsonFileStorage<>(MissionPlan.class)
+        .saveListToFile(List.of(new MissionPlan()), filePath.toString());
+    repository = new MissionPlansRepository(filePath.toString());
   }
 
   @Test
@@ -51,10 +30,10 @@ class MissionPlansRepositoryTest {
     int id = repository.save(plan);
 
     // when
-    MissionPlansRepository newRepo = new MissionPlansRepository(path);
+    MissionPlansRepository newRepo = new MissionPlansRepository(filePath.toString());
 
     // then
-    assertNotNull(newRepo.findById(id));
+    assertTrue(newRepo.findById(id).isPresent());
   }
 
   @Test
@@ -64,44 +43,56 @@ class MissionPlansRepositoryTest {
     repository.save(plan);
 
     // when
-    MissionPlan result = repository.findById(0);
+    MissionPlan result = repository.findById(0).orElseThrow();
 
     // then
     assertNotNull(result);
   }
 
   @Test
-  void findById_shouldReturnNullWhenInvalidIndex() {
+  void findById_shouldReturnEmptyWhenInvalidIndex() {
     // when
-    MissionPlan result = repository.findById(999);
+    boolean result = repository.findById(999).isPresent();
 
     // then
-    assertNull(result);
+    assertFalse(result);
   }
 
   @Test
-  void save_shouldAddPlanAndPersist() throws JSONException {
+  void save_shouldAddPlanAndPersist() {
     // given
     MissionPlan plan = new MissionPlan();
+    plan.setMissionDurationSols(360);
 
     // when
     int id = repository.save(plan);
 
     // then
     assertEquals(1, id);
-    assertEquals(plan, repository.findById(1));
+    assertEquals(360, repository.findById(1).orElseThrow().getMissionDurationSols());
 
     // verify persistence
-    MissionPlansRepository newRepo = new MissionPlansRepository(path);
-    JSONAssert.assertEquals(
-        objectMapper.writeValueAsString(plan),
-        objectMapper.writeValueAsString(newRepo.findById(1)),
-        true
-    );
+    MissionPlansRepository newRepo = new MissionPlansRepository(filePath.toString());
+    assertEquals(360, newRepo.findById(1).orElseThrow().getMissionDurationSols());
   }
 
   @Test
-  void delete_shouldRemovePlan() {
+  void replace_shouldPersistWhenRepositoryIsReloaded() {
+    // given
+    MissionPlan plan = new MissionPlan();
+    plan.setMissionDurationSols(420);
+
+    // when
+    int id = repository.replace(0, plan);
+
+    // then
+    assertEquals(0, id);
+    MissionPlansRepository reloadedRepository = new MissionPlansRepository(filePath.toString());
+    assertEquals(420, reloadedRepository.findById(0).orElseThrow().getMissionDurationSols());
+  }
+
+  @Test
+  void delete_shouldRemovePlanAndPersist() {
     // given
     repository.save(new MissionPlan());
     repository.save(new MissionPlan());
@@ -110,7 +101,11 @@ class MissionPlansRepositoryTest {
     repository.delete(2);
 
     // then
-    assertNull(repository.findById(2));
-    assertNotNull(repository.findById(1)); // teraz drugi element przesunął się na index 0
+    assertFalse(repository.findById(2).isPresent());
+    assertTrue(repository.findById(1).isPresent());
+
+    MissionPlansRepository reloadedRepository = new MissionPlansRepository(filePath.toString());
+    assertFalse(reloadedRepository.findById(2).isPresent());
+    assertTrue(reloadedRepository.findById(1).isPresent());
   }
 }

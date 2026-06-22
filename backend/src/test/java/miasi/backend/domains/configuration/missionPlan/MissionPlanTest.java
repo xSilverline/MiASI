@@ -1,11 +1,11 @@
 package miasi.backend.domains.configuration.missionPlan;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import miasi.backend.domains.configuration.modules.Module;
 import miasi.backend.domains.configuration.other.SexProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class MissionPlanTest {
 

@@ -1,11 +1,11 @@
 package miasi.backend.domains.configuration.other;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SexProfileTest {
 
@@ -20,7 +20,7 @@ class SexProfileTest {
       profile = new SexProfile();
       start = profile.getPopulation();
     }
-    
+
     @ParameterizedTest
     @ValueSource(ints = {2, -3, 0})
     void add(int number) {
@@ -34,5 +34,4 @@ class SexProfileTest {
       assertEquals(start + number, profile.getPopulation());
     }
   }
-
 }

@@ -1,14 +1,13 @@
 package miasi.backend.domains.analysis.services;
 
+import java.util.List;
 import miasi.backend.domains.analysis.simulation.Status;
 import miasi.backend.domains.analysis.types.core.DailyState;
 import miasi.backend.domains.analysis.types.core.ObservationType;
 import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.input.MissionManifest;
 import miasi.backend.domains.analysis.types.result.SimulationOutcome;
-import miasi.backend.enums.ResourceType;
-
-import java.util.List;
+import miasi.backend.sharedkernel.model.ResourceType;
 
 public class SimulationOutcomeEvaluator {
 
@@ -23,7 +22,8 @@ public class SimulationOutcomeEvaluator {
       }
 
       // 2. Szukamy dnia wezwania SOS
-      if (sosCalledSol == null && state.getObservations().contains(ObservationType.EVACUATION_ALERT)) {
+      if (sosCalledSol == null
+          && state.getObservations().contains(ObservationType.EVACUATION_ALERT)) {
         sosCalledSol = state.getSol();
       }
     }
@@ -44,10 +44,12 @@ public class SimulationOutcomeEvaluator {
   }
 
   private boolean hasAnyResourceDeficit(List<Resource> warehouse) {
-    return warehouse.stream().anyMatch(r ->
-        (r.getType() == ResourceType.OXYGEN ||
-            r.getType() == ResourceType.WATER ||
-            r.getType() == ResourceType.FOOD) && r.getAmount() < 0
-    );
+    return warehouse.stream()
+        .anyMatch(
+            r ->
+                (r.getType() == ResourceType.OXYGEN
+                        || r.getType() == ResourceType.WATER
+                        || r.getType() == ResourceType.FOOD)
+                    && r.getAmount() < 0);
   }
 }

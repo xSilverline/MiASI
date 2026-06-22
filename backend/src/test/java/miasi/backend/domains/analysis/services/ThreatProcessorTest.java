@@ -1,22 +1,21 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.modules.Module;
-import miasi.backend.domains.analysis.types.schedule.ImpactType;
-import miasi.backend.domains.analysis.types.schedule.Threat;
-import miasi.backend.enums.ModuleState;
-import miasi.backend.enums.ResourceType;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import miasi.backend.domains.analysis.types.core.Resource;
+import miasi.backend.domains.analysis.types.modules.Module;
+import miasi.backend.domains.analysis.types.schedule.ImpactType;
+import miasi.backend.domains.analysis.types.schedule.Threat;
+import miasi.backend.sharedkernel.model.ModuleState;
+import miasi.backend.sharedkernel.model.ResourceType;
+import org.junit.jupiter.api.Test;
 
 class ThreatProcessorTest {
 
@@ -81,7 +80,6 @@ class ThreatProcessorTest {
     assertTrue(true);
   }
 
-
   @Test
   void shouldChangeModuleEfficiency() {
     // Given
@@ -127,7 +125,6 @@ class ThreatProcessorTest {
     // Then
     verify(module).setEfficiency(0f);
   }
-
 
   @Test
   void shouldIgnoreEfficiencyChangeWhenModulesNull() {

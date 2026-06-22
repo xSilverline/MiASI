@@ -1,12 +1,12 @@
 package miasi.backend.database;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
+import java.util.List;
+import miasi.backend.configuration.adapter.out.persistence.json.ModuleRecordList;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ModuleRecordListTest {
 
@@ -17,11 +17,7 @@ class ModuleRecordListTest {
   void setUp() {
     // given
     database = mock(JsonFileStorage.class);
-    recordList = new ModuleRecordList<>(
-        List.of("A", "B"),
-        "test.json",
-        database
-    );
+    recordList = new ModuleRecordList<>(List.of("A", "B"), "test.json", database);
   }
 
   @Test
@@ -40,8 +36,7 @@ class ModuleRecordListTest {
     recordList.save();
 
     // then
-    verify(database, times(1))
-        .saveListToFile(recordList.getObjects(), "test.json");
+    verify(database, times(1)).saveListToFile(recordList.getObjects(), "test.json");
   }
 
   @Test

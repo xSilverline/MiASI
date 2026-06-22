@@ -1,17 +1,16 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.modules.Module;
-import miasi.backend.enums.ResourceType;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import miasi.backend.domains.analysis.types.core.Resource;
+import miasi.backend.domains.analysis.types.modules.Module;
+import miasi.backend.sharedkernel.model.ResourceType;
+import org.junit.jupiter.api.Test;
 
 class WeightCalculatorTest {
 
@@ -29,16 +28,10 @@ class WeightCalculatorTest {
     Resource resource = new Resource(type, amountToAdd);
 
     // When
-    float result = calculator.calculateTotalWeight(
-        List.of(module),
-        List.of(resource)
-    );
+    float result = calculator.calculateTotalWeight(List.of(module), List.of(resource));
 
     // Then
-    assertEquals(
-        startWeight + type.getWeightRatio() * amountToAdd,
-        result
-    );
+    assertEquals(startWeight + type.getWeightRatio() * amountToAdd, result);
   }
 
   @Test

@@ -1,17 +1,24 @@
 package miasi.backend.domains.analysis.simulation;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.experimental.FieldDefaults;
-
 import java.util.UUID;
+import miasi.backend.sharedkernel.events.EventEnvelope;
+import miasi.backend.sharedkernel.events.IntegrationEvent;
 
-@Getter
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
-public class SimulationAnalysisCompletedEvent {
-  UUID manifestId;
-  SimulationVariant idealVariant; // scenariusz bez awarii (linia bazowa)
-  SimulationVariant realVariant;  // scenariusz uwzględniający awarie i spadki wydajności
+public record SimulationAnalysisCompletedEvent(
+    EventEnvelope envelope,
+    UUID manifestId,
+    SimulationVariant idealVariant,
+    SimulationVariant realVariant)
+    implements IntegrationEvent {
+
+  public static SimulationAnalysisCompletedEvent create(
+      UUID manifestId, SimulationVariant idealVariant, SimulationVariant realVariant) {
+    return new SimulationAnalysisCompletedEvent(
+        EventEnvelope.initial(manifestId.toString()), manifestId, idealVariant, realVariant);
+  }
+
+  @Override
+  public String eventType() {
+    return "SimulationAnalysisCompleted";
+  }
 }

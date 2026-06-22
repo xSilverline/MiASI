@@ -1,14 +1,13 @@
 package miasi.backend.domains.configuration.missionPlan;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.configuration.modules.Module;
 import miasi.backend.domains.configuration.other.Resources;
 import miasi.backend.domains.configuration.other.SexProfile;
-import miasi.backend.enums.ResourceType;
-
-import java.util.ArrayList;
-import java.util.List;
+import miasi.backend.sharedkernel.model.ResourceType;
 
 @Getter
 @Setter

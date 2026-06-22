@@ -1,17 +1,25 @@
 package miasi.backend.api;
 
+import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
-import miasi.backend.api.jsons.BasicResponseEntity;
-import miasi.backend.api.jsons.CreateScheduleRequest;
-import miasi.backend.api.jsons.GenerateScenarioRequest;
-import miasi.backend.api.jsons.ScheduleModuleStateChangeRequest;
-import miasi.backend.domains.schedule.MissionSchedule;
-import miasi.backend.domains.schedule.MissionTimeline;
-import miasi.backend.domains.schedule.ScenarioDraft;
-import miasi.backend.domains.schedule.ScheduleService;
-import miasi.backend.domains.schedule.ScheduledEvent;
-import miasi.backend.enums.EventType;
+import miasi.backend.adapter.in.web.dto.BasicResponseEntity;
+import miasi.backend.adapter.in.web.dto.CreateScheduleRequest;
+import miasi.backend.adapter.in.web.dto.GenerateScenarioRequest;
+import miasi.backend.adapter.in.web.dto.ScenarioDraftResponse;
+import miasi.backend.adapter.in.web.dto.ScheduleModuleStateChangeRequest;
+import miasi.backend.adapter.in.web.dto.ScheduleResponse;
+import miasi.backend.adapter.in.web.dto.ScheduleResponseMapper;
+import miasi.backend.adapter.in.web.dto.ScheduledEventRequest;
+import miasi.backend.adapter.in.web.dto.TimelineResponse;
+import miasi.backend.schedule.application.port.in.ApproveScenarioUseCase;
+import miasi.backend.schedule.application.port.in.ChangeScheduleEventsUseCase;
+import miasi.backend.schedule.application.port.in.CorrectScenarioUseCase;
+import miasi.backend.schedule.application.port.in.CreateScheduleUseCase;
+import miasi.backend.schedule.application.port.in.GenerateScenarioUseCase;
+import miasi.backend.schedule.application.port.in.GetScheduleTimelineUseCase;
+import miasi.backend.schedule.application.port.in.GetScheduleUseCase;
+import miasi.backend.schedule.domain.EventType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,99 +38,115 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ScheduleController {
 
-  private final ScheduleService scheduleService;
+  private final CreateScheduleUseCase createScheduleUseCase;
+  private final GetScheduleUseCase getScheduleUseCase;
+  private final GetScheduleTimelineUseCase getScheduleTimelineUseCase;
+  private final ChangeScheduleEventsUseCase changeScheduleEventsUseCase;
+  private final GenerateScenarioUseCase generateScenarioUseCase;
+  private final CorrectScenarioUseCase correctScenarioUseCase;
+  private final ApproveScenarioUseCase approveScenarioUseCase;
 
   @PostMapping
-  public ResponseEntity<MissionSchedule> createSchedule(
-      @RequestBody CreateScheduleRequest request) {
-    MissionSchedule schedule =
-        scheduleService.createSchedule(request.missionPlanId(), request.durationSols());
+  public ResponseEntity<ScheduleResponse> createSchedule(
+      @Valid @RequestBody CreateScheduleRequest request) {
+    var schedule =
+        createScheduleUseCase.createSchedule(request.missionPlanId(), request.durationSols());
 
-    return ResponseEntity.created(URI.create("/api/schedule/" + schedule.getId())).body(schedule);
+    return ResponseEntity.created(URI.create("/api/schedule/" + schedule.getId()))
+        .body(ScheduleResponseMapper.toResponse(schedule));
   }
 
   @GetMapping("/{scheduleId}")
-  public ResponseEntity<MissionSchedule> getSchedule(@PathVariable String scheduleId) {
-    return ResponseEntity.ok(scheduleService.getSchedule(scheduleId));
+  public ResponseEntity<ScheduleResponse> getSchedule(@PathVariable String scheduleId) {
+    return ResponseEntity.ok(
+        ScheduleResponseMapper.toResponse(getScheduleUseCase.getSchedule(scheduleId)));
   }
 
   @GetMapping("/{scheduleId}/timeline")
-  public ResponseEntity<MissionTimeline> getTimeline(
+  public ResponseEntity<TimelineResponse> getTimeline(
       @PathVariable String scheduleId, @RequestParam(required = false) EventType type) {
-    MissionTimeline timeline = scheduleService.getTimeline(scheduleId);
-    return ResponseEntity.ok(type == null ? timeline : timeline.filterByType(type));
+    var timeline = getScheduleTimelineUseCase.getTimeline(scheduleId);
+    return ResponseEntity.ok(
+        ScheduleResponseMapper.toResponse(type == null ? timeline : timeline.filterByType(type)));
   }
 
   @PostMapping("/{scheduleId}/events")
-  public ResponseEntity<MissionSchedule> addEvent(
-      @PathVariable String scheduleId, @RequestBody ScheduledEvent event) {
-    MissionSchedule schedule = scheduleService.addEvent(scheduleId, event);
-    return ResponseEntity.ok(schedule);
+  public ResponseEntity<ScheduleResponse> addEvent(
+      @PathVariable String scheduleId, @Valid @RequestBody ScheduledEventRequest request) {
+    var schedule = changeScheduleEventsUseCase.addEvent(scheduleId, request.toDomain());
+    return ResponseEntity.ok(ScheduleResponseMapper.toResponse(schedule));
   }
 
   @PutMapping("/{scheduleId}/events/{eventId}")
-  public ResponseEntity<MissionSchedule> updateEvent(
+  public ResponseEntity<ScheduleResponse> updateEvent(
       @PathVariable String scheduleId,
       @PathVariable String eventId,
-      @RequestBody ScheduledEvent event) {
-    MissionSchedule schedule = scheduleService.updateEvent(scheduleId, eventId, event);
-    return ResponseEntity.ok(schedule);
+      @Valid @RequestBody ScheduledEventRequest request) {
+    var schedule = changeScheduleEventsUseCase.updateEvent(scheduleId, eventId, request.toDomain());
+    return ResponseEntity.ok(ScheduleResponseMapper.toResponse(schedule));
   }
 
   @PostMapping("/{scheduleId}/module-state-changes")
-  public ResponseEntity<MissionSchedule> scheduleModuleStateChange(
-      @PathVariable String scheduleId, @RequestBody ScheduleModuleStateChangeRequest request) {
-    MissionSchedule schedule =
-        scheduleService.scheduleModuleStateChange(
+  public ResponseEntity<ScheduleResponse> scheduleModuleStateChange(
+      @PathVariable String scheduleId,
+      @Valid @RequestBody ScheduleModuleStateChangeRequest request) {
+    var schedule =
+        changeScheduleEventsUseCase.scheduleModuleStateChange(
             scheduleId,
             request.id(),
             request.sol(),
             request.description(),
             request.moduleId(),
             request.newState());
-    return ResponseEntity.ok(schedule);
+    return ResponseEntity.ok(ScheduleResponseMapper.toResponse(schedule));
   }
 
   @DeleteMapping("/{scheduleId}/events/{eventId}")
   public ResponseEntity<BasicResponseEntity> removeEvent(
       @PathVariable String scheduleId, @PathVariable String eventId) {
-    scheduleService.removeEvent(scheduleId, eventId);
+    changeScheduleEventsUseCase.removeEvent(scheduleId, eventId);
     return ResponseEntity.ok(BasicResponseEntity.success("Event removed"));
   }
 
   @PostMapping("/scenario")
-  public ResponseEntity<ScenarioDraft> generateScenario(
-      @RequestBody GenerateScenarioRequest request) {
-    ScenarioDraft draft =
-        scheduleService.generateScenario(
+  public ResponseEntity<ScenarioDraftResponse> generateScenario(
+      @Valid @RequestBody GenerateScenarioRequest request) {
+    var draft =
+        generateScenarioUseCase.generateScenario(
             request.missionPlanId(), request.durationSols(), request.difficulty());
 
     return ResponseEntity.created(URI.create("/api/schedule/scenario/" + draft.getId()))
-        .body(draft);
+        .body(ScheduleResponseMapper.toResponse(draft));
   }
 
   @GetMapping("/scenario/{draftId}")
-  public ResponseEntity<ScenarioDraft> getScenarioDraft(@PathVariable String draftId) {
-    return ResponseEntity.ok(scheduleService.getScenarioDraft(draftId));
+  public ResponseEntity<ScenarioDraftResponse> getScenarioDraft(@PathVariable String draftId) {
+    return ResponseEntity.ok(
+        ScheduleResponseMapper.toResponse(generateScenarioUseCase.getScenarioDraft(draftId)));
   }
 
   @PutMapping("/scenario/{draftId}/events/{eventId}")
-  public ResponseEntity<ScenarioDraft> correctScenarioEvent(
+  public ResponseEntity<ScenarioDraftResponse> correctScenarioEvent(
       @PathVariable String draftId,
       @PathVariable String eventId,
-      @RequestBody ScheduledEvent event) {
-    return ResponseEntity.ok(scheduleService.correctScenarioEvent(draftId, eventId, event));
+      @Valid @RequestBody ScheduledEventRequest request) {
+    return ResponseEntity.ok(
+        ScheduleResponseMapper.toResponse(
+            correctScenarioUseCase.correctScenarioEvent(draftId, eventId, request.toDomain())));
   }
 
   @PostMapping("/scenario/{draftId}/approve")
-  public ResponseEntity<MissionSchedule> approveScenarioDraft(@PathVariable String draftId) {
-    MissionSchedule schedule = scheduleService.approveScenarioDraft(draftId);
-    return ResponseEntity.created(URI.create("/api/schedule/" + schedule.getId())).body(schedule);
+  public ResponseEntity<ScheduleResponse> approveScenarioDraft(@PathVariable String draftId) {
+    var schedule = approveScenarioUseCase.approveScenarioDraft(draftId);
+    return ResponseEntity.created(URI.create("/api/schedule/" + schedule.getId()))
+        .body(ScheduleResponseMapper.toResponse(schedule));
   }
 
   @PostMapping("/{scheduleId}/scenario/{draftId}/approve")
-  public ResponseEntity<MissionSchedule> approveScenarioIntoSchedule(
+  public ResponseEntity<ScheduleResponse> approveScenarioIntoSchedule(
       @PathVariable String scheduleId, @PathVariable String draftId) {
-    return ResponseEntity.ok(scheduleService.approveScenarioIntoSchedule(scheduleId, draftId));
+    return ResponseEntity.ok(
+        ScheduleResponseMapper.toResponse(
+            approveScenarioUseCase.approveScenarioIntoSchedule(scheduleId, draftId)));
   }
 }

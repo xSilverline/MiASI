@@ -1,6 +1,8 @@
 package miasi.backend.api.config;
 
-import miasi.backend.domains.schedule.ScheduleService;
+import miasi.backend.schedule.application.ScheduleApplicationService;
+import miasi.backend.schedule.application.port.out.MissionScheduleRepositoryPort;
+import miasi.backend.schedule.application.port.out.ScheduleEventPublisherPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -8,7 +10,8 @@ import org.springframework.context.annotation.Configuration;
 public class ScheduleConfig {
 
   @Bean
-  public ScheduleService scheduleService() {
-    return new ScheduleService();
+  public ScheduleApplicationService scheduleApplicationService(
+      MissionScheduleRepositoryPort scheduleRepository, ScheduleEventPublisherPort eventPublisher) {
+    return new ScheduleApplicationService(scheduleRepository, eventPublisher);
   }
 }
