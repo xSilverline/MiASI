@@ -1,13 +1,13 @@
 package miasi.backend.eventListners;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import miasi.backend.domains.analisis.AnalysisScheduleEventInbox;
+import miasi.backend.domains.schedule.ModuleState;
 import miasi.backend.events.MissionScheduleCreated;
 import miasi.backend.events.MissionScheduleUpdated;
 import miasi.backend.events.ModuleStateChangeScheduled;
-import miasi.backend.enums.ModuleState;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AnalysisScheduleEventListenerTest {
   @Test

@@ -1,9 +1,8 @@
 package miasi.backend.domains.schedule;
 
-import miasi.backend.enums.DifficultyLevel;
-import miasi.backend.enums.EventType;
-import miasi.backend.enums.ModuleState;
-import miasi.backend.enums.ScheduleStatus;
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.EventType;
+import miasi.backend.domains.schedule.enums.ScheduleStatus;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,7 +62,7 @@ class ScheduleServiceTest {
 
     // Then
     ModuleStateChange stateChange =
-        assertInstanceOf(ModuleStateChange.class, updated.getEvents().get(0));
+        assertInstanceOf(ModuleStateChange.class, updated.getEvents().getFirst());
     assertNotNull(stateChange.getId());
     assertEquals(EventType.MODULE_STATE_CHANGE, stateChange.getType());
     assertEquals(12, stateChange.getSol());

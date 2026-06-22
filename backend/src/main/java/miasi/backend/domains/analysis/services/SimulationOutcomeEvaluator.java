@@ -1,12 +1,12 @@
 package miasi.backend.domains.analysis.services;
 
 import miasi.backend.domains.analysis.simulation.Status;
+import miasi.backend.domains.analysis.types.ResourceType;
 import miasi.backend.domains.analysis.types.core.DailyState;
 import miasi.backend.domains.analysis.types.core.ObservationType;
 import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.input.MissionManifest;
 import miasi.backend.domains.analysis.types.result.SimulationOutcome;
-import miasi.backend.enums.ResourceType;
 
 import java.util.List;
 

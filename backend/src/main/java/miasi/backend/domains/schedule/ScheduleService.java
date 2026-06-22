@@ -1,14 +1,14 @@
 package miasi.backend.domains.schedule;
 
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.EventType;
+import miasi.backend.domains.schedule.enums.ThreatType;
+
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import miasi.backend.enums.DifficultyLevel;
-import miasi.backend.enums.EventType;
-import miasi.backend.enums.ModuleState;
-import miasi.backend.enums.ThreatType;
 
 public class ScheduleService {
 

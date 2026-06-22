@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.ResourceType;
+import miasi.backend.domains.analysis.types.ResourceType;
 
 import java.util.ArrayList;
 import java.util.EnumMap;

@@ -1,9 +1,5 @@
 package miasi.backend.eventListners;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-
-import miasi.backend.domains.configuration.ConfService;
+import miasi.backend.api.config.ConfService;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.schedule.MissionPlanEventInbox;
 import miasi.backend.events.MissionPlanCreatedEvent;
@@ -13,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @ActiveProfiles("test")

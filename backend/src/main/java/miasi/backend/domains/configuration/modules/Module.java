@@ -7,9 +7,9 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.domains.configuration.other.Resources;
-import miasi.backend.enums.ModuleState;
-import miasi.backend.enums.ResourceType;
+import miasi.backend.domains.configuration.Resources;
+import miasi.backend.domains.configuration.enums.ModuleState;
+import miasi.backend.domains.configuration.enums.ResourceType;
 
 import java.util.List;
 

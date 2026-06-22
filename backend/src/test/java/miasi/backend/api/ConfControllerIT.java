@@ -1,12 +1,12 @@
 package miasi.backend.api;
 
 import com.jayway.jsonpath.JsonPath;
-import miasi.backend.domains.configuration.ConfService;
+import miasi.backend.api.config.ConfService;
+import miasi.backend.domains.configuration.enums.ModuleState;
+import miasi.backend.domains.configuration.enums.ResourceType;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
 import miasi.backend.domains.configuration.modules.ModuleCategory;
-import miasi.backend.enums.ModuleState;
-import miasi.backend.enums.ResourceType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;

@@ -1,11 +1,11 @@
-package miasi.backend.domains.configuration.other;
+package miasi.backend.domains.configuration;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.ResourceType;
+import miasi.backend.domains.configuration.enums.ResourceType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class SexProfile {
     }
   }
 
-  void changePopulation(int amount) {
+  public void changePopulation(int amount) {
     population += amount;
   }
 }

@@ -1,10 +1,10 @@
-package miasi.backend.domains.configuration.other;
+package miasi.backend.domains.configuration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import miasi.backend.enums.ResourceType;
+import miasi.backend.domains.configuration.enums.ResourceType;
 
 @NoArgsConstructor
 @AllArgsConstructor
