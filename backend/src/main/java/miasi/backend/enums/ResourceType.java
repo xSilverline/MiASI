@@ -1,12 +1,22 @@
 package miasi.backend.enums;
 
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-@ToString
+@AllArgsConstructor
+@Getter
+//@ToString
 public enum ResourceType {
-  CALORIES,
-  OXYGEN,
-  CARBON_DIOXIDE,
-  WATER,
-  ENERGY
+
+  FOOD(0.5f),
+  OXYGEN(1.2f),
+  WATER(1.1f),
+  ENERGY(0f);
+
+  private final float weightRatio;
+
+  public static ResourceType[] getDemandResourcesTypes() {
+    return new ResourceType[]{FOOD, OXYGEN, WATER};
+  }
 }
+

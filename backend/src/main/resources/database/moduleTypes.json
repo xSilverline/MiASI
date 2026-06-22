@@ -1,0 +1,17 @@
+[ {
+  "name" : "laboratory",
+  "resourceConsumption" : [ {
+    "resourceType" : "ENERGY",
+    "quantity" : 1.0
+  }, {
+    "resourceType" : "WATER",
+    "quantity" : 1.0
+  } ],
+  "resourceProduction" : [ {
+    "resourceType" : "FOOD",
+    "quantity" : 2.5
+  }, {
+    "resourceType" : "OXYGEN",
+    "quantity" : 15.0
+  } ]
+} ]

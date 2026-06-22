@@ -7,6 +7,6 @@ public record LoginRequest(
     String login,
 
     @NotBlank(message = "Nie podano hasła")
-    String passwordHash
+    String password
 ) {
 }

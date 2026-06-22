@@ -1,0 +1,12 @@
+[
+  {
+    "login": "admin",
+    "_passwordPlain": "Andrzej@12",
+    "passwordHash": "$2a$10$28Ah670lcntsnkIws32jTum1feLBmVT.2lEqaH5xWNg/4oBkcnTRO"
+  },
+  {
+    "login": "user",
+    "_passwordPlain": "123",
+    "passwordHash": "$2a$10$uzze3ijzl/3FeP8.M7ku7uy3DNdLF0nFFLnTkrlta8VZViwBt67gK"
+  }
+]
