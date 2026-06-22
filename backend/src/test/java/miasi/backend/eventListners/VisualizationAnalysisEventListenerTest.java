@@ -1,13 +1,14 @@
 package miasi.backend.eventListners;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.util.UUID;
-import miasi.backend.domains.analisis.baseline.BaselineAnalysisCompletedEvent;
-import miasi.backend.domains.analisis.simulation.MissionFailureDetectedEvent;
-import miasi.backend.domains.analisis.simulation.SimulationAnalysisCompletedEvent;
+import miasi.backend.domains.analysis.baseline.BaselineAnalysisCompletedEvent;
+import miasi.backend.domains.analysis.simulation.MissionFailureDetectedEvent;
+import miasi.backend.domains.analysis.simulation.SimulationAnalysisCompletedEvent;
 import miasi.backend.domains.visualization.VisualizationAnalysisEventInbox;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class VisualizationAnalysisEventListenerTest {
   @Test

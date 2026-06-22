@@ -53,32 +53,30 @@
       {
         "name": "default_laboratory",
         "status": "ACTIVE",
-        "type": {
-          "name": "laboratory",
-          "resourceConsumption": [
-            {
-              "resourceType": "ENERGY",
-              "quantity": 1.0
-            },
-            {
-              "resourceType": "WATER",
-              "quantity": 1.0
-            }
-          ],
-          "resourceProduction": [
-            {
-              "resourceType": "FOOD",
-              "quantity": 2.5
-            },
-            {
-              "resourceType": "OXYGEN",
-              "quantity": 15.0
-            }
-          ]
-        },
-        "weight": 2137.0
+        "category": "UTILITY_MODULE",
+        "weight": 2137.0,
+        "resourceConsumption": [
+          {
+            "resourceType": "ENERGY",
+            "quantity": 1.0
+          },
+          {
+            "resourceType": "WATER",
+            "quantity": 1.0
+          }
+        ],
+        "resourceProduction": [
+          {
+            "resourceType": "FOOD",
+            "quantity": 2.5
+          },
+          {
+            "resourceType": "OXYGEN",
+            "quantity": 15.0
+          }
+        ]
       }
     ],
-    "maxStartingWeight": 7777.0
+    "maxStartingWeight": 0.0
   }
 ]
