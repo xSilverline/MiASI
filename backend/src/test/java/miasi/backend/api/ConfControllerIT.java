@@ -4,6 +4,7 @@ import com.jayway.jsonpath.JsonPath;
 import miasi.backend.domains.configuration.ConfService;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
+import miasi.backend.domains.configuration.modules.ModuleCategory;
 import miasi.backend.enums.ModuleState;
 import miasi.backend.enums.ResourceType;
 import org.junit.jupiter.api.AfterEach;
@@ -203,6 +204,23 @@ class ConfControllerIT {
     // Given
     String url = "/api/conf/module-states";
     String expectedJson = objectMapper.writeValueAsString(ModuleState.values());
+
+    // When
+    ResultActions result = mvc.perform(
+        MockMvcRequestBuilders.get(url)
+    );
+
+    // Then
+    result
+        .andExpect(status().isOk())
+        .andExpect(content().json(expectedJson));
+  }
+
+  @Test
+  void getModuleCategories() throws Exception {
+    // Given
+    String url = "/api/conf/module-categories";
+    String expectedJson = objectMapper.writeValueAsString(ModuleCategory.values());
 
     // When
     ResultActions result = mvc.perform(
