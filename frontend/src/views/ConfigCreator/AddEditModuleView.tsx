@@ -6,7 +6,6 @@ interface AddModuleStepProps {
   mode?: "add" | "edit";
   initialData?: ModuleData;
   onCancel: () => void;
-
   onSave: (data: Partial<ModuleData>) => void;
 }
 
@@ -51,6 +50,12 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
     };
   });
 
+  const handleBlockInvalidFloats = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+  };
+
   const handleResourceChange = (
     res: ResourceKey,
     field: "prod" | "cons",
@@ -70,28 +75,31 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
       setErrors({ name: isNameEmpty, type: isTypeEmpty });
       return;
     }
+
+    const parseRes = (val: string) => parseFloat(val.replace(",", ".")) || 0;
+
     const parsedResources = {
       woda: {
-        prod: Number(resources.woda.prod) || 0,
-        cons: Number(resources.woda.cons) || 0,
+        prod: parseRes(resources.woda.prod),
+        cons: parseRes(resources.woda.cons),
       },
       tlen: {
-        prod: Number(resources.tlen.prod) || 0,
-        cons: Number(resources.tlen.cons) || 0,
+        prod: parseRes(resources.tlen.prod),
+        cons: parseRes(resources.tlen.cons),
       },
       zywnosc: {
-        prod: Number(resources.zywnosc.prod) || 0,
-        cons: Number(resources.zywnosc.cons) || 0,
+        prod: parseRes(resources.zywnosc.prod),
+        cons: parseRes(resources.zywnosc.cons),
       },
       energia: {
-        prod: Number(resources.energia.prod) || 0,
-        cons: Number(resources.energia.cons) || 0,
+        prod: parseRes(resources.energia.prod),
+        cons: parseRes(resources.energia.cons),
       },
     };
 
     onSave({
       id: initialData?.id,
-      name,
+      name: name.trim(),
       type,
       resources: parsedResources,
     });
@@ -131,7 +139,6 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
                   : "focus:ring-1 focus:ring-mars-orange/40"
               }`}
             />
-
             {errors.name && (
               <div className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 pointer-events-none">
                 <AlertCircle size={18} strokeWidth={2.5} />
@@ -164,8 +171,9 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
               <option value="mieszkalny">Mieszkalny</option>
               <option value="produkcyjny">Produkcyjny</option>
               <option value="energetyczny">Energetyczny</option>
+              <option value="magazynowy">Magazynowy</option>
+              <option value="uzytkowy">Użytkowy</option>
             </select>
-
             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-2">
               {errors.type && (
                 <AlertCircle
@@ -199,19 +207,23 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
             <div className="text-[10px] md:text-xs tracking-widest uppercase text-slate-200 text-center font-medium">
               {res.label}
             </div>
-
             <input
               type="number"
+              min="0"
+              step="0.1"
               value={resources[res.id].prod}
+              onKeyDown={handleBlockInvalidFloats}
               onChange={(e) =>
                 handleResourceChange(res.id, "prod", e.target.value)
               }
               className="w-full bg-mars-line text-white px-2 py-2.5 rounded-xl text-center text-sm tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 transition-all font-medium shadow-inner"
             />
-
             <input
               type="number"
+              min="0"
+              step="0.1"
               value={resources[res.id].cons}
+              onKeyDown={handleBlockInvalidFloats}
               onChange={(e) =>
                 handleResourceChange(res.id, "cons", e.target.value)
               }

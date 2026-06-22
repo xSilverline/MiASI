@@ -36,3 +36,10 @@ export const MOCK_EVENTS: EventData[] = [
     ],
   },
 ];
+
+export interface ScheduledEvent {
+  id: string; // Unikalne ID instancji w harmonogramie
+  eventId: string; // ID zdarzenia z bazy (np. 'ev-1')
+  startDay: number;
+  duration: number;
+}

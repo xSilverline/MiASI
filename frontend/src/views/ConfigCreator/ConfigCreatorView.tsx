@@ -3,7 +3,10 @@ import { AlertTriangle, Save } from "lucide-react";
 import earthBg from "../../assets/earth.png";
 import marsBg from "../../assets/mars.png";
 
-import { ResourceConfigStep } from "./ResourceConfigView";
+import {
+  ResourceConfigStep,
+  type ResourceConsumption,
+} from "./ResourceConfigView";
 import { ModulesConfigStep } from "./ModulesConfigView";
 import { AddModuleStep } from "./AddEditModuleView";
 import { EventsConfigStep } from "./EventsConfigView";
@@ -20,14 +23,20 @@ interface ConfigCreatorViewProps {
   standaloneView?: StandaloneViewType;
   initialModules?: ModuleData[];
   initialEvents?: EventData[];
+  initialConsumption?: ResourceConsumption;
   showStartWarning?: boolean;
-  onFinish: (data?: { modules?: ModuleData[]; events?: EventData[] }) => void;
+  onFinish: (data?: {
+    modules?: ModuleData[];
+    events?: EventData[];
+    consumption?: ResourceConsumption;
+  }) => void;
 }
 
 export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
   standaloneView = null,
   initialModules,
   initialEvents,
+  initialConsumption,
   showStartWarning = false,
   onFinish,
 }) => {
@@ -39,8 +48,8 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
   };
 
   const [step, setStep] = useState<number>(getInitialStep());
-
   const isStandalone = !!standaloneView;
+
   const [isStartModalOpen, setIsStartModalOpen] =
     useState<boolean>(showStartWarning);
   const [isFinishModalOpen, setIsFinishModalOpen] = useState<boolean>(false);
@@ -55,13 +64,15 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
   );
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
+  const [consumption, setConsumption] = useState<
+    ResourceConsumption | undefined
+  >(initialConsumption);
+
   const handleFinalSave = () => {
-    onFinish({ modules, events });
+    onFinish({ modules, events, consumption });
   };
 
-  const handleCancel = () => {
-    onFinish();
-  };
+  const handleCancel = () => onFinish();
 
   const getStepTitle = () => {
     switch (step) {
@@ -105,7 +116,6 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
 
   const moduleToEdit = modules.find((m) => m.id === editingModuleId);
   const eventToEdit = events.find((e) => e.id === editingEventId);
-
   const isWideStep = step === 6 || step === 7;
 
   return (
@@ -141,11 +151,14 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
 
         {step === 1 && (
           <ResourceConfigStep
-            onNext={() =>
-              isStandalone ? setIsFinishModalOpen(true) : setStep(2)
-            }
+            initialData={consumption}
+            onNext={(data) => {
+              setConsumption(data);
+              if (isStandalone) setIsFinishModalOpen(true);
+              else setStep(2);
+            }}
             standaloneMode={isStandalone}
-            onCancel={onFinish}
+            onCancel={handleCancel}
           />
         )}
 
@@ -165,7 +178,7 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
               setModules(modules.filter((m) => m.id !== id))
             }
             standaloneMode={isStandalone}
-            onCancel={onFinish}
+            onCancel={handleCancel}
           />
         )}
 
@@ -197,7 +210,7 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
             }}
             onDeleteEvent={(id) => setEvents(events.filter((e) => e.id !== id))}
             standaloneMode={isStandalone}
-            onCancel={onFinish}
+            onCancel={handleCancel}
           />
         )}
 

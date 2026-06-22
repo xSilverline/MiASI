@@ -33,6 +33,7 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
     initialData?.impacts || [],
   );
   const [activeImpactId, setActiveImpactId] = useState<string>("");
+
   const [errors, setErrors] = useState({
     name: false,
     type: false,
@@ -45,10 +46,26 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
   const [impactAction, setImpactAction] = useState<ActionType | "">("");
   const [impactValue, setImpactValue] = useState<string>("");
 
+  const [impactErrors, setImpactErrors] = useState({
+    target: false,
+    action: false,
+    value: false,
+  });
+
+  const handleBlockNonIntegers = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (["e", "E", "+", "-", ".", ","].includes(e.key)) e.preventDefault();
+  };
+
+  const handleBlockInvalidFloats = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (["e", "E", "+", "-"].includes(e.key)) e.preventDefault();
+  };
+
   const handleSaveEvent = () => {
     const isNameEmpty = !name.trim();
     const isTypeEmpty = !type;
-    const parsedDuration = Number(duration);
+    const parsedDuration = parseInt(duration, 10);
     const isDurationInvalid =
       !duration || isNaN(parsedDuration) || parsedDuration <= 0;
 
@@ -71,6 +88,7 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
   };
 
   const openImpactModal = (mode: "add" | "edit", impactId?: string) => {
+    setImpactErrors({ target: false, action: false, value: false }); // Reset błędów
     setImpactMode(mode);
     if (mode === "edit" && impactId) {
       const imp = impacts.find((i) => i.id === impactId);
@@ -88,7 +106,20 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
   };
 
   const saveImpact = () => {
-    if (!impactTarget || !impactAction || !impactValue) return;
+    const parsedValue = parseFloat(impactValue.replace(",", ".")) || 0;
+
+    const isTargetEmpty = !impactTarget;
+    const isActionEmpty = !impactAction;
+    const isValueInvalid = !impactValue || parsedValue <= 0;
+
+    if (isTargetEmpty || isActionEmpty || isValueInvalid) {
+      setImpactErrors({
+        target: isTargetEmpty,
+        action: isActionEmpty,
+        value: isValueInvalid,
+      });
+      return;
+    }
 
     const [targetType, targetId] = impactTarget.split("_") as [
       TargetType,
@@ -114,7 +145,7 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
       targetName,
       targetType,
       actionType: impactAction as ActionType,
-      value: Number(impactValue) || 0,
+      value: parsedValue,
     };
 
     if (impactMode === "add") {
@@ -205,7 +236,9 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
                 <input
                   type="number"
                   min="1"
+                  step="1"
                   value={duration}
+                  onKeyDown={handleBlockNonIntegers}
                   onChange={(e) => {
                     setDuration(e.target.value);
                     if (errors.duration)
@@ -313,10 +346,8 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
         </div>
       </div>
 
-      {/* ==================== POPUP DODAWANIA WPŁYWU ==================== */}
       {isImpactModalOpen && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-mars-background/80 backdrop-blur-sm p-6">
-          {/* Poszerzona karta dla 3 kolumn */}
           <div className="bg-mars-itemBackground border border-mars-orange/30 p-10 rounded-4xl shadow-2xl flex flex-col w-full max-w-2xl relative">
             <h2 className="text-center font-bold tracking-widest text-sm uppercase mb-12 text-mars-orange">
               {impactMode === "edit" ? "Edycja Wpływu" : "Dodawanie Wpływu"}
@@ -324,7 +355,7 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
 
             <div className="grid grid-cols-3 gap-6 items-end w-full">
               {/* KOLUMNA 1: DOTYCZY */}
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 relative">
                 <label className="text-[10px] md:text-xs tracking-widest uppercase text-slate-200 text-center">
                   Dotyczy
                 </label>
@@ -335,8 +366,10 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
                       setImpactTarget(e.target.value);
                       setImpactAction("");
                       setImpactValue("");
+                      if (impactErrors.target)
+                        setImpactErrors((p) => ({ ...p, target: false }));
                     }}
-                    className="w-full bg-mars-line text-white px-4 py-3 rounded-xl text-center text-[10px] md:text-xs tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 appearance-none cursor-pointer"
+                    className={`w-full bg-mars-line text-white px-4 py-3 rounded-xl text-center text-[10px] md:text-xs tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 appearance-none cursor-pointer ${impactErrors.target ? "ring-1 ring-red-500 border border-red-500" : ""}`}
                   >
                     <option value="" disabled>
                       Wybierz...
@@ -363,23 +396,24 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
               </div>
 
               {/* KOLUMNA 2: RODZAJ */}
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 relative">
                 <label className="text-[10px] md:text-xs tracking-widest uppercase text-slate-200 text-center">
                   Rodzaj
                 </label>
                 <div className="relative">
                   <select
                     value={impactAction}
-                    onChange={(e) =>
-                      setImpactAction(e.target.value as ActionType)
-                    }
+                    onChange={(e) => {
+                      setImpactAction(e.target.value as ActionType);
+                      if (impactErrors.action)
+                        setImpactErrors((p) => ({ ...p, action: false }));
+                    }}
                     disabled={!impactTarget}
-                    className="w-full bg-mars-line text-white px-4 py-3 rounded-xl text-center text-[10px] md:text-xs tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 appearance-none cursor-pointer disabled:opacity-50"
+                    className={`w-full bg-mars-line text-white px-4 py-3 rounded-xl text-center text-[10px] md:text-xs tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 appearance-none cursor-pointer disabled:opacity-50 ${impactErrors.action ? "ring-1 ring-red-500 border border-red-500" : ""}`}
                   >
                     <option value="" disabled>
                       Wybierz...
                     </option>
-                    {/* Dynamiczne opcje na podstawie wybranego celu */}
                     {impactTarget.startsWith("module") && (
                       <option value="efficiency">Wydajność</option>
                     )}
@@ -405,12 +439,18 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
                 <div className="relative">
                   <input
                     type="number"
+                    min="0"
+                    step="0.1"
                     value={impactValue}
-                    onChange={(e) => setImpactValue(e.target.value)}
+                    onKeyDown={handleBlockInvalidFloats}
+                    onChange={(e) => {
+                      setImpactValue(e.target.value);
+                      if (impactErrors.value)
+                        setImpactErrors((p) => ({ ...p, value: false }));
+                    }}
                     disabled={!impactAction}
-                    className="w-full bg-mars-line text-white pl-4 pr-16 py-3 rounded-xl text-center text-[10px] md:text-xs tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 disabled:opacity-50"
+                    className={`w-full bg-mars-line text-white pl-4 pr-16 py-3 rounded-xl text-center text-[10px] md:text-xs tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 disabled:opacity-50 ${impactErrors.value ? "ring-1 ring-red-500 border border-red-500" : ""}`}
                   />
-                  {/* Dynamiczny dopisek jednostki z prawej strony wewnątrz inputa */}
                   {impactTarget && (
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-[9px] uppercase pointer-events-none">
                       {impactTarget.startsWith("module") ? "%" : "JEDN."}
@@ -419,6 +459,15 @@ export const AddEventStep: React.FC<AddEventStepProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* Komunikat błędu jeśli czegokolwiek brakuje w popupie */}
+            {(impactErrors.target ||
+              impactErrors.action ||
+              impactErrors.value) && (
+              <div className="w-full text-center mt-4 text-red-500 text-xs tracking-widest uppercase animate-pulse font-bold">
+                Wypełnij wszystkie pola, aby kontynuować
+              </div>
+            )}
 
             <div className="mt-12 flex justify-between w-full px-4">
               <button

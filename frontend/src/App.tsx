@@ -1,102 +1,117 @@
 import React, { useState } from "react";
-import { Users, Clock, Check, X } from "lucide-react";
+import { Users, Clock, AlertTriangle, RefreshCw, Loader2 } from "lucide-react";
 import { Sidebar } from "./components/Sidebar.tsx";
 import { HeaderCard } from "./components/HeaderCard.tsx";
 import { DetailCard, type DetailItem } from "./components/DetailCard.tsx";
 import { UsageChart } from "./components/UsageChart.tsx";
 import { formatNumber } from "./utils/formatters.ts";
 import {
-  MISSION_DURATION,
-  CREW_MEMBERS_NUMBER,
-  OXYGEN_AMOUNT,
-  WATER_AMOUNT,
-  FOOD_AMOUNT,
   ENERGY_PRODUCTION,
   ENERGY_USAGE,
   ENERGY_DIFFERENCE,
 } from "./config/config.ts";
+import { ScheduleView } from "./views/Schedule/ScheduleView.tsx";
 
 export type ViewState = "login" | "dashboard" | "configCreator" | string;
 import { LoginView } from "./views/LoginView.tsx";
-import { ConfigCreatorView } from "./views/ConfigCreator/ConfigCreatorView.tsx";
+import {
+  ConfigCreatorView,
+  type StandaloneViewType,
+} from "./views/ConfigCreator/ConfigCreatorView.tsx";
+import type { ResourceConsumption } from "./views/ConfigCreator/ResourceConfigView.tsx";
+import type { ModuleData } from "./types/module.ts";
+import type { EventData } from "./types/events.ts";
 
-import { type ModuleData, MOCK_MODULES } from "./types/module.ts";
-import { type EventData, MOCK_EVENTS } from "./types/events.ts";
+import { useMissionData } from "./hooks/useMissionData.ts";
+import type {
+  MissionDashboardConfig,
+  ModuleWithCount,
+} from "./infrastructure/MissionAdapter.ts";
+import {
+  CrewModal,
+  ResourcesModal,
+  ModulesModal,
+} from "./components/DashboardModals.tsx";
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>("login");
-  const MOCK_HAS_CONFIG = false;
   const [isManualWizard, setIsManualWizard] = useState(false);
 
-  const [crew, setCrew] = useState({
-    men: Math.floor(CREW_MEMBERS_NUMBER / 2),
-    women: Math.ceil(CREW_MEMBERS_NUMBER / 2),
-  });
-
-  const [resources, setResources] = useState({
-    oxygen: OXYGEN_AMOUNT,
-    water: WATER_AMOUNT,
-    food: FOOD_AMOUNT,
-  });
-
-  const [modulesList, setModulesList] = useState(
-    MOCK_MODULES.map((mod) => ({ ...mod, count: 1 })),
-  );
-
-  const [eventsList, setEventsList] = useState<EventData[]>(MOCK_EVENTS);
+  const {
+    config,
+    isLoading,
+    isDataModified,
+    isRecalculating,
+    updateConfig,
+    recalculate,
+  } = useMissionData();
 
   const [isCrewModalOpen, setIsCrewModalOpen] = useState(false);
   const [isResourcesModalOpen, setIsResourcesModalOpen] = useState(false);
   const [isModulesModalOpen, setIsModulesModalOpen] = useState(false);
 
-  const [editCrew, setEditCrew] = useState(crew);
-  const [editResources, setEditResources] = useState(resources);
-  const [editModulesList, setEditModulesList] = useState(modulesList);
-
   const handleLogin = () => {
     setIsManualWizard(false);
-    if (MOCK_HAS_CONFIG) {
-      setCurrentView("dashboard");
-    } else {
-      setCurrentView("configCreator");
-    }
+    setCurrentView("dashboard");
   };
 
   const handleConfigFinish = (data?: {
     modules?: ModuleData[];
     events?: EventData[];
+    consumption?: ResourceConsumption;
   }) => {
-    if (data) {
-      if (data.modules) {
-        setModulesList((prev) => {
-          return data.modules!.map((newMod) => {
-            const existing = prev.find((p) => p.id === newMod.id);
-            return { ...newMod, count: existing ? existing.count : 0 };
-          });
+    if (data && config) {
+      let hasChanges = false;
+      const updates: Partial<MissionDashboardConfig> = {};
+
+      if (
+        data.modules &&
+        JSON.stringify(data.modules) !== JSON.stringify(config.modulesList)
+      ) {
+        updates.modulesList = data.modules.map((newMod) => {
+          const existing = config.modulesList.find((p) => p.id === newMod.id);
+          return {
+            ...newMod,
+            count: existing ? existing.count : 0,
+          } as ModuleWithCount;
         });
+        hasChanges = true;
       }
-      if (data.events) {
-        setEventsList(data.events);
+      if (
+        data.events &&
+        JSON.stringify(data.events) !== JSON.stringify(config.eventsList)
+      ) {
+        updates.eventsList = data.events;
+        hasChanges = true;
+      }
+      if (
+        data.consumption &&
+        JSON.stringify(data.consumption) !==
+          JSON.stringify(config.consumptionRates)
+      ) {
+        updates.consumptionRates = data.consumption;
+        hasChanges = true;
+      }
+
+      if (hasChanges) {
+        void updateConfig(updates);
       }
     }
     setCurrentView("dashboard");
   };
 
-  const openCrewModal = () => {
-    setEditCrew(crew);
-    setIsCrewModalOpen(true);
-  };
-  const openResourcesModal = () => {
-    setEditResources(resources);
-    setIsResourcesModalOpen(true);
-  };
-  const openModulesModal = () => {
-    setEditModulesList(modulesList);
-    setIsModulesModalOpen(true);
-  };
+  if (isLoading || !config) {
+    return (
+      <div className="h-screen w-screen bg-mars-background flex flex-col items-center justify-center text-mars-orange">
+        <Loader2 size={48} className="animate-spin mb-4" />
+        <p className="tracking-widest uppercase font-bold text-sm">
+          Nawiązywanie połączenia z bazą...
+        </p>
+      </div>
+    );
+  }
 
-  const totalCrew = crew.men + crew.women;
-
+  const totalCrew = config.crew.men + config.crew.women;
   const getPersonsWord = (count: number) => {
     if (count === 1) return "OSOBA";
     const lastDigit = count % 10;
@@ -107,11 +122,19 @@ const App: React.FC = () => {
   };
 
   const resourceData: DetailItem[] = [
-    { label: "TLEN", value: formatNumber(resources.oxygen), valueSuffix: "L" },
-    { label: "WODA", value: formatNumber(resources.water), valueSuffix: "L" },
+    {
+      label: "TLEN",
+      value: formatNumber(config.resources.oxygen),
+      valueSuffix: "L",
+    },
+    {
+      label: "WODA",
+      value: formatNumber(config.resources.water),
+      valueSuffix: "L",
+    },
     {
       label: "ŻYWNOŚĆ",
-      value: formatNumber(resources.food),
+      value: formatNumber(config.resources.food),
       valueSuffix: "PORCJI",
     },
   ];
@@ -124,8 +147,7 @@ const App: React.FC = () => {
     magazynowy: "MAGAZYNOWE",
     uzytkowy: "UŻYTKOWE",
   };
-
-  const groupedModules = modulesList.reduce(
+  const groupedModules = config.modulesList.reduce(
     (acc, mod) => {
       const typeLabel =
         typeMapping[mod.type?.toLowerCase()] ||
@@ -136,12 +158,8 @@ const App: React.FC = () => {
     },
     {} as Record<string, number>,
   );
-
   const moduleData: DetailItem[] = Object.entries(groupedModules).map(
-    ([label, value]) => ({
-      label,
-      value: value.toString(),
-    }),
+    ([label, value]) => ({ label, value: value.toString() }),
   );
 
   const energyData: DetailItem[] = [
@@ -165,54 +183,37 @@ const App: React.FC = () => {
     },
   ];
 
+  const getStandaloneView = (): StandaloneViewType => {
+    if (currentView === "resources") return "resources";
+    if (currentView === "modules") return "modules";
+    if (currentView === "events") return "events";
+    return null;
+  };
+
   if (currentView === "login") return <LoginView onLogin={handleLogin} />;
 
-  if (currentView === "configCreator")
+  if (
+    ["configCreator", "resources", "modules", "events"].includes(currentView)
+  ) {
     return (
       <ConfigCreatorView
+        standaloneView={getStandaloneView()}
         showStartWarning={isManualWizard}
         onFinish={handleConfigFinish}
-        initialModules={modulesList}
-        initialEvents={eventsList}
+        initialModules={config.modulesList}
+        initialEvents={config.eventsList}
+        initialConsumption={config.consumptionRates}
       />
     );
-  if (currentView === "resources")
-    return (
-      <ConfigCreatorView
-        standaloneView="resources"
-        onFinish={handleConfigFinish}
-        initialModules={modulesList}
-        initialEvents={eventsList}
-      />
-    );
-  if (currentView === "modules")
-    return (
-      <ConfigCreatorView
-        standaloneView="modules"
-        onFinish={handleConfigFinish}
-        initialModules={modulesList}
-        initialEvents={eventsList}
-      />
-    );
-  if (currentView === "events")
-    return (
-      <ConfigCreatorView
-        standaloneView="events"
-        onFinish={handleConfigFinish}
-        initialModules={modulesList}
-        initialEvents={eventsList}
-      />
-    );
+  }
 
   return (
     <div className="flex h-screen w-screen bg-mars-background text-slate-100 font-sans overflow-hidden relative">
       <Sidebar
         currentView={currentView}
-        onNavigate={(viewId) => {
-          if (viewId === "configCreator") {
-            setIsManualWizard(true);
-          }
-          setCurrentView(viewId);
+        onNavigate={(v) => {
+          if (v === "configCreator") setIsManualWizard(true);
+          setCurrentView(v);
         }}
         onLogout={() => setCurrentView("login")}
       />
@@ -225,31 +226,70 @@ const App: React.FC = () => {
                 icon={Users}
                 title="ZAŁOGA"
                 value={`${totalCrew} ${getPersonsWord(totalCrew)}`}
-                onEdit={openCrewModal}
+                onEdit={() => setIsCrewModalOpen(true)}
               />
               <HeaderCard
                 icon={Clock}
                 title="CZAS TRWANIA MISJI"
-                value={`${MISSION_DURATION} SOL`}
+                value={`${config.missionDuration} SOL`}
               />
             </div>
 
-            <UsageChart />
+            <div className="flex-1 min-h-0 w-full flex flex-col relative">
+              {isDataModified ? (
+                <div className="flex-1 flex flex-col justify-center items-center bg-mars-itemBackground rounded-3xl p-10 shadow-md border border-mars-orange/20 min-h-[300px]">
+                  <div className="flex flex-col items-center text-center animate-in fade-in zoom-in duration-300">
+                    <AlertTriangle
+                      size={48}
+                      className="text-mars-orange mb-4"
+                      strokeWidth={1.5}
+                    />
+                    <h3 className="text-sm md:text-base font-bold tracking-widest text-white uppercase mb-3">
+                      Zmieniono Parametry Systemu
+                    </h3>
+                    <p className="text-xs md:text-sm text-slate-400 mb-8 max-w-lg leading-relaxed">
+                      Zaktualizowano dane. Przeprowadź rekalkulację, aby pobrać
+                      najnowsze dane telemetryczne.
+                    </p>
+                    <button
+                      onClick={() => {
+                        void recalculate();
+                      }}
+                      disabled={isRecalculating}
+                      className="flex items-center gap-3 py-3.5 px-8 rounded-xl text-xs tracking-widest font-bold uppercase bg-mars-orange/10 text-mars-orange border border-mars-orange/30 hover:bg-mars-orange/20 hover:border-mars-orange transition-all disabled:opacity-50 disabled:cursor-wait"
+                    >
+                      {isRecalculating ? (
+                        <>
+                          <RefreshCw size={18} className="animate-spin" />
+                          Trwa Obliczanie...
+                        </>
+                      ) : (
+                        <>Rekalkuluj Wykresy</>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <UsageChart />
+              )}
+            </div>
 
             <div className="grid grid-cols-3 gap-8 w-full shrink-0">
               <DetailCard
                 title="ZASOBY POCZĄTKOWE"
                 items={resourceData}
-                onEdit={openResourcesModal}
+                onEdit={() => setIsResourcesModalOpen(true)}
               />
               <DetailCard
                 title="Zestawienie modułów"
                 items={moduleData}
-                onEdit={openModulesModal}
+                onEdit={() => setIsModulesModalOpen(true)}
               />
               <DetailCard title="BILANS ENERGII" items={energyData} />
             </div>
           </>
+        ) : currentView === "schedule" ? (
+          <ScheduleView missionDuration={config.missionDuration} />
         ) : (
           <div className="flex items-center justify-center h-full">
             <h2 className="text-2xl text-slate-400 uppercase tracking-widest">
@@ -260,177 +300,33 @@ const App: React.FC = () => {
       </main>
 
       {isCrewModalOpen && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-mars-background/80 backdrop-blur-sm p-6">
-          <div className="bg-mars-itemBackground border border-mars-line p-10 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full animate-in fade-in zoom-in duration-300">
-            <h3 className="text-sm md:text-base font-bold tracking-widest text-mars-orange uppercase mb-8">
-              Edycja Załogi
-            </h3>
-            <div className="flex flex-col w-full gap-5 mb-10">
-              <div className="grid grid-cols-[100px_1fr] items-center gap-4">
-                <label className="text-[10px] tracking-widest uppercase text-slate-300 text-right">
-                  Mężczyźni
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={editCrew.men}
-                  onChange={(e) =>
-                    setEditCrew((p) => ({
-                      ...p,
-                      men: Number(e.target.value) || 0,
-                    }))
-                  }
-                  className="w-full bg-mars-line text-white px-4 py-2.5 rounded-xl text-center text-sm focus:outline-none focus:ring-1 focus:ring-mars-orange/40"
-                />
-              </div>
-              <div className="grid grid-cols-[100px_1fr] items-center gap-4">
-                <label className="text-[10px] tracking-widest uppercase text-slate-300 text-right">
-                  Kobiety
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={editCrew.women}
-                  onChange={(e) =>
-                    setEditCrew((p) => ({
-                      ...p,
-                      women: Number(e.target.value) || 0,
-                    }))
-                  }
-                  className="w-full bg-mars-line text-white px-4 py-2.5 rounded-xl text-center text-sm focus:outline-none focus:ring-1 focus:ring-mars-orange/40"
-                />
-              </div>
-            </div>
-            <div className="flex w-full gap-4">
-              <button
-                onClick={() => setIsCrewModalOpen(false)}
-                className="flex-1 py-3 flex justify-center rounded-xl border border-mars-line text-slate-300 hover:bg-mars-line/50 hover:text-red-400 transition-colors cursor-pointer"
-              >
-                <X size={24} />
-              </button>
-              <button
-                onClick={() => {
-                  setCrew(editCrew);
-                  setIsCrewModalOpen(false);
-                }}
-                className="flex-1 py-3 flex justify-center rounded-xl bg-green-500/10 text-green-500 border border-green-500/30 hover:bg-green-500/20 transition-colors cursor-pointer"
-              >
-                <Check size={24} />
-              </button>
-            </div>
-          </div>
-        </div>
+        <CrewModal
+          data={config.crew}
+          onClose={() => setIsCrewModalOpen(false)}
+          onSave={(d) => {
+            void updateConfig({ crew: d });
+          }}
+        />
       )}
 
       {isResourcesModalOpen && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-mars-background/80 backdrop-blur-sm p-6">
-          <div className="bg-mars-itemBackground border border-mars-line p-10 rounded-3xl shadow-2xl flex flex-col items-center max-w-sm w-full animate-in fade-in zoom-in duration-300">
-            <h3 className="text-sm md:text-base font-bold tracking-widest text-mars-orange uppercase mb-8">
-              Zasoby Początkowe
-            </h3>
-            <div className="flex flex-col w-full gap-5 mb-10">
-              {Object.entries({
-                oxygen: "Tlen (L)",
-                water: "Woda (L)",
-                food: "Żywność (Porcje)",
-              }).map(([key, label]) => (
-                <div
-                  key={key}
-                  className="grid grid-cols-[100px_1fr] items-center gap-4"
-                >
-                  <label className="text-[10px] tracking-widest uppercase text-slate-300 text-right">
-                    {label}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={editResources[key as keyof typeof editResources]}
-                    onChange={(e) =>
-                      setEditResources((p) => ({
-                        ...p,
-                        [key]: Number(e.target.value) || 0,
-                      }))
-                    }
-                    className="w-full bg-mars-line text-white px-4 py-2.5 rounded-xl text-center text-sm focus:outline-none focus:ring-1 focus:ring-mars-orange/40"
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex w-full gap-4">
-              <button
-                onClick={() => setIsResourcesModalOpen(false)}
-                className="flex-1 py-3 flex justify-center rounded-xl border border-mars-line text-slate-300 hover:bg-mars-line/50 hover:text-red-400 transition-colors cursor-pointer"
-              >
-                <X size={24} />
-              </button>
-              <button
-                onClick={() => {
-                  setResources(editResources);
-                  setIsResourcesModalOpen(false);
-                }}
-                className="flex-1 py-3 flex justify-center rounded-xl bg-green-500/10 text-green-500 border border-green-500/30 hover:bg-green-500/20 transition-colors cursor-pointer"
-              >
-                <Check size={24} />
-              </button>
-            </div>
-          </div>
-        </div>
+        <ResourcesModal
+          data={config.resources}
+          onClose={() => setIsResourcesModalOpen(false)}
+          onSave={(d) => {
+            void updateConfig({ resources: d });
+          }}
+        />
       )}
 
       {isModulesModalOpen && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-mars-background/80 backdrop-blur-sm p-6">
-          <div className="bg-mars-itemBackground border border-mars-line p-10 rounded-3xl shadow-2xl flex flex-col items-center max-w-md w-full animate-in fade-in zoom-in duration-300">
-            <h3 className="text-sm md:text-base font-bold tracking-widest text-mars-orange uppercase mb-8">
-              Zestawienie Modułów
-            </h3>
-            <div className="flex flex-col w-full gap-3 mb-10 max-h-[50vh] overflow-y-auto pr-2">
-              {editModulesList.map((mod) => (
-                <div
-                  key={mod.id}
-                  className="grid grid-cols-[1fr_90px] items-center gap-4 py-1"
-                >
-                  <label
-                    className="text-[10px] md:text-xs tracking-widest uppercase text-slate-300 text-left truncate"
-                    title={mod.name}
-                  >
-                    {mod.name}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={mod.count}
-                    onChange={(e) => {
-                      const val = Number(e.target.value) || 0;
-                      setEditModulesList((prev) =>
-                        prev.map((m) =>
-                          m.id === mod.id ? { ...m, count: val } : m,
-                        ),
-                      );
-                    }}
-                    className="w-full bg-mars-line text-white px-2 py-2.5 rounded-xl text-center text-sm focus:outline-none focus:ring-1 focus:ring-mars-orange/40"
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex w-full gap-4 mt-auto">
-              <button
-                onClick={() => setIsModulesModalOpen(false)}
-                className="flex-1 py-3 flex justify-center rounded-xl border border-mars-line text-slate-300 hover:bg-mars-line/50 hover:text-red-400 transition-colors cursor-pointer"
-              >
-                <X size={24} />
-              </button>
-              <button
-                onClick={() => {
-                  setModulesList(editModulesList);
-                  setIsModulesModalOpen(false);
-                }}
-                className="flex-1 py-3 flex justify-center rounded-xl bg-green-500/10 text-green-500 border border-green-500/30 hover:bg-green-500/20 transition-colors cursor-pointer"
-              >
-                <Check size={24} />
-              </button>
-            </div>
-          </div>
-        </div>
+        <ModulesModal
+          data={config.modulesList}
+          onClose={() => setIsModulesModalOpen(false)}
+          onSave={(d) => {
+            void updateConfig({ modulesList: d });
+          }}
+        />
       )}
     </div>
   );
