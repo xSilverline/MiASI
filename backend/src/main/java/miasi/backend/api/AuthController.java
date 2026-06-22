@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-@CrossOrigin(origins = "http://localhost:*") // TODO: change when frontend ports are known
+@CrossOrigin(origins = "http://localhost:5173") // TODO: change when frontend ports are known
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

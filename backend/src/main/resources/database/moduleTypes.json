@@ -14,4 +14,14 @@
     "resourceType" : "OXYGEN",
     "quantity" : 15.0
   } ]
+}, {
+  "name" : "string",
+  "resourceConsumption" : [ {
+    "resourceType" : "FOOD",
+    "quantity" : 0.1
+  } ],
+  "resourceProduction" : [ {
+    "resourceType" : "FOOD",
+    "quantity" : 0.1
+  } ]
 } ]
