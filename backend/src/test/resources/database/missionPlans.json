@@ -1,84 +1,164 @@
-[
-  {
-    "crew": [
-      {
-        "name": "Women's Crew",
-        "population": 3,
-        "optimalDemand": {
-          "FOOD": 0.8,
-          "OXYGEN": 0.8,
-          "WATER": 0.8
-        },
-        "minimalDemand": {
-          "FOOD": 0.2,
-          "OXYGEN": 0.2,
-          "WATER": 0.3
-        }
-      },
-      {
-        "name": "Men's Crew",
-        "population": 15,
-        "optimalDemand": {
-          "FOOD": 1.0,
-          "OXYGEN": 1.0,
-          "WATER": 1.0
-        },
-        "minimalDemand": {
-          "FOOD": 0.3,
-          "OXYGEN": 0.3,
-          "WATER": 0.5
-        }
-      }
-    ],
-    "missionDurationSols": 67,
-    "startingResources": [
-      {
-        "resourceType": "FOOD",
-        "quantity": 200.0
-      },
-      {
-        "resourceType": "OXYGEN",
-        "quantity": 200.0
-      },
-      {
-        "resourceType": "WATER",
-        "quantity": 200.0
-      },
-      {
-        "resourceType": "ENERGY",
-        "quantity": 200.0
-      }
-    ],
-    "modules": [
-      {
-        "name": "default_laboratory",
-        "status": "ACTIVE",
-        "type": {
-          "name": "laboratory",
-          "resourceConsumption": [
-            {
-              "resourceType": "ENERGY",
-              "quantity": 1.0
-            },
-            {
-              "resourceType": "WATER",
-              "quantity": 1.0
-            }
-          ],
-          "resourceProduction": [
-            {
-              "resourceType": "FOOD",
-              "quantity": 2.5
-            },
-            {
-              "resourceType": "OXYGEN",
-              "quantity": 15.0
-            }
-          ]
-        },
-        "weight": 2137.0
-      }
-    ],
-    "maxStartingWeight": 7777.0
-  }
-]
+[ {
+  "crew" : [ {
+    "name" : "Women's Crew",
+    "population" : 3,
+    "optimalDemand" : {
+      "FOOD" : 0.8,
+      "OXYGEN" : 0.8,
+      "WATER" : 0.8
+    },
+    "minimalDemand" : {
+      "FOOD" : 0.2,
+      "OXYGEN" : 0.2,
+      "WATER" : 0.3
+    }
+  }, {
+    "name" : "Men's Crew",
+    "population" : 15,
+    "optimalDemand" : {
+      "FOOD" : 1.0,
+      "OXYGEN" : 1.0,
+      "WATER" : 1.0
+    },
+    "minimalDemand" : {
+      "FOOD" : 0.3,
+      "OXYGEN" : 0.3,
+      "WATER" : 0.5
+    }
+  } ],
+  "missionDurationSols" : 67,
+  "startingResources" : [ {
+    "resourceType" : "FOOD",
+    "quantity" : 200.0
+  }, {
+    "resourceType" : "OXYGEN",
+    "quantity" : 200.0
+  }, {
+    "resourceType" : "WATER",
+    "quantity" : 200.0
+  }, {
+    "resourceType" : "ENERGY",
+    "quantity" : 200.0
+  } ],
+  "modules" : [ {
+    "name" : "default_laboratory",
+    "status" : "ACTIVE",
+    "category" : "UTILITY_MODULE",
+    "weight" : 2137.0,
+    "resourceConsumption" : [ {
+      "resourceType" : "ENERGY",
+      "quantity" : 1.0
+    }, {
+      "resourceType" : "WATER",
+      "quantity" : 1.0
+    } ],
+    "resourceProduction" : [ {
+      "resourceType" : "FOOD",
+      "quantity" : 2.5
+    }, {
+      "resourceType" : "OXYGEN",
+      "quantity" : 15.0
+    } ]
+  } ],
+  "maxStartingWeight" : 0.0
+}, {
+  "crew" : [ {
+    "name" : "default",
+    "population" : 0,
+    "optimalDemand" : {
+      "FOOD" : 0.0,
+      "OXYGEN" : 0.0,
+      "WATER" : 0.0
+    },
+    "minimalDemand" : {
+      "FOOD" : 0.0,
+      "OXYGEN" : 0.0,
+      "WATER" : 0.0
+    }
+  } ],
+  "missionDurationSols" : 0,
+  "startingResources" : [ {
+    "resourceType" : "FOOD",
+    "quantity" : 0.0
+  }, {
+    "resourceType" : "OXYGEN",
+    "quantity" : 0.0
+  }, {
+    "resourceType" : "WATER",
+    "quantity" : 0.0
+  }, {
+    "resourceType" : "ENERGY",
+    "quantity" : 0.0
+  } ],
+  "modules" : [ {
+    "name" : "default_laboratory",
+    "status" : "ACTIVE",
+    "category" : "UTILITY_MODULE",
+    "weight" : 2137.0,
+    "resourceConsumption" : [ {
+      "resourceType" : "ENERGY",
+      "quantity" : 1.0
+    }, {
+      "resourceType" : "WATER",
+      "quantity" : 1.0
+    } ],
+    "resourceProduction" : [ {
+      "resourceType" : "FOOD",
+      "quantity" : 2.5
+    }, {
+      "resourceType" : "OXYGEN",
+      "quantity" : 15.0
+    } ]
+  } ],
+  "maxStartingWeight" : 0.0
+}, {
+  "crew" : [ {
+    "name" : "default",
+    "population" : 0,
+    "optimalDemand" : {
+      "FOOD" : 0.0,
+      "WATER" : 0.0,
+      "OXYGEN" : 0.0
+    },
+    "minimalDemand" : {
+      "FOOD" : 0.0,
+      "WATER" : 0.0,
+      "OXYGEN" : 0.0
+    }
+  } ],
+  "missionDurationSols" : 0,
+  "startingResources" : [ {
+    "resourceType" : "FOOD",
+    "quantity" : 0.0
+  }, {
+    "resourceType" : "OXYGEN",
+    "quantity" : 0.0
+  }, {
+    "resourceType" : "WATER",
+    "quantity" : 0.0
+  }, {
+    "resourceType" : "ENERGY",
+    "quantity" : 0.0
+  } ],
+  "modules" : [ {
+    "name" : "default_laboratory",
+    "status" : "ACTIVE",
+    "category" : "UTILITY_MODULE",
+    "weight" : 2137.0,
+    "resourceConsumption" : [ {
+      "resourceType" : "ENERGY",
+      "quantity" : 1.0
+    }, {
+      "resourceType" : "WATER",
+      "quantity" : 1.0
+    } ],
+    "resourceProduction" : [ {
+      "resourceType" : "FOOD",
+      "quantity" : 2.5
+    }, {
+      "resourceType" : "OXYGEN",
+      "quantity" : 15.0
+    } ]
+  } ],
+  "maxStartingWeight" : 0.0
+} ]

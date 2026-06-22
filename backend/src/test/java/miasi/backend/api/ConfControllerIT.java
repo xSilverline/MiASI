@@ -4,7 +4,6 @@ import com.jayway.jsonpath.JsonPath;
 import miasi.backend.domains.configuration.ConfService;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
-import miasi.backend.domains.configuration.modules.ModuleType;
 import miasi.backend.enums.ModuleState;
 import miasi.backend.enums.ResourceType;
 import org.junit.jupiter.api.AfterEach;
@@ -28,7 +27,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.stream.Stream;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -174,34 +176,7 @@ class ConfControllerIT {
         .andExpect(jsonPath("$.status").value("success"));
     JSONAssert.assertEquals(
         objectMapper.writeValueAsString(module),
-        objectMapper.writeValueAsString(ctx.getModuleCatalog().moduleList().get(id)),
-        true
-    );
-  }
-
-  @Test
-  void postModuleType() throws Exception {
-    // Given
-    ModuleType type = new ModuleType();
-    String requestJson =
-        objectMapper.writeValueAsString(type);
-
-    // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post("/api/conf/module-type")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestJson)
-    );
-    int id = Integer.parseInt(JsonPath.read(result.andReturn().getResponse().getContentAsString(), "$.message"));
-
-    // Then
-    result
-        .andExpect(status().isCreated())
-        .andExpect(header().exists("Location"))
-        .andExpect(jsonPath("$.status").value("success"));
-    JSONAssert.assertEquals(
-        objectMapper.writeValueAsString(type),
-        objectMapper.writeValueAsString(ctx.getModuleCatalog().typeList().get(id)),
+        objectMapper.writeValueAsString(ctx.getModuleCatalog().get(id)),
         true
     );
   }
