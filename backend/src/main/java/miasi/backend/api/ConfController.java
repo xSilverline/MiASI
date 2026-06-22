@@ -11,8 +11,7 @@ import miasi.backend.domains.configuration.enums.ModuleState;
 import miasi.backend.domains.configuration.enums.ResourceType;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
-import miasi.backend.domains.configuration.modules.ModuleCatalog;
-import miasi.backend.domains.configuration.modules.ModuleType;
+import miasi.backend.domains.configuration.modules.ModuleCategory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:*") // TODO: do zmiany gdy będą znane porty frontendu
 @RestController
@@ -60,7 +60,7 @@ public class ConfController {
   }
 
   @GetMapping("/module-catalog")
-  public ResponseEntity<ModuleCatalog> getModuleCatalog() {
+  public ResponseEntity<List<Module>> getModuleCatalog() {
     return ResponseEntity.ok(confService.getModuleCatalog());
   }
 
@@ -129,22 +129,9 @@ public class ConfController {
         .body(BasicResponseEntity.success(Integer.toString(id)));
   }
 
-  @PostMapping("/module-type")
-  @ApiResponses({
-      @ApiResponse(responseCode = "201", description = "Typ modułu został dodany")
-  })
-  @Operation(
-      description = "Dodaje typ moduły do bazy danych, jeżeli nazwa będzie taka sama," +
-          " jak element w bazie, zostanie on nadpisany"
-  )
-  public ResponseEntity<BasicResponseEntity> postModuleType(
-      @RequestBody ModuleType type
-  ) {
-    int id = confService.addModuleType(type);
-
-    return ResponseEntity
-        .created(URI.create("/api/conf/module-catalog"))
-        .body(BasicResponseEntity.success(Integer.toString(id)));
+  @GetMapping("/module-categories")
+  public ResponseEntity<ModuleCategory[]> getCategories() {
+    return ResponseEntity.ok(ModuleCategory.values());
   }
 
   @GetMapping("/resource-types")

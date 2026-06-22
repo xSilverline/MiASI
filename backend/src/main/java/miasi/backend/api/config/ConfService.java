@@ -3,12 +3,12 @@ package miasi.backend.api.config;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
-import miasi.backend.domains.configuration.modules.ModuleCatalog;
-import miasi.backend.domains.configuration.modules.ModuleType;
 import miasi.backend.domains.configuration.ports.IConfigurationEventPublisherPort;
 import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
 import miasi.backend.domains.configuration.ports.IModuleRepositoryPort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +30,7 @@ public class ConfService {
     return missionPlansRepository.findById(missionId);
   }
 
-  public ModuleCatalog getModuleCatalog() {
+  public List<Module> getModuleCatalog() {
     return moduleRepository.toJson();
   }
 
@@ -42,6 +42,7 @@ public class ConfService {
   }
 
   public Integer overrideMissionPlan(int id, MissionPlan missionPlan) {
+
     Integer output = missionPlansRepository.replace(id, missionPlan);
     output = (output != -1) ? output : null;
 
@@ -53,9 +54,5 @@ public class ConfService {
 
   public int addModule(Module module) {
     return moduleRepository.add(module);
-  }
-
-  public int addModuleType(ModuleType type) {
-    return moduleRepository.add(type);
   }
 }

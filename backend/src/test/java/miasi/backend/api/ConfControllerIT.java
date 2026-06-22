@@ -6,7 +6,7 @@ import miasi.backend.domains.configuration.enums.ModuleState;
 import miasi.backend.domains.configuration.enums.ResourceType;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
-import miasi.backend.domains.configuration.modules.ModuleType;
+import miasi.backend.domains.configuration.modules.ModuleCategory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -177,34 +177,7 @@ class ConfControllerIT {
         .andExpect(jsonPath("$.status").value("success"));
     JSONAssert.assertEquals(
         objectMapper.writeValueAsString(module),
-        objectMapper.writeValueAsString(ctx.getModuleCatalog().moduleList().get(id)),
-        true
-    );
-  }
-
-  @Test
-  void postModuleType() throws Exception {
-    // Given
-    ModuleType type = new ModuleType();
-    String requestJson =
-        objectMapper.writeValueAsString(type);
-
-    // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post("/api/conf/module-type")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestJson)
-    );
-    int id = Integer.parseInt(JsonPath.read(result.andReturn().getResponse().getContentAsString(), "$.message"));
-
-    // Then
-    result
-        .andExpect(status().isCreated())
-        .andExpect(header().exists("Location"))
-        .andExpect(jsonPath("$.status").value("success"));
-    JSONAssert.assertEquals(
-        objectMapper.writeValueAsString(type),
-        objectMapper.writeValueAsString(ctx.getModuleCatalog().typeList().get(id)),
+        objectMapper.writeValueAsString(ctx.getModuleCatalog().get(id)),
         true
     );
   }
@@ -231,6 +204,23 @@ class ConfControllerIT {
     // Given
     String url = "/api/conf/module-states";
     String expectedJson = objectMapper.writeValueAsString(ModuleState.values());
+
+    // When
+    ResultActions result = mvc.perform(
+        MockMvcRequestBuilders.get(url)
+    );
+
+    // Then
+    result
+        .andExpect(status().isOk())
+        .andExpect(content().json(expectedJson));
+  }
+
+  @Test
+  void getModuleCategories() throws Exception {
+    // Given
+    String url = "/api/conf/module-categories";
+    String expectedJson = objectMapper.writeValueAsString(ModuleCategory.values());
 
     // When
     ResultActions result = mvc.perform(

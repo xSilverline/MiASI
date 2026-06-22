@@ -15,6 +15,5 @@ class ModuleCatalogTest {
   @Test
   void saveModule() {
     ctx.addModule(new Module());
-    ctx.addModuleType(ModuleType.genSample());
   }
 }

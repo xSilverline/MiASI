@@ -1,5 +1,6 @@
 package miasi.backend.domains.analisis.ports;
 
+
 import miasi.backend.domains.analysis.baseline.BaselineAnalysisCompletedEvent;
 import miasi.backend.domains.analysis.simulation.MissionFailureDetectedEvent;
 import miasi.backend.domains.analysis.simulation.SimulationAnalysisCompletedEvent;

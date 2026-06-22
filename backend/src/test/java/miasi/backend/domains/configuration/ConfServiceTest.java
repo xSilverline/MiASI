@@ -7,7 +7,7 @@ import miasi.backend.domains.configuration.enums.ModuleState;
 import miasi.backend.domains.configuration.enums.ResourceType;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
-import miasi.backend.domains.configuration.modules.ModuleType;
+import miasi.backend.domains.configuration.modules.ModuleCategory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -21,7 +21,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -124,8 +123,20 @@ class ConfServiceTest {
     Module module = new Module(
         "test2",
         ModuleState.PARTIALLY_DAMAGED,
-        ModuleType.genSample(),
-        12
+        ModuleCategory.ENERGY_MODULE,
+        12,
+        List.of(new Resources[]{
+            new Resources(
+                ResourceType.WATER,
+                1f
+            )
+        }),
+        List.of(new Resources[]{
+            new Resources(
+                ResourceType.ENERGY,
+                1f
+            )
+        })
     );
     int sizeBefore = moduleRepository.getModules().size();
 
@@ -144,8 +155,20 @@ class ConfServiceTest {
     Module module = new Module(
         "test",
         ModuleState.PARTIALLY_DAMAGED,
-        ModuleType.genSample(),
-        12
+        ModuleCategory.ENERGY_MODULE,
+        12,
+        List.of(new Resources[]{
+            new Resources(
+                ResourceType.WATER,
+                1f
+            )
+        }),
+        List.of(new Resources[]{
+            new Resources(
+                ResourceType.ENERGY,
+                1f
+            )
+        })
     );
     confService.addModule(module);
     int sizeBefore = moduleRepository.getModules().size();
@@ -162,48 +185,12 @@ class ConfServiceTest {
     assert moduleRepository.getModules().get(id).getStatus().equals(changedState);
   }
 
-  @Test
-  void addModuleType_shouldPersistInRepository() {
-    // given
-    ModuleType type = new ModuleType();
-    int sizeBefore = moduleRepository.getModuleTypes().size();
-
-    // when
-    int id = confService.addModuleType(type);
-
-    // then
-    assert id >= 0;
-    assert moduleRepository.getModuleTypes().size() == sizeBefore + 1;
-    assert moduleRepository.getModuleTypes().get(id) != null;
-  }
-
   private int getMissionPlansSize() {
     int i = 0;
     while (missionPlansRepository.findById(i) != null) {
       i++;
     }
     return i;
-  }
-
-  @Test
-  void addModuleType_shouldOverrideSameName() {
-    // given
-    ModuleType type = ModuleType.genSample();
-    type.setName("test");
-    confService.addModuleType(type);
-    int sizeBefore = moduleRepository.getModuleTypes().size();
-
-    // when
-    List<Resources> changedState = new ArrayList<>();
-    changedState.add(new Resources(ResourceType.OXYGEN, 12));
-    type.setResourceConsumption(changedState);
-    int id = confService.addModuleType(type);
-
-    // then
-    assert id >= 0;
-    assert moduleRepository.getModuleTypes().size() == sizeBefore;
-    assert moduleRepository.getModuleTypes().get(id) != null;
-    assert moduleRepository.getModuleTypes().get(id).getResourceConsumption().equals(changedState);
   }
 
 
