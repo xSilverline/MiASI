@@ -2,8 +2,8 @@ package miasi.backend.domains.analysis.services;
 
 import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.modules.Module;
+import miasi.backend.domains.analysis.types.modules.ModuleState;
 import miasi.backend.domains.analysis.types.schedule.Threat;
-import miasi.backend.enums.ModuleState;
 
 import java.util.List;
 

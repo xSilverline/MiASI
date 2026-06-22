@@ -1,11 +1,15 @@
 package miasi.backend.domains.configuration.missionPlan;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import miasi.backend.domains.configuration.Resources;
+import miasi.backend.domains.configuration.SexProfile;
+import miasi.backend.domains.configuration.enums.ResourceType;
 import miasi.backend.domains.configuration.modules.Module;
-import miasi.backend.domains.configuration.other.Resources;
-import miasi.backend.domains.configuration.other.SexProfile;
-import miasi.backend.enums.ResourceType;
 
 import java.util.ArrayList;
 import java.util.List;

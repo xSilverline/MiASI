@@ -1,9 +1,14 @@
 package miasi.backend.domains.configuration.modules;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.domains.configuration.other.Resources;
-import miasi.backend.enums.ResourceType;
+import miasi.backend.domains.configuration.Resources;
+import miasi.backend.domains.configuration.enums.ResourceType;
 
 import java.util.List;
 

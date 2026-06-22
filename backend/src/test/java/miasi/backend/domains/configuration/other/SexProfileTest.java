@@ -1,5 +1,6 @@
 package miasi.backend.domains.configuration.other;
 
+import miasi.backend.domains.configuration.SexProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,7 +21,7 @@ class SexProfileTest {
       profile = new SexProfile();
       start = profile.getPopulation();
     }
-    
+
     @ParameterizedTest
     @ValueSource(ints = {2, -3, 0})
     void add(int number) {

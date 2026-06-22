@@ -1,6 +1,5 @@
 package miasi.backend.api;
 
-import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.api.jsons.BasicResponseEntity;
 import miasi.backend.api.jsons.CreateScheduleRequest;
@@ -10,7 +9,7 @@ import miasi.backend.domains.schedule.MissionTimeline;
 import miasi.backend.domains.schedule.ScenarioDraft;
 import miasi.backend.domains.schedule.ScheduleService;
 import miasi.backend.domains.schedule.ScheduledEvent;
-import miasi.backend.enums.EventType;
+import miasi.backend.domains.schedule.enums.EventType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
 
 @CrossOrigin(origins = "http://localhost:*")
 @RestController

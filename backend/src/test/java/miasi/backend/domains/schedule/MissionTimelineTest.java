@@ -1,6 +1,6 @@
 package miasi.backend.domains.schedule;
 
-import miasi.backend.enums.EventType;
+import miasi.backend.domains.schedule.enums.EventType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

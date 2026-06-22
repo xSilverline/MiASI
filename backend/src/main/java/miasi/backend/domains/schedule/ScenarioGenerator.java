@@ -1,17 +1,18 @@
 package miasi.backend.domains.schedule;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.DifficultyLevel;
-import miasi.backend.enums.EventType;
-import miasi.backend.enums.ScenarioGenerationMode;
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.EventType;
+import miasi.backend.domains.schedule.enums.ScenarioGenerationMode;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -64,7 +65,7 @@ public class ScenarioGenerator {
     double impactValue =
         definition.getMinImpactValue()
             + (definition.getMaxImpactValue() - definition.getMinImpactValue())
-                * effectiveRandom.nextDouble();
+            * effectiveRandom.nextDouble();
     int threatDuration =
         randomIntBetween(
             (int) Math.ceil(definition.getMinImpactValue()),

@@ -1,16 +1,17 @@
 package miasi.backend.domains.schedule;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.DifficultyLevel;
-import miasi.backend.enums.ScheduleStatus;
-import miasi.backend.enums.ScenarioGenerationMode;
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.ScenarioGenerationMode;
+import miasi.backend.domains.schedule.enums.ScheduleStatus;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter

@@ -3,7 +3,7 @@ package miasi.backend.domains.analysis.types.core;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.ResourceType;
+import miasi.backend.domains.analysis.types.ResourceType;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)

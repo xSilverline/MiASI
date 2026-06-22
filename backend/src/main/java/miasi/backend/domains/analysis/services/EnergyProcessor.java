@@ -1,10 +1,10 @@
 package miasi.backend.domains.analysis.services;
 
 import lombok.RequiredArgsConstructor;
+import miasi.backend.domains.analysis.types.ResourceType;
 import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.modules.Module;
-import miasi.backend.enums.ModuleState;
-import miasi.backend.enums.ResourceType;
+import miasi.backend.domains.analysis.types.modules.ModuleState;
 
 import java.util.List;
 

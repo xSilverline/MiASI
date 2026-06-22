@@ -11,11 +11,6 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 @AnalyzeClasses(packages = "miasi.backend", importOptions = ImportOption.DoNotIncludeTests.class)
 public class PackageArchTests {
 
-  @ArchTest()
-  static final ArchRule enums_should_be_in_enums_package = classes()
-      .that().areEnums()
-      .should().resideInAPackage("..enums..");
-
   @ArchTest
   static final ArchRule events_should_be_in_events_package =
       classes()

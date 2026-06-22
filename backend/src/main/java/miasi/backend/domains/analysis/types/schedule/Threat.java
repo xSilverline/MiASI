@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.ImpactTarget;
-import miasi.backend.enums.ImpactType;
 
 @Getter
 @Setter

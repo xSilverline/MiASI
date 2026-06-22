@@ -1,12 +1,12 @@
 package miasi.backend.domains.analysis.services;
 
 import lombok.RequiredArgsConstructor;
+import miasi.backend.domains.analysis.types.ResourceType;
 import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.crew.ConsumptionMode;
 import miasi.backend.domains.analysis.types.input.MissionManifest;
 import miasi.backend.domains.analysis.types.modules.Module;
 import miasi.backend.domains.analysis.types.schedule.Delivery;
-import miasi.backend.enums.ResourceType;
 
 import java.util.List;
 
