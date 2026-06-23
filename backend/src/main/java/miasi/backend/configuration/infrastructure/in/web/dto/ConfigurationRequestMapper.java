@@ -20,7 +20,12 @@ public final class ConfigurationRequestMapper {
   }
 
   public static Module toDomain(ModuleRequest request) {
-    return new Module(request.name(), request.status(), toDomain(request.type()), request.weight());
+    return new Module(
+        request.name(),
+        request.status(),
+        request.category(),
+        toDomain(request.type()),
+        request.weight());
   }
 
   public static ModuleType toDomain(ModuleTypeRequest request) {

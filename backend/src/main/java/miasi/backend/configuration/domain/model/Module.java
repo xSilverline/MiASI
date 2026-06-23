@@ -13,13 +13,19 @@ import miasi.backend.common.domain.model.ModuleState;
 public class Module {
   String name;
   ModuleState status;
+  ModuleCategory category;
   ModuleType type;
   float weight;
 
   public Module() {
     name = "default_laboratory";
     status = ModuleState.ACTIVE;
+    category = ModuleCategory.SCIENCE_MODULE;
     type = ModuleType.genSample();
     weight = 2137;
+  }
+
+  public Module(String name, ModuleState status, ModuleType type, float weight) {
+    this(name, status, ModuleCategory.UTILITY_MODULE, type, weight);
   }
 }

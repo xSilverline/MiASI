@@ -1,5 +1,6 @@
 package miasi.backend.schedule.infrastructure.in.web;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -71,6 +72,11 @@ public class ScheduleController {
   }
 
   @PostMapping("/{scheduleId}/events")
+  @Operation(
+      summary = "Dodaje custom event do harmonogramu",
+      description =
+          "Pozwala ręcznie dodać event typu THREAT, SUPPLY_DELIVERY albo MODULE_STATE_CHANGE"
+              + " do istniejącego harmonogramu.")
   public ResponseEntity<ScheduleResponse> addEvent(
       @PathVariable String scheduleId, @Valid @RequestBody ScheduledEventRequest request) {
     var schedule = changeScheduleEventsUseCase.addEvent(scheduleId, request.toDomain());
@@ -109,6 +115,11 @@ public class ScheduleController {
   }
 
   @PostMapping("/scenario")
+  @Operation(
+      summary = "Generuje draft scenariusza",
+      description =
+          "Tworzy tymczasowy draft scenariusza zdarzeń dla planu misji. Zwrócony draftId"
+              + " identyfikuje ten tymczasowy zestaw zdarzeń przed zatwierdzeniem go jako harmonogram.")
   public ResponseEntity<ScenarioDraftResponse> generateScenario(
       @Valid @RequestBody GenerateScenarioRequest request) {
     var draft =
@@ -120,12 +131,17 @@ public class ScheduleController {
   }
 
   @GetMapping("/scenario/{draftId}")
+  @Operation(
+      summary = "Pobiera draft scenariusza",
+      description =
+          "draftId to identyfikator tymczasowego scenariusza wygenerowanego przez POST /api/schedule/scenario.")
   public ResponseEntity<ScenarioDraftResponse> getScenarioDraft(@PathVariable String draftId) {
     return ResponseEntity.ok(
         ScheduleResponseMapper.toResponse(generateScenarioUseCase.getScenarioDraft(draftId)));
   }
 
   @PutMapping("/scenario/{draftId}/events/{eventId}")
+  @Operation(description = "Poprawia event w tymczasowym drafcie scenariusza.")
   public ResponseEntity<ScenarioDraftResponse> correctScenarioEvent(
       @PathVariable String draftId,
       @PathVariable String eventId,
@@ -136,6 +152,7 @@ public class ScheduleController {
   }
 
   @PostMapping("/scenario/{draftId}/approve")
+  @Operation(description = "Zatwierdza draft scenariusza i tworzy z niego nowy harmonogram.")
   public ResponseEntity<ScheduleResponse> approveScenarioDraft(@PathVariable String draftId) {
     var schedule = approveScenarioUseCase.approveScenarioDraft(draftId);
     return ResponseEntity.created(URI.create("/api/schedule/" + schedule.getId()))
@@ -143,6 +160,7 @@ public class ScheduleController {
   }
 
   @PostMapping("/{scheduleId}/scenario/{draftId}/approve")
+  @Operation(description = "Zatwierdza draft scenariusza do istniejącego harmonogramu.")
   public ResponseEntity<ScheduleResponse> approveScenarioIntoSchedule(
       @PathVariable String scheduleId, @PathVariable String draftId) {
     return ResponseEntity.ok(

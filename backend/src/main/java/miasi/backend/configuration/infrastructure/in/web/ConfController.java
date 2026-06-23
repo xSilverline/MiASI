@@ -19,6 +19,7 @@ import miasi.backend.configuration.application.port.in.ManageMissionPlanUseCase;
 import miasi.backend.configuration.application.port.in.ManageModuleCatalogUseCase;
 import miasi.backend.configuration.domain.model.MissionPlan;
 import miasi.backend.configuration.domain.model.ModuleCatalog;
+import miasi.backend.configuration.domain.model.ModuleCategory;
 import miasi.backend.configuration.infrastructure.in.web.dto.ConfigurationRequestMapper;
 import miasi.backend.configuration.infrastructure.in.web.dto.MissionPlanRequest;
 import miasi.backend.configuration.infrastructure.in.web.dto.ModuleRequest;
@@ -61,6 +62,11 @@ public class ConfController {
   }
 
   @GetMapping("/module-catalog")
+  @Operation(
+      summary = "Pobiera katalog modułów",
+      description =
+          "Zwraca dostępne moduły oraz typy modułów. Typ opisuje produkcję i zużycie zasobów,"
+              + " a kategoria jest stałym enumem przypisanym do konkretnego modułu.")
   public ResponseEntity<ModuleCatalog> getModuleCatalog() {
     return ResponseEntity.ok(getModuleCatalogUseCase.getModuleCatalog());
   }
@@ -140,5 +146,11 @@ public class ConfController {
   @GetMapping("/module-states")
   public ResponseEntity<ModuleState[]> getModuleStates() {
     return ResponseEntity.ok(ModuleState.values());
+  }
+
+  @GetMapping("/module-categories")
+  @Operation(description = "Zwraca stałą listę dozwolonych kategorii modułów.")
+  public ResponseEntity<ModuleCategory[]> getModuleCategories() {
+    return ResponseEntity.ok(ModuleCategory.values());
   }
 }
