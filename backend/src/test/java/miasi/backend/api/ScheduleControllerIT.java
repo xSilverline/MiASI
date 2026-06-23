@@ -146,7 +146,11 @@ class ScheduleControllerIT {
     );
 
     // Then
-    result.andExpect(status().isOk());
+    result
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.events[0].id").value(event.getId()))
+        .andExpect(jsonPath("$.events[0].type").value(event.getType().name()))
+        .andExpect(jsonPath("$.events[0].description").value(event.getDescription()));
   }
 
 

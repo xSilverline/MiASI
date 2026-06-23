@@ -230,7 +230,9 @@ class ConfControllerIT {
     // Then
     result
         .andExpect(status().isOk())
-        .andExpect(content().json(expectedJson));
+        .andExpect(content().json(expectedJson))
+        .andExpect(jsonPath("$[?(@ == 'FARM')]").exists())
+        .andExpect(jsonPath("$[?(@ == 'HABITAT_MODULE')]").exists());
   }
 
   @Test

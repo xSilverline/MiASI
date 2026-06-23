@@ -60,6 +60,10 @@ public class ConfController {
   }
 
   @GetMapping("/module-catalog")
+  @Operation(
+      summary = "Pobiera katalog modułów",
+      description = "Zwraca moduły dostępne do konfiguracji misji. Kategoria modułu jest stałą wartością enum ModuleCategory przypisaną do modułu, a produkcja i zużycie zasobów są osobnymi polami modułu."
+  )
   public ResponseEntity<List<Module>> getModuleCatalog() {
     return ResponseEntity.ok(confService.getModuleCatalog());
   }
@@ -130,6 +134,10 @@ public class ConfController {
   }
 
   @GetMapping("/module-categories")
+  @Operation(
+      summary = "Pobiera dostępne kategorie modułów",
+      description = "Kategorie modułów nie są tworzone przez API. Frontend powinien korzystać z tej stałej listy enumów przy dodawaniu modułu."
+  )
   public ResponseEntity<ModuleCategory[]> getCategories() {
     return ResponseEntity.ok(ModuleCategory.values());
   }
