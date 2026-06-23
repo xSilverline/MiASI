@@ -1,49 +1,73 @@
-# Frontend
+# React + TypeScript + Vite
 
-React/Vite client for Mars Mission Planner.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Requirements
+Currently, two official plugins are available:
 
-- Node.js 20+.
-- Backend running on `http://localhost:8080` for live API calls.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Install
+## React Compiler
 
-```powershell
-npm install
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-## Run
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```powershell
-npm run dev
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-
-Open `http://127.0.0.1:5173/`.
-
-The development server proxies `/api` to `http://localhost:8080`. For another backend URL, set:
-
-```powershell
-$env:VITE_API_BASE_URL = "http://localhost:8080"
-npm run dev
-```
-
-## Build and checks
-
-```powershell
-npm run build
-npm run lint
-```
-
-`npm run build` runs `tsc -b && vite build`.
-
-## Implemented screens
-
-- Session: login, verify and logout through `/api/auth`.
-- Mission: default plan, plan by id, plan count and resource types through `/api/conf`.
-- Catalog: module catalog and module states through `/api/conf`.
-- Schedule: create/load schedule, fetch timeline, generate/load/approve scenario draft and add
-  `THREAT`, `SUPPLY_DELIVERY` or `MODULE_STATE_CHANGE` events through `/api/schedule`.
-
-API routes and DTO types are centralized in `src/api.ts`; UI code should not introduce scattered
-endpoint strings.
