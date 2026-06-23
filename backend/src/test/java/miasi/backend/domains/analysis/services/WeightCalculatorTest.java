@@ -1,8 +1,8 @@
 package miasi.backend.domains.analysis.services;
 
+import miasi.backend.domains.analysis.types.ResourceType;
 import miasi.backend.domains.analysis.types.core.Resource;
 import miasi.backend.domains.analysis.types.modules.Module;
-import miasi.backend.enums.ResourceType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

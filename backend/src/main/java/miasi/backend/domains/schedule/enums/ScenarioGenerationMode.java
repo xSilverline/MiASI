@@ -1,4 +1,4 @@
-package miasi.backend.enums;
+package miasi.backend.domains.schedule.enums;
 
 public enum ScenarioGenerationMode {
   MANUAL,

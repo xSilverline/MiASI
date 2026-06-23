@@ -7,7 +7,6 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.analysis.types.core.DailyBalance;
 import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.enums.ModuleState;
 
 import java.util.List;
 

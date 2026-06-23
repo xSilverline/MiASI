@@ -1,14 +1,15 @@
 package miasi.backend.domains.schedule;
 
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.EventType;
+import miasi.backend.domains.schedule.enums.ThreatType;
+
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import miasi.backend.enums.DifficultyLevel;
-import miasi.backend.enums.ThreatType;
-import org.springframework.stereotype.Service;
 
-@Service
 public class ScheduleService {
 
   private final Map<String, MissionSchedule> schedules = new ConcurrentHashMap<>();
@@ -36,22 +37,32 @@ public class ScheduleService {
 
   public MissionSchedule addEvent(String scheduleId, ScheduledEvent event) {
     MissionSchedule schedule = getSchedule(scheduleId);
-    policy.validateSolWithinMission(event, schedule.getDurationSols());
-    if (event instanceof SupplyDelivery delivery) {
-      policy.validateDeliveryWeight(delivery, Double.MAX_VALUE);
-    }
+    validateEventScheduling(schedule, event);
     schedule.addEvent(event);
     return schedule;
   }
 
   public MissionSchedule updateEvent(String scheduleId, String eventId, ScheduledEvent event) {
     MissionSchedule schedule = getSchedule(scheduleId);
-    policy.validateSolWithinMission(event, schedule.getDurationSols());
-    if (event instanceof SupplyDelivery delivery) {
-      policy.validateDeliveryWeight(delivery, Double.MAX_VALUE);
-    }
+    validateEventScheduling(schedule, event);
     schedule.updateEvent(eventId, event);
     return schedule;
+  }
+
+  public MissionSchedule scheduleModuleStateChange(
+      String scheduleId,
+      String eventId,
+      int sol,
+      String description,
+      String moduleId,
+      ModuleState newState) {
+    ModuleStateChange stateChange = new ModuleStateChange(moduleId, newState);
+    stateChange.setId(hasText(eventId) ? eventId : UUID.randomUUID().toString());
+    stateChange.setType(EventType.MODULE_STATE_CHANGE);
+    stateChange.setSol(sol);
+    stateChange.setDescription(description);
+    validateModuleStateChange(stateChange);
+    return addEvent(scheduleId, stateChange);
   }
 
   public void removeEvent(String scheduleId, String eventId) {
@@ -133,5 +144,28 @@ public class ScheduleService {
                 6.0,
                 10.0,
                 "days")));
+  }
+
+  private void validateEventScheduling(MissionSchedule schedule, ScheduledEvent event) {
+    policy.validateSolWithinMission(event, schedule.getDurationSols());
+    if (!policy.allowManyEventsInSameSol(event, schedule)) {
+      throw new IllegalArgumentException("Multiple events in the same sol are not allowed");
+    }
+    if (event instanceof SupplyDelivery delivery) {
+      policy.validateDeliveryWeight(delivery, Double.MAX_VALUE);
+    }
+  }
+
+  private void validateModuleStateChange(ModuleStateChange stateChange) {
+    if (!hasText(stateChange.getModuleId())) {
+      throw new IllegalArgumentException("Module id is required");
+    }
+    if (stateChange.getNewState() == null) {
+      throw new IllegalArgumentException("New module state is required");
+    }
+  }
+
+  private boolean hasText(String value) {
+    return value != null && !value.isBlank();
   }
 }

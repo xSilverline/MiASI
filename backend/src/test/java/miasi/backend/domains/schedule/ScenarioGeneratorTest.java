@@ -1,9 +1,9 @@
 package miasi.backend.domains.schedule;
 
-import miasi.backend.enums.DifficultyLevel;
-import miasi.backend.enums.EventType;
-import miasi.backend.enums.ScenarioGenerationMode;
-import miasi.backend.enums.ThreatType;
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.EventType;
+import miasi.backend.domains.schedule.enums.ScenarioGenerationMode;
+import miasi.backend.domains.schedule.enums.ThreatType;
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 

@@ -1,6 +1,6 @@
 package miasi.backend.domains.analysis.types.core;
 
-import miasi.backend.enums.ResourceType;
+import miasi.backend.domains.analysis.types.ResourceType;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

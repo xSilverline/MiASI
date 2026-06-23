@@ -1,12 +1,13 @@
 package miasi.backend.domains.schedule;
 
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+
+import java.util.List;
 
 @Getter
 @Setter

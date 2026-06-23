@@ -1,16 +1,16 @@
 package miasi.backend.api;
 
-import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.api.jsons.BasicResponseEntity;
 import miasi.backend.api.jsons.CreateScheduleRequest;
 import miasi.backend.api.jsons.GenerateScenarioRequest;
+import miasi.backend.api.jsons.ScheduleModuleStateChangeRequest;
 import miasi.backend.domains.schedule.MissionSchedule;
 import miasi.backend.domains.schedule.MissionTimeline;
 import miasi.backend.domains.schedule.ScenarioDraft;
 import miasi.backend.domains.schedule.ScheduleService;
 import miasi.backend.domains.schedule.ScheduledEvent;
-import miasi.backend.enums.EventType;
+import miasi.backend.domains.schedule.enums.EventType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
 
 @CrossOrigin(origins = "http://localhost:*")
 @RestController
@@ -65,6 +67,20 @@ public class ScheduleController {
       @PathVariable String eventId,
       @RequestBody ScheduledEvent event) {
     MissionSchedule schedule = scheduleService.updateEvent(scheduleId, eventId, event);
+    return ResponseEntity.ok(schedule);
+  }
+
+  @PostMapping("/{scheduleId}/module-state-changes")
+  public ResponseEntity<MissionSchedule> scheduleModuleStateChange(
+      @PathVariable String scheduleId, @RequestBody ScheduleModuleStateChangeRequest request) {
+    MissionSchedule schedule =
+        scheduleService.scheduleModuleStateChange(
+            scheduleId,
+            request.id(),
+            request.sol(),
+            request.description(),
+            request.moduleId(),
+            request.newState());
     return ResponseEntity.ok(schedule);
   }
 

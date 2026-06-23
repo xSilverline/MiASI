@@ -11,12 +11,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SpringConfigurationEventAdapter implements IConfigurationEventPublisherPort {
 
-    // narzędzie do springa
-    private final ApplicationEventPublisher applicationEventPublisher;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
-    @Override
-    public void publishMissionPlanCreated(MissionPlan plan) {
-        // wysłanie eventu
-        applicationEventPublisher.publishEvent(new MissionPlanCreatedEvent(plan));
-    }
+  @Override
+  public void publishMissionPlanCreated(int missionPlanId, MissionPlan plan) {
+    applicationEventPublisher.publishEvent(new MissionPlanCreatedEvent(missionPlanId, plan));
+  }
 }

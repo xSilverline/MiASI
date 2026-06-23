@@ -1,8 +1,12 @@
 package miasi.backend.domains.schedule;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import miasi.backend.enums.EventType;
+import miasi.backend.domains.schedule.enums.EventType;
 
 @Getter
 @Setter

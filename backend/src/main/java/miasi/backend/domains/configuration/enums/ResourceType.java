@@ -1,4 +1,4 @@
-package miasi.backend.enums;
+package miasi.backend.domains.configuration.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

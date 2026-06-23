@@ -6,7 +6,7 @@ zostawiam w takim razie wam decyzję, żeby nie utrudnić przypadkowo
 ```java
 package miasi.backend.config;
 
-import miasi.backend.enums.ResourceType;
+import miasi.backend.domains.configuration.enums.ResourceType;
 import miasi.backend.domains.analysis.types.core.ResourceWeightDictionary;
 import java.util.Map;
 

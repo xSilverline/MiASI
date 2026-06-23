@@ -1,7 +1,7 @@
 package miasi.backend.domains.schedule;
 
-import miasi.backend.enums.DifficultyLevel;
-import miasi.backend.enums.ThreatType;
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.ThreatType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

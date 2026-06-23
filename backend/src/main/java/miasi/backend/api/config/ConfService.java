@@ -1,14 +1,14 @@
-package miasi.backend.domains.configuration;
+package miasi.backend.api.config;
 
 import lombok.RequiredArgsConstructor;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
-import miasi.backend.domains.configuration.modules.ModuleCatalog;
-import miasi.backend.domains.configuration.modules.ModuleType;
 import miasi.backend.domains.configuration.ports.IConfigurationEventPublisherPort;
 import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
 import miasi.backend.domains.configuration.ports.IModuleRepositoryPort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,14 +30,13 @@ public class ConfService {
     return missionPlansRepository.findById(missionId);
   }
 
-  public ModuleCatalog getModuleCatalog() {
+  public List<Module> getModuleCatalog() {
     return moduleRepository.toJson();
   }
 
   public int saveMissionPlan(MissionPlan missionPlan) {
-    // serwis zapisuje do bazy
     int id = missionPlansRepository.save(missionPlan);
-    eventPublisher.publishMissionPlanCreated(missionPlan);
+    eventPublisher.publishMissionPlanCreated(id, missionPlan);
 
     return id;
   }
@@ -47,15 +46,13 @@ public class ConfService {
     Integer output = missionPlansRepository.replace(id, missionPlan);
     output = (output != -1) ? output : null;
 
-    eventPublisher.publishMissionPlanCreated(missionPlan);
+    if (output != null) {
+      eventPublisher.publishMissionPlanCreated(output, missionPlan);
+    }
     return output;
   }
 
   public int addModule(Module module) {
     return moduleRepository.add(module);
-  }
-
-  public int addModuleType(ModuleType type) {
-    return moduleRepository.add(type);
   }
 }
