@@ -1,26 +1,37 @@
 package miasi.backend.domains.analysis.infrastructure.out.persistence;
 
-import tools.jackson.databind.ObjectMapper;
-import java.io.File;
-import java.io.IOException;
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+import miasi.backend.database.JsonFileStorage;
 import miasi.backend.domains.analysis.application.port.out.IPayloadSessionRepositoryPort;
 import miasi.backend.domains.analysis.domain._payload.PayloadOptimizationSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 @Repository
-@RequiredArgsConstructor
 public class PayloadSessionJsonAdapter implements IPayloadSessionRepositoryPort {
 
-  private final ObjectMapper objectMapper;
+  private final JsonFileStorage<PayloadOptimizationSession> database = new JsonFileStorage<>(
+      PayloadOptimizationSession.class);
+  private final String filePath;
+  private List<PayloadOptimizationSession> sessions = new ArrayList<>();
 
-  private static final String FILE_PATH = "payload_sessions_database.json";
+  public PayloadSessionJsonAdapter(
+      @Value("${database.filename.analysis.payload}") String filePath
+  ) {
+    this.filePath = filePath;
+    List<PayloadOptimizationSession> loaded = database.loadListFromFile(filePath);
+    if (loaded != null) {
+      this.sessions = new ArrayList<>(loaded);
+    }
+  }
 
   @Override
   public void save(PayloadOptimizationSession session) {
-    File file = new File(FILE_PATH);
-    objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, session);
-    System.out.println("Zapisano sesję do pliku: " + file.getAbsolutePath());
-  }
+    sessions.removeIf(s -> s.getId().equals(session.getId()));
+    sessions.add(session);
 
+    database.saveListToFile(sessions, filePath);
+    System.out.println("Zapisano sesję payload do: " + filePath);
+  }
 }
