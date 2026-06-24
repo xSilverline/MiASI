@@ -1,4 +1,6 @@
 ﻿.idea/
 *.iml
 backend/target
-out
+/out/
+!port/out/
+!port/out/**

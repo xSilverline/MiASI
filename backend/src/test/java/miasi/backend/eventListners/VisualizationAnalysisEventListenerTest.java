@@ -1,34 +1,41 @@
 package miasi.backend.eventListners;
 
-import miasi.backend.domains.analysis.baseline.BaselineAnalysisCompletedEvent;
-import miasi.backend.domains.analysis.simulation.MissionFailureDetectedEvent;
-import miasi.backend.domains.analysis.simulation.SimulationAnalysisCompletedEvent;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+
+import miasi.backend.domains.analysis.domain._payload.PayloadOptimizationCompletedEvent;
+import miasi.backend.domains.analysis.domain._payload.PayloadOptimizationSession;
+import miasi.backend.domains.analysis.domain._simulation.NominalSimulationCompletedEvent;
+import miasi.backend.domains.analysis.domain._simulation.NominalSimulationSession;
+import miasi.backend.domains.analysis.domain._simulation.ScenariosAnalysisCompletedEvent;
+import miasi.backend.domains.analysis.domain._simulation.ScenariosAnalysisSession;
 import miasi.backend.domains.visualization.VisualizationAnalysisEventInbox;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class VisualizationAnalysisEventListenerTest {
+
   @Test
   void shouldRecordAnalysisEventsForVisualization() {
+    PayloadOptimizationSession dummyPayloadSession = mock(PayloadOptimizationSession.class);
+    NominalSimulationSession dummyNominalSession = mock(NominalSimulationSession.class);
+    ScenariosAnalysisSession dummyScenariosSession = mock(ScenariosAnalysisSession.class);
+
     VisualizationAnalysisEventInbox inbox = new VisualizationAnalysisEventInbox();
     VisualizationAnalysisEventListener listener = new VisualizationAnalysisEventListener(inbox);
-    BaselineAnalysisCompletedEvent baselineEvent =
-        new BaselineAnalysisCompletedEvent(UUID.randomUUID(), null, null);
-    SimulationAnalysisCompletedEvent simulationEvent =
-        new SimulationAnalysisCompletedEvent(UUID.randomUUID(), null, null);
-    MissionFailureDetectedEvent failureEvent =
-        new MissionFailureDetectedEvent(UUID.randomUUID(), null);
+    PayloadOptimizationCompletedEvent payloadOptimizationCompletedEvent =
+        new PayloadOptimizationCompletedEvent(dummyPayloadSession);
+    NominalSimulationCompletedEvent nominalSimulationCompletedEvent =
+        new NominalSimulationCompletedEvent(dummyNominalSession);
+    ScenariosAnalysisCompletedEvent scenariosAnalysisCompletedEvent =
+        new ScenariosAnalysisCompletedEvent(dummyScenariosSession);
 
-    listener.onBaselineAnalysisCompleted(baselineEvent);
-    listener.onSimulationAnalysisCompleted(simulationEvent);
-    listener.onMissionFailureDetected(failureEvent);
+    listener.onPayloadOptimizationCompleted(payloadOptimizationCompletedEvent);
+    listener.onNominalSimulationCompleted(nominalSimulationCompletedEvent);
+    listener.onScenariosAnalysisCompleted(scenariosAnalysisCompletedEvent);
 
     assertEquals(3, inbox.getReceivedEvents().size());
-    assertEquals(baselineEvent, inbox.getReceivedEvents().get(0));
-    assertEquals(simulationEvent, inbox.getReceivedEvents().get(1));
-    assertEquals(failureEvent, inbox.getReceivedEvents().get(2));
+    assertEquals(payloadOptimizationCompletedEvent, inbox.getReceivedEvents().get(0));
+    assertEquals(nominalSimulationCompletedEvent, inbox.getReceivedEvents().get(1));
+    assertEquals(scenariosAnalysisCompletedEvent, inbox.getReceivedEvents().get(2));
   }
 }

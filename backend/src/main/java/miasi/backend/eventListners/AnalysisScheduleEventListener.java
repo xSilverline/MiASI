@@ -1,7 +1,7 @@
 package miasi.backend.eventListners;
 
 import lombok.RequiredArgsConstructor;
-import miasi.backend.domains.analisis.AnalysisScheduleEventInbox;
+import miasi.backend.domains.analysis.AnalysisScheduleEventInbox;
 import miasi.backend.events.MissionScheduleCreated;
 import miasi.backend.events.MissionScheduleUpdated;
 import miasi.backend.events.ModuleStateChangeScheduled;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class AnalysisScheduleEventListener {
+
   private final AnalysisScheduleEventInbox inbox;
 
   @EventListener

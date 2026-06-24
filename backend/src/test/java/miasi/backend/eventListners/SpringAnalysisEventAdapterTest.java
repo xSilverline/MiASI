@@ -1,34 +1,40 @@
 package miasi.backend.eventListners;
 
-import miasi.backend.domains.analysis.baseline.BaselineAnalysisCompletedEvent;
-import miasi.backend.domains.analysis.simulation.MissionFailureDetectedEvent;
-import miasi.backend.domains.analysis.simulation.SimulationAnalysisCompletedEvent;
-import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
-
-import java.util.UUID;
-
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import miasi.backend.domains.analysis.domain._payload.PayloadOptimizationCompletedEvent;
+import miasi.backend.domains.analysis.domain._payload.PayloadOptimizationSession;
+import miasi.backend.domains.analysis.domain._simulation.NominalSimulationCompletedEvent;
+import miasi.backend.domains.analysis.domain._simulation.NominalSimulationSession;
+import miasi.backend.domains.analysis.domain._simulation.ScenariosAnalysisCompletedEvent;
+import miasi.backend.domains.analysis.domain._simulation.ScenariosAnalysisSession;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
+
 class SpringAnalysisEventAdapterTest {
+
+  PayloadOptimizationSession dummyPayloadSession = mock(PayloadOptimizationSession.class);
+  NominalSimulationSession dummyNominalSession = mock(NominalSimulationSession.class);
+  ScenariosAnalysisSession dummyScenariosSession = mock(ScenariosAnalysisSession.class);
+
   @Test
   void shouldPublishAnalysisEventsThroughSpring() {
     ApplicationEventPublisher springPublisher = mock(ApplicationEventPublisher.class);
     SpringAnalysisEventAdapter adapter = new SpringAnalysisEventAdapter(springPublisher);
-    BaselineAnalysisCompletedEvent baselineEvent =
-        new BaselineAnalysisCompletedEvent(UUID.randomUUID(), null, null);
-    SimulationAnalysisCompletedEvent simulationEvent =
-        new SimulationAnalysisCompletedEvent(UUID.randomUUID(), null, null);
-    MissionFailureDetectedEvent failureEvent =
-        new MissionFailureDetectedEvent(UUID.randomUUID(), null);
+    PayloadOptimizationCompletedEvent payloadOptimizationCompletedEvent =
+        new PayloadOptimizationCompletedEvent(dummyPayloadSession);
+    NominalSimulationCompletedEvent nominalSimulationCompletedEvent =
+        new NominalSimulationCompletedEvent(dummyNominalSession);
+    ScenariosAnalysisCompletedEvent scenariosAnalysisCompletedEvent =
+        new ScenariosAnalysisCompletedEvent(dummyScenariosSession);
 
-    adapter.publishBaselineAnalysisCompleted(baselineEvent);
-    adapter.publishSimulationAnalysisCompleted(simulationEvent);
-    adapter.publishMissionFailureDetected(failureEvent);
+    adapter.publishPayloadOptimizationCompleted(payloadOptimizationCompletedEvent);
+    adapter.publishNominalSimulationCompleted(nominalSimulationCompletedEvent);
+    adapter.publishScenariosAnalysisCompleted(scenariosAnalysisCompletedEvent);
 
-    verify(springPublisher).publishEvent(baselineEvent);
-    verify(springPublisher).publishEvent(simulationEvent);
-    verify(springPublisher).publishEvent(failureEvent);
+    verify(springPublisher).publishEvent(payloadOptimizationCompletedEvent);
+    verify(springPublisher).publishEvent(nominalSimulationCompletedEvent);
+    verify(springPublisher).publishEvent(scenariosAnalysisCompletedEvent);
   }
 }

@@ -1,14 +1,31 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.simulation.Status;
-import miasi.backend.domains.analysis.types.ResourceType;
-import miasi.backend.domains.analysis.types.core.DailyState;
-import miasi.backend.domains.analysis.types.core.ObservationType;
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.crew.ConsumptionMode;
-import miasi.backend.domains.analysis.types.input.MissionManifest;
-import miasi.backend.domains.analysis.types.result.SimulationOutcome;
-import miasi.backend.domains.analysis.types.schedule.Delivery;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import miasi.backend.domains.analysis.domain._simulation.SimulationOutcome;
+import miasi.backend.domains.analysis.domain._simulation.SimulationOutcomeEvaluator;
+import miasi.backend.domains.analysis.domain._simulation.TimelineSimulator;
+import miasi.backend.domains.analysis.domain.core.DailyState;
+import miasi.backend.domains.analysis.domain.core.MissionManifest;
+import miasi.backend.domains.analysis.domain.core.ObservationType;
+import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
+import miasi.backend.domains.analysis.domain.core.Status;
+import miasi.backend.domains.analysis.domain.crew.ConsumptionMode;
+import miasi.backend.domains.analysis.domain.crew.DemandCalculator;
+import miasi.backend.domains.analysis.domain.crew.SurvivalPredictor;
+import miasi.backend.domains.analysis.domain.energy.PowerGridSimulator;
+import miasi.backend.domains.analysis.domain.modules.ProductionCalculator;
+import miasi.backend.domains.analysis.domain.schedule.Delivery;
+import miasi.backend.domains.analysis.domain.schedule.DeliveryProcessor;
+import miasi.backend.domains.analysis.domain.schedule.ThreatProcessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,20 +36,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class TimelineSimulatorTest {
 
-  // Mockujemy wszystkie procesory i kalkulatory
+  // Mock all processors and calculators
   @Mock
   private DemandCalculator demandCalculator;
   @Mock
@@ -42,7 +49,7 @@ class TimelineSimulatorTest {
   @Mock
   private ThreatProcessor threatProcessor;
   @Mock
-  private EnergyProcessor energyProcessor;
+  private PowerGridSimulator powerGridSimulator;
   @Mock
   private SurvivalPredictor survivalPredictor;
 
@@ -53,10 +60,10 @@ class TimelineSimulatorTest {
 
   @BeforeEach
   void setUp() {
-    // Misja: 5 dni głównej + 2 dni ratunku = 7 dni celu
+    // Mission: 5 days main + 2 days rescue = 7 days target
     mockManifest = new MissionManifest(
-        null, 5, 2, 20000f,
-        new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
+        0, 5, 2, 20000f,
+        new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
     );
 
     lenient().when(productionCalculator.calculateModulesProduction(any()))
@@ -66,66 +73,71 @@ class TimelineSimulatorTest {
     lenient().when(demandCalculator.calculateCrewDemand(any(), any()))
         .thenReturn(new ArrayList<>());
 
-    lenient().when(survivalPredictor.evaluateCrewConsumptionMode(anyInt(), anyInt(), any(), any(), any()))
+    lenient().when(
+            survivalPredictor.evaluateCrewConsumptionMode(anyInt(), anyInt(), any(), any(), any()))
         .thenReturn(ConsumptionMode.OPTIMAL);
-    lenient().when(survivalPredictor.checkIfEvacuationIsNeeded(anyInt(), anyInt(), any(), any(), any()))
+    lenient().when(
+            survivalPredictor.checkIfEvacuationIsNeeded(anyInt(), anyInt(), any(), any(), any()))
         .thenReturn(false);
-    lenient().when(energyProcessor.process(any(Float.class), any()))
+    lenient().when(powerGridSimulator.process(any(Float.class), any()))
         .thenReturn(false);
   }
 
-  @ParameterizedTest(name = "Zapas: {0} O2, Zużycie: {1}/dzień -> Oczekiwany wynik: {2}")
+  @ParameterizedTest(name = "Stock: {0} O2, Consumption: {1}/day -> Expected result: {2}")
   @CsvSource({
-      "100.0,  5.0, SUCCESS",  // Wystarczy na 20 dni. Misja trwa 7. Spokój.
-      "35.0,   5.0, SUCCESS",  // Idealnie na styk (7 * 5 = 35).
-      "15.0,   5.0, FAILURE",  // Zapasu na 3 dni. Symulator wygeneruje deficyt. Śmierć.
-      "0.0,   10.0, FAILURE"   // Pusto w magazynie startowym.
+      "100.0,  5.0, SUCCESS",  // Enough for 20 days. Mission lasts 7. Safe.
+      "35.0,   5.0, SUCCESS",  // Just enough (7 * 5 = 35).
+      "15.0,   5.0, FAILURE",  // Stock for 3 days. Simulator will generate deficit. Death.
+      "0.0,   10.0, FAILURE"   // Empty starting inventory.
   })
-  @DisplayName("Symulacja przetrwania (Orkiestracja Symulatora + Ewaluatora)")
-  void shouldSimulateSurvivalBasedOnOxygen(float startingOxygen, float dailyConsumption, Status expectedStatus) {
+  @DisplayName("Survival simulation (Simulator + Evaluator orchestration)")
+  void shouldSimulateSurvivalBasedOnOxygen(float startingOxygen, float dailyConsumption,
+      Status expectedStatus) {
 
     // given
     List<Resource> startingResources = List.of(new Resource(ResourceType.OXYGEN, startingOxygen));
 
-    // Wymuszamy na kalkulatorze określone zużycie
+    // Force specific consumption on the calculator
     lenient().when(demandCalculator.calculateCrewDemand(any(), any()))
         .thenReturn(List.of(new Resource(ResourceType.OXYGEN, dailyConsumption)));
 
-    // when: Generujemy surową oś czasu
+    // when: Generate raw timeline
     List<DailyState> timeline = timelineSimulator.simulate(
         mockManifest, new ArrayList<>(), startingResources
     );
 
-    // then: Używamy prawdziwego ewaluatora, aby sprawdzić czy matematyka symulatora zadziałała
+    // then: Use the real evaluator to check if simulator math worked
     SimulationOutcomeEvaluator evaluator = new SimulationOutcomeEvaluator();
     SimulationOutcome outcome = evaluator.evaluate(timeline, mockManifest);
 
     DailyState lastState = timeline.getLast();
     float finalOxygen = lastState.getWarehouse().stream()
-        .filter(r -> r.getType() == ResourceType.OXYGEN).map(Resource::getAmount).findFirst().orElse(-999f);
+        .filter(r -> r.getType() == ResourceType.OXYGEN).map(Resource::getAmount).findFirst()
+        .orElse(-999f);
 
-    String errorMsg = String.format("❌ Oczekiwano: %s, Zwrócono: %s. Zatrzymano na sol: %d. Stan O2: %.2f",
+    String errorMsg = String.format(
+        "❌ Expected: %s, Returned: %s. Stopped at sol: %d. O2 level: %.2f",
         expectedStatus, outcome.getStatus(), lastState.getSol(), finalOxygen);
 
     assertEquals(expectedStatus, outcome.getStatus(), errorMsg);
   }
 
   @Test
-  @DisplayName("Udany ratunek na styk (EVACUATION) - Zapas kończy się po przylocie rakiety")
+  @DisplayName("Successful rescue just in time (EVACUATION) - Stock depletes after rocket arrival")
   void shouldResultInEvacuationWhenRescueArrivesJustInTime() {
     // --- GIVEN ---
-    // Zapas tlenu: 3.5. Zużycie: 1.0/dzień.
+    // Oxygen stock: 3.5. Consumption: 1.0/day.
     // Sol 1: 2.5
     // Sol 2: 1.5
     // Sol 3: 0.5
-    // Sol 4: -0.5 (ŚMIERĆ!)
+    // Sol 4: -0.5 (DEATH!)
     List<Resource> startingResources = List.of(new Resource(ResourceType.OXYGEN, 3.5f));
 
     lenient().when(demandCalculator.calculateCrewDemand(any(), any()))
         .thenReturn(List.of(new Resource(ResourceType.OXYGEN, 1.0f)));
 
-    // Predictor bije na alarm od razu w Sol 1 (Dni lotu rakiety ratunkowej = 2)
-    // Rakieta przyleci w Sol: 1 + 2 = 3.
+    // Predictor raises alarm immediately in Sol 1 (Rescue rocket flight days = 2)
+    // Rocket will arrive in Sol: 1 + 2 = 3.
     when(survivalPredictor.checkIfEvacuationIsNeeded(anyInt(), anyInt(), any(), any(), any()))
         .thenReturn(true);
 
@@ -138,20 +150,21 @@ class TimelineSimulatorTest {
     SimulationOutcome outcome = evaluator.evaluate(timeline, mockManifest);
 
     // --- THEN ---
-    // Zgon nastąpiłby w Sol 4, ale ratunek przyszedł w Sol 3. Misja kończy się statusem EVACUATION!
+    // Death would theoretically occur in Sol 4, but rescue arrived in Sol 3. Mission ends with EVACUATION status!
     assertEquals(Status.EVACUATION, outcome.getStatus(),
-        "Rakieta powinna zdążyć uratować załogę przed śmiercią z braku tlenu!");
-    assertEquals(4, outcome.getDeathSol(), "Śmierć teoretycznie nastąpiłaby w Sol 4");
-    assertEquals(3, outcome.getEvacuationSol(), "Ewakuacja powinna mieć miejsce w Sol 3");
+        "The rocket should save the crew from death by lack of oxygen!");
+    assertEquals(4, outcome.getDeathSol(), "Death would theoretically occur in Sol 4");
+    assertEquals(3, outcome.getEvacuationSol(), "Evacuation should take place in Sol 3");
   }
 
   @Test
-  @DisplayName("Prawidłowe przypinanie tagu DELIVERY_RECEIVED tylko w dniu dostawy")
+  @DisplayName("Correctly tag DELIVERY_RECEIVED only on delivery day")
   void shouldTagDeliveryReceivedExactlyOnDeliveryDay() {
     // --- GIVEN ---
-    // Manifest z dostawą ustaloną na Sol 3
-    Delivery delivery = new Delivery(3, List.of(new Resource(ResourceType.FOOD, 100f)), new ArrayList<>());
-    mockManifest.setDeliveries(List.of(delivery));
+    // Manifest with delivery set on Sol 3
+    Delivery delivery = new Delivery(3, List.of(new Resource(ResourceType.FOOD, 100f)),
+        new ArrayList<>());
+    mockManifest = mockManifest.copyWithDeliveries(List.of(delivery));
 
     // --- WHEN ---
     List<DailyState> timeline = timelineSimulator.simulate(
@@ -159,30 +172,32 @@ class TimelineSimulatorTest {
     );
 
     // --- THEN ---
-    DailyState sol1 = timeline.get(0); // Index 0 to Sol 1
+    DailyState sol1 = timeline.get(0); // Index 0 is Sol 1
     DailyState sol2 = timeline.get(1);
-    DailyState sol3 = timeline.get(2); // Index 2 to Sol 3
+    DailyState sol3 = timeline.get(2); // Index 2 is Sol 3
 
-    assertTrue(sol1.getObservations().stream().noneMatch(o -> o == ObservationType.DELIVERY_RECEIVED),
-        "W Sol 1 nie powinno być dostawy");
-    assertTrue(sol2.getObservations().stream().noneMatch(o -> o == ObservationType.DELIVERY_RECEIVED),
-        "W Sol 2 nie powinno być dostawy");
+    assertTrue(
+        sol1.getObservations().stream().noneMatch(o -> o == ObservationType.DELIVERY_RECEIVED),
+        "There should be no delivery on Sol 1");
+    assertTrue(
+        sol2.getObservations().stream().noneMatch(o -> o == ObservationType.DELIVERY_RECEIVED),
+        "There should be no delivery on Sol 2");
     assertTrue(sol3.getObservations().contains(ObservationType.DELIVERY_RECEIVED),
-        "Tag dostawy MUSI znajdować się w historii dla Sol 3!");
+        "The delivery tag MUST be present in the history for Sol 3!");
   }
 
   @Test
-  @DisplayName("Powrót do trybu OPTIMAL i nałożenie odpowiedniego tagu po zakończeniu kryzysu")
+  @DisplayName("Return to OPTIMAL mode and apply correct tag after crisis ends")
   void shouldTagOptimalModeWhenRecoveringFromMinimal() {
     // --- GIVEN ---
-    // Mockujemy zachowanie wróżki przetrwania (Predictora), by symulować falujący kryzys
-    // Sol 1: Oszczędzamy (MINIMAL)
-    // Sol 2: Nadal oszczędzamy (MINIMAL)
-    // Sol 3: Dostawa uratowała sytuację, wracamy do normy (OPTIMAL)
+    // Mock survival predictor behavior to simulate a fluctuating crisis
+    // Sol 1: Conserving (MINIMAL)
+    // Sol 2: Still conserving (MINIMAL)
+    // Sol 3: Delivery saved the situation, returning to normal (OPTIMAL)
     when(survivalPredictor.evaluateCrewConsumptionMode(anyInt(), anyInt(), any(), any(), any()))
         .thenReturn(ConsumptionMode.MINIMAL)  // Sol 1
         .thenReturn(ConsumptionMode.MINIMAL)  // Sol 2
-        .thenReturn(ConsumptionMode.OPTIMAL); // Sol 3 i dalej
+        .thenReturn(ConsumptionMode.OPTIMAL); // Sol 3 and onwards
 
     // --- WHEN ---
     List<DailyState> timeline = timelineSimulator.simulate(
@@ -194,25 +209,25 @@ class TimelineSimulatorTest {
     DailyState sol2 = timeline.get(1);
     DailyState sol3 = timeline.get(2);
 
-    // Zmiana OPTIMAL (startowy) -> MINIMAL
+    // Change OPTIMAL (starting) -> MINIMAL
     assertTrue(sol1.getObservations().contains(ObservationType.MINIMAL_DEMAND_ACTIVATED),
-        "W Sol 1 powinien być tag przejścia na MINIMAL");
+        "There should be a MINIMAL transition tag on Sol 1");
 
-    // Brak zmiany (MINIMAL -> MINIMAL) - nie spamujemy tagami!
+    // No change (MINIMAL -> MINIMAL) - no tag spam!
     assertTrue(sol2.getObservations().isEmpty(),
-        "W Sol 2 tryb się nie zmienił, Dziennik Zdarzeń powinien być czysty (brak spamu)");
+        "Mode did not change on Sol 2, Event Log should be clean (no spam)");
 
-    // Zmiana MINIMAL -> OPTIMAL
+    // Change MINIMAL -> OPTIMAL
     assertTrue(sol3.getObservations().contains(ObservationType.OPTIMAL_DEMAND_ACTIVATED),
-        "W Sol 3 powinien być tag powrotu do trybu OPTIMAL");
+        "There should be a return to OPTIMAL tag on Sol 3");
   }
 
   @Test
-  @DisplayName("Prawidłowe nakładanie tagu TOTAL_BLACKOUT przy awarii zasilania")
+  @DisplayName("Correctly tag TOTAL_BLACKOUT upon power failure")
   void shouldTagTotalBlackoutWhenEnergyProcessorFails() {
     // --- GIVEN ---
-    // Procesor energii zgłasza, że prądu brakło!
-    when(energyProcessor.process(any(Float.class), any())).thenReturn(true);
+    // Energy processor reports power is out!
+    when(powerGridSimulator.process(any(Float.class), any())).thenReturn(true);
 
     // --- WHEN ---
     List<DailyState> timeline = timelineSimulator.simulate(
@@ -220,17 +235,19 @@ class TimelineSimulatorTest {
     );
 
     // --- THEN ---
-    // Sprawdzamy czy symulator poprawnie "nakleił" karteczkę w Dzienniku Zdarzeń
+    // Check if simulator correctly added the note to the Event Log
     assertTrue(timeline.getFirst().getObservations().contains(ObservationType.TOTAL_BLACKOUT),
-        "Oczekiwano tagu TOTAL_BLACKOUT w pierwszym dniu symulacji");
+        "Expected TOTAL_BLACKOUT tag on the first day of simulation");
   }
 
   @Test
-  @DisplayName("Prawidłowe nakładanie tagów przy aktywacji trybu MINIMAL i SOS")
+  @DisplayName("Correctly apply tags upon activation of MINIMAL and SOS modes")
   void shouldTagEvacuationAndMinimalModeWhenPredictorTriggers() {
     // --- GIVEN ---
-    when(survivalPredictor.checkIfEvacuationIsNeeded(anyInt(), anyInt(), any(), any(), any())).thenReturn(true);
-    when(survivalPredictor.evaluateCrewConsumptionMode(anyInt(), anyInt(), any(), any(), any())).thenReturn(ConsumptionMode.MINIMAL);
+    when(survivalPredictor.checkIfEvacuationIsNeeded(anyInt(), anyInt(), any(), any(),
+        any())).thenReturn(true);
+    when(survivalPredictor.evaluateCrewConsumptionMode(anyInt(), anyInt(), any(), any(),
+        any())).thenReturn(ConsumptionMode.MINIMAL);
 
     // --- WHEN ---
     List<DailyState> timeline = timelineSimulator.simulate(
@@ -240,8 +257,8 @@ class TimelineSimulatorTest {
     // --- THEN ---
     DailyState dayOne = timeline.getFirst();
     assertTrue(dayOne.getObservations().contains(ObservationType.EVACUATION_ALERT),
-        "Oczekiwano tagu EVACUATION_ALERT");
+        "Expected EVACUATION_ALERT tag");
     assertTrue(dayOne.getObservations().contains(ObservationType.MINIMAL_DEMAND_ACTIVATED),
-        "Oczekiwano tagu MINIMAL_DEMAND_ACTIVATED ze względu na zmianę z OPTIMAL");
+        "Expected MINIMAL_DEMAND_ACTIVATED tag due to transition from OPTIMAL");
   }
 }

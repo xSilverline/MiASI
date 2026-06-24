@@ -1,19 +1,19 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.types.ResourceType;
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.crew.ConsumptionMode;
-import miasi.backend.domains.analysis.types.crew.CrewGroup;
-import miasi.backend.domains.analysis.types.modules.Module;
-import miasi.backend.domains.analysis.types.modules.ModuleState;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import miasi.backend.domains.analysis.domain.crew.DemandCalculator;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
+import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.crew.ConsumptionMode;
+import miasi.backend.domains.analysis.domain.crew.CrewGroup;
+import miasi.backend.domains.analysis.domain.modules.Module;
+import miasi.backend.domains.analysis.domain.modules.ModuleState;
+import org.junit.jupiter.api.Test;
 
 class DemandCalculatorTest {
 

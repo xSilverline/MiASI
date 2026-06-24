@@ -1,28 +1,25 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.types.ResourceType;
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.modules.Module;
-import miasi.backend.domains.analysis.types.modules.ModuleState;
-import miasi.backend.domains.analysis.types.schedule.ImpactType;
-import miasi.backend.domains.analysis.types.schedule.Threat;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
+import miasi.backend.domains.analysis.domain.modules.Module;
+import miasi.backend.domains.analysis.domain.modules.ModuleState;
+import miasi.backend.domains.analysis.domain.schedule.ImpactType;
+import miasi.backend.domains.analysis.domain.schedule.Threat;
+import miasi.backend.domains.analysis.domain.schedule.ThreatProcessor;
+import org.junit.jupiter.api.Test;
 
 class ThreatProcessorTest {
 
   @Test
   void shouldDecreaseResourceAmountForQuantityChangeThreat() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
     Resource resource = new Resource(ResourceType.WATER, 100);
@@ -35,16 +32,13 @@ class ThreatProcessorTest {
 
     List<Resource> warehouse = new ArrayList<>(List.of(resource));
 
-    // When
     processor.process(3, List.of(threat), null, warehouse);
 
-    // Then
     assertEquals(80, warehouse.getFirst().getAmount());
   }
 
   @Test
   void shouldNotDecreaseBelowZero() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
     Resource resource = new Resource(ResourceType.WATER, 5);
@@ -57,16 +51,13 @@ class ThreatProcessorTest {
 
     List<Resource> warehouse = new ArrayList<>(List.of(resource));
 
-    // When
     processor.process(2, List.of(threat), null, warehouse);
 
-    // Then
     assertEquals(0, warehouse.getFirst().getAmount());
   }
 
   @Test
   void shouldIgnoreQuantityChangeWhenWarehouseIsNull() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
 
@@ -74,20 +65,19 @@ class ThreatProcessorTest {
     when(threat.getDurationSols()).thenReturn(5);
     when(threat.getType()).thenReturn(ImpactType.QUANTITY_CHANGE);
 
-    // When
     processor.process(2, List.of(threat), null, null);
 
-    // Then
     assertTrue(true);
   }
 
-
   @Test
   void shouldChangeModuleEfficiency() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
-    Module module = mock(Module.class);
+
+    // Używamy Buildera i PRAWDZIWEGO obiektu!
+    Module module = Module.builder().name("DRILL").efficiency(0.8f).status(ModuleState.ACTIVE)
+        .build();
 
     when(threat.getSol()).thenReturn(1);
     when(threat.getDurationSols()).thenReturn(5);
@@ -95,22 +85,22 @@ class ThreatProcessorTest {
     when(threat.getTargetIdentifier()).thenReturn("DRILL");
     when(threat.getImpactValue()).thenReturn(0.3f);
 
-    when(module.getName()).thenReturn("DRILL");
-    when(module.getEfficiency()).thenReturn(0.8f);
+    // MUTOWALNA LISTA
+    List<Module> modules = new ArrayList<>(List.of(module));
 
-    // When
-    processor.process(2, List.of(threat), List.of(module), null);
+    processor.process(2, List.of(threat), modules, null);
 
-    // Then
-    verify(module).setEfficiency(0.5f);
+    // Sprawdzamy stan końcowy
+    assertEquals(0.5f, modules.get(0).getEfficiency(), 0.01f);
   }
 
   @Test
   void shouldNotAllowNegativeEfficiency() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
-    Module module = mock(Module.class);
+
+    Module module = Module.builder().name("MODULE").efficiency(1f).status(ModuleState.ACTIVE)
+        .build();
 
     when(threat.getSol()).thenReturn(1);
     when(threat.getDurationSols()).thenReturn(5);
@@ -118,20 +108,15 @@ class ThreatProcessorTest {
     when(threat.getTargetIdentifier()).thenReturn("MODULE");
     when(threat.getImpactValue()).thenReturn(5f);
 
-    when(module.getName()).thenReturn("MODULE");
-    when(module.getEfficiency()).thenReturn(1f);
+    List<Module> modules = new ArrayList<>(List.of(module));
 
-    // When
-    processor.process(2, List.of(threat), List.of(module), null);
+    processor.process(2, List.of(threat), modules, null);
 
-    // Then
-    verify(module).setEfficiency(0f);
+    assertEquals(0f, modules.get(0).getEfficiency());
   }
-
 
   @Test
   void shouldIgnoreEfficiencyChangeWhenModulesNull() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
 
@@ -139,37 +124,34 @@ class ThreatProcessorTest {
     when(threat.getDurationSols()).thenReturn(3);
     when(threat.getType()).thenReturn(ImpactType.EFFICIENCY_CHANGE);
 
-    // When
     processor.process(2, List.of(threat), null, null);
 
-    // Then
     assertTrue(true);
   }
 
   @Test
   void shouldDestroyModuleForStateChangeThreat() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
-    Module module = mock(Module.class);
+
+    Module module = Module.builder().name("ENGINE").efficiency(1.0f).status(ModuleState.ACTIVE)
+        .build();
 
     when(threat.getSol()).thenReturn(1);
     when(threat.getDurationSols()).thenReturn(3);
     when(threat.getType()).thenReturn(ImpactType.STATE_CHANGE);
     when(threat.getTargetIdentifier()).thenReturn("ENGINE");
-    when(module.getName()).thenReturn("ENGINE");
 
-    // When
-    processor.process(2, List.of(threat), List.of(module), null);
+    List<Module> modules = new ArrayList<>(List.of(module));
 
-    // Then
-    verify(module).setStatus(ModuleState.DESTROYED);
-    verify(module).setEfficiency(0f);
+    processor.process(2, List.of(threat), modules, null);
+
+    assertEquals(ModuleState.DESTROYED, modules.get(0).getStatus());
+    assertEquals(0f, modules.get(0).getEfficiency());
   }
 
   @Test
   void shouldIgnoreStateChangeWhenModulesNull() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
 
@@ -177,45 +159,38 @@ class ThreatProcessorTest {
     when(threat.getDurationSols()).thenReturn(3);
     when(threat.getType()).thenReturn(ImpactType.STATE_CHANGE);
 
-    // When
     processor.process(2, List.of(threat), null, null);
 
-    // Then
     assertTrue(true);
   }
 
   @Test
   void shouldReturnWithoutProcessingWhenThreatsNull() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
-
-    // When
     processor.process(1, null, null, null);
-
-    // Then
     assertTrue(true);
   }
 
   @Test
   void shouldIgnoreThreatOutsideActivePeriod() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
-    Module module = mock(Module.class);
+
+    Module module = Module.builder().name("ENGINE").efficiency(1.0f).status(ModuleState.ACTIVE)
+        .build();
 
     when(threat.getSol()).thenReturn(10);
     when(threat.getDurationSols()).thenReturn(2);
 
-    // When
-    processor.process(1, List.of(threat), List.of(module), null);
+    List<Module> modules = new ArrayList<>(List.of(module));
 
-    // Then
-    verifyNoInteractions(module);
+    processor.process(1, List.of(threat), modules, null);
+
+    assertEquals(ModuleState.ACTIVE, modules.get(0).getStatus());
   }
 
   @Test
   void shouldIgnoreResourceWhenIdentifierDoesNotMatch() {
-    // Given
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
     Resource resource = new Resource(ResourceType.WATER, 50);
@@ -228,10 +203,8 @@ class ThreatProcessorTest {
 
     List<Resource> warehouse = new ArrayList<>(List.of(resource));
 
-    // When
     processor.process(2, List.of(threat), null, warehouse);
 
-    // Then
     assertEquals(50, warehouse.getFirst().getAmount());
   }
 }
