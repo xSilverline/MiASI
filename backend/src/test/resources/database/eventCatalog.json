@@ -5,6 +5,14 @@
     "type": "THREAT",
     "description": "Dust storm event available as a mission schedule preset.",
     "affectedElement": "solar-panels",
-    "consequence": "Reduced solar energy production during the storm."
+    "consequence": "Reduced solar energy production during the storm.",
+    "effects": [
+      {
+        "target": "ENERGY",
+        "value": -10.0,
+        "unit": "PERCENT",
+        "description": "Reduced solar energy production during the storm."
+      }
+    ]
   }
 ]

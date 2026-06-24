@@ -84,6 +84,13 @@ public class ScenarioGenerator {
     threat.setType(EventType.THREAT);
     threat.setSol(randomIntBetween(1, durationSols, effectiveRandom));
     threat.setDescription(buildThreatDescription(definition, threatDuration));
+    threat.setEffects(
+        List.of(
+            new EventEffect(
+                definition.getAffectedElement(),
+                impactValue,
+                definition.getImpactUnit(),
+                definition.getConsequence())));
     return threat;
   }
 

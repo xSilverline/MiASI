@@ -7,6 +7,7 @@ import miasi.backend.domains.configuration.enums.ResourceType;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
 import miasi.backend.domains.configuration.modules.ModuleCategory;
+import miasi.backend.domains.schedule.EventEffect;
 import miasi.backend.domains.schedule.EventDefinition;
 import miasi.backend.domains.schedule.enums.EventType;
 import org.junit.jupiter.api.AfterEach;
@@ -28,6 +29,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -157,7 +159,13 @@ class ConfControllerIT {
             EventType.THREAT,
             "Custom user event",
             "solar-panels",
-            "reduced solar energy production");
+            "reduced solar energy production",
+            List.of(
+                new EventEffect(
+                    "ENERGY",
+                    -10.0,
+                    "PERCENT",
+                    "reduced solar energy production")));
 
     // When
     ResultActions result = mvc.perform(
@@ -175,7 +183,9 @@ class ConfControllerIT {
         .andExpect(jsonPath("$.type").value(event.getType().name()))
         .andExpect(jsonPath("$.description").value(event.getDescription()))
         .andExpect(jsonPath("$.affectedElement").value(event.getAffectedElement()))
-        .andExpect(jsonPath("$.consequence").value(event.getConsequence()));
+        .andExpect(jsonPath("$.consequence").value(event.getConsequence()))
+        .andExpect(jsonPath("$.effects[0].target").value("ENERGY"))
+        .andExpect(jsonPath("$.effects[0].value").value(-10.0));
   }
 
   @Test
@@ -192,7 +202,13 @@ class ConfControllerIT {
             EventType.THREAT,
             "Updated event",
             "food-production",
-            "food production is interrupted");
+            "food production is interrupted",
+            List.of(
+                new EventEffect(
+                    "FOOD",
+                    -50.0,
+                    "PERCENT",
+                    "food production is interrupted")));
 
     // When
     ResultActions result = mvc.perform(
@@ -209,7 +225,9 @@ class ConfControllerIT {
         .andExpect(jsonPath("$.type").value(updated.getType().name()))
         .andExpect(jsonPath("$.description").value(updated.getDescription()))
         .andExpect(jsonPath("$.affectedElement").value(updated.getAffectedElement()))
-        .andExpect(jsonPath("$.consequence").value(updated.getConsequence()));
+        .andExpect(jsonPath("$.consequence").value(updated.getConsequence()))
+        .andExpect(jsonPath("$.effects[0].target").value("FOOD"))
+        .andExpect(jsonPath("$.effects[0].value").value(-50.0));
   }
 
   @Test

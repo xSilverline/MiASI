@@ -94,6 +94,10 @@ class ScenarioGeneratorTest {
     assertTrue(threat.getDurationSols() <= 4);
     assertEquals(definition.getAffectedElement(), threat.getAffectedElement());
     assertEquals(definition.getConsequence(), threat.getConsequence());
+    assertEquals(1, threat.getEffects().size());
+    assertEquals(definition.getAffectedElement(), threat.getEffects().getFirst().getTarget());
+    assertEquals(definition.getImpactUnit(), threat.getEffects().getFirst().getUnit());
+    assertEquals(definition.getConsequence(), threat.getEffects().getFirst().getDescription());
   }
 
   @Test

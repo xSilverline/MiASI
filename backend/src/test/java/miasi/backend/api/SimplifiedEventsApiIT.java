@@ -10,7 +10,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.stream.Stream;
+import miasi.backend.domains.schedule.EventEffect;
 import miasi.backend.domains.schedule.EventDefinition;
 import miasi.backend.domains.schedule.MissionSchedule;
 import miasi.backend.domains.schedule.ScenarioDraft;
@@ -181,7 +183,13 @@ class SimplifiedEventsApiIT {
             EventType.THREAT,
             "Created from frontend",
             "solar-panels",
-            "reduced solar energy production");
+            "reduced solar energy production",
+            List.of(
+                new EventEffect(
+                    "ENERGY",
+                    -10.0,
+                    "PERCENT",
+                    "reduced solar energy production")));
 
     ResultActions created =
         mvc.perform(
@@ -194,7 +202,9 @@ class SimplifiedEventsApiIT {
         .andExpect(header().exists("Location"))
         .andExpect(jsonPath("$.id").isNotEmpty())
         .andExpect(jsonPath("$.affectedElement").value(event.getAffectedElement()))
-        .andExpect(jsonPath("$.consequence").value(event.getConsequence()));
+        .andExpect(jsonPath("$.consequence").value(event.getConsequence()))
+        .andExpect(jsonPath("$.effects[0].target").value("ENERGY"))
+        .andExpect(jsonPath("$.effects[0].value").value(-10.0));
 
     String eventDefinitionId =
         JsonPath.read(created.andReturn().getResponse().getContentAsString(), "$.id");
@@ -210,7 +220,8 @@ class SimplifiedEventsApiIT {
             EventType.THREAT,
             "Updated from frontend",
             "solar-panels",
-            "lower power output");
+            "lower power output",
+            List.of(new EventEffect("ENERGY", -20.0, "PERCENT", "lower power output")));
 
     mvc.perform(
             MockMvcRequestBuilders.put("/api/event-definitions/%s".formatted(eventDefinitionId))
@@ -218,7 +229,8 @@ class SimplifiedEventsApiIT {
                 .content(objectMapper.writeValueAsString(updated)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(eventDefinitionId))
-        .andExpect(jsonPath("$.consequence").value(updated.getConsequence()));
+        .andExpect(jsonPath("$.consequence").value(updated.getConsequence()))
+        .andExpect(jsonPath("$.effects[0].value").value(-20.0));
 
     mvc.perform(
             MockMvcRequestBuilders.delete(
