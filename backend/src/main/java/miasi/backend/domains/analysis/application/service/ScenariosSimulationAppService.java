@@ -1,6 +1,7 @@
 package miasi.backend.domains.analysis.application.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.domains.analysis.application.port.in.IRunScenariosSimulationUseCase;
 import miasi.backend.domains.analysis.application.port.in.RunScenariosSimulationCommand;
@@ -14,7 +15,6 @@ import miasi.backend.domains.analysis.domain._simulation.ScenariosAnalysisSessio
 import miasi.backend.domains.analysis.domain._simulation.ScenariosSimulator;
 import miasi.backend.domains.analysis.domain.core.MissionManifest;
 import miasi.backend.domains.analysis.domain.schedule.Threat;
-
 
 @RequiredArgsConstructor
 public class ScenariosSimulationAppService implements IRunScenariosSimulationUseCase {
@@ -30,29 +30,39 @@ public class ScenariosSimulationAppService implements IRunScenariosSimulationUse
   public ScenariosAnalysisSession simulate(RunScenariosSimulationCommand command) {
 
     // 1. POBIERANIE ZATWIERDZONEGO UKŁADU (FAZA 2) ORAZ AWARII
-    NominalSimulationSession nominalSession = dataProvider.getNominalSession(command.nominalSessionId());
+    NominalSimulationSession nominalSession =
+        dataProvider.getNominalSession(command.nominalSessionId());
+    if (nominalSession == null) {
+      throw new NoSuchElementException(
+          "Nominal simulation session not found: " + command.nominalSessionId());
+    }
     List<Threat> threats = dataProvider.getThreatsForSchedule(command.scheduleId());
 
     // 2. MAGIA ARCHITEKTURY: Cofamy się do Fazy 1 po Manifest Misji!
-    // Dyrygent wyciąga z NominalSession ID poprzedniej fazy, pobiera ją i bierze oryginalny dokument.
-    PayloadOptimizationSession payloadSession = dataProvider.getPayloadSession(nominalSession.getPayloadSessionId());
+    // Dyrygent wyciąga z NominalSession ID poprzedniej fazy, pobiera ją i bierze oryginalny
+    // dokument.
+    PayloadOptimizationSession payloadSession =
+        dataProvider.getPayloadSession(nominalSession.getPayloadSessionId());
+    if (payloadSession == null) {
+      throw new NoSuchElementException(
+          "Payload optimization session not found: " + nominalSession.getPayloadSessionId());
+    }
     MissionManifest baseManifest = payloadSession.getInputManifest();
 
     // 3. LOGIKA DOMENOWA (Podajemy pełen komplet 4 argumentów)
-    ScenariosAnalysisSession session = scenariosSimulator.analyze(
-        nominalSession,
-        baseManifest,
-        threats,
-        command.scheduleId() // Przekazujemy id harmonogramu wprost z komendy
-    );
+    ScenariosAnalysisSession session =
+        scenariosSimulator.analyze(
+            nominalSession,
+            baseManifest,
+            threats,
+            command.scheduleId() // Przekazujemy id harmonogramu wprost z komendy
+            );
 
     // 4. ZAPIS DO BAZY
     sessionRepository.saveScenarios(session);
 
     // 5. PUBLIKACJA ZDARZENIA (Dla wizualizacji)
-    eventPublisher.publishScenariosAnalysisCompleted(
-        new ScenariosAnalysisCompletedEvent(session)
-    );
+    eventPublisher.publishScenariosAnalysisCompleted(new ScenariosAnalysisCompletedEvent(session));
 
     return session;
   }

@@ -1,18 +1,17 @@
 package miasi.backend.domains.schedule;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
 import miasi.backend.domains.schedule.enums.DifficultyLevel;
 import miasi.backend.domains.schedule.enums.EventType;
 import miasi.backend.domains.schedule.enums.ScenarioGenerationMode;
 import miasi.backend.domains.schedule.enums.ScheduleStatus;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MissionScheduleTest {
 

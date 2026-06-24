@@ -17,8 +17,8 @@ public class PowerGridSimulator {
 
   public boolean process(float availableEnergy, List<Module> currentModules) {
 
-    float powerProduced = getEnergyAmount(
-        productionCalculator.calculateModulesProduction(currentModules));
+    float powerProduced =
+        getEnergyAmount(productionCalculator.calculateModulesProduction(currentModules));
     float powerConsumed = getEnergyAmount(demandCalculator.calculateModulesDemand(currentModules));
 
     if (availableEnergy < 0 || (powerProduced + availableEnergy < powerConsumed)) {

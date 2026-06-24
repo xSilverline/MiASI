@@ -13,15 +13,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
   @ExceptionHandler(InstanceNotFoundException.class)
   public ResponseEntity<BasicResponseEntity> notFound(InstanceNotFoundException ex) {
-    return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(BasicResponseEntity.error(ex.getMessage()));
   }
 
   @ExceptionHandler(NoSuchElementException.class)
   public ResponseEntity<BasicResponseEntity> notFound(NoSuchElementException ex) {
-    return ResponseEntity
-        .status(HttpStatus.NOT_FOUND)
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(BasicResponseEntity.error(ex.getMessage()));
   }
 

@@ -11,6 +11,4 @@ public interface IAnalysisEventPublisherPort {
   void publishNominalSimulationCompleted(NominalSimulationCompletedEvent event);
 
   void publishScenariosAnalysisCompleted(ScenariosAnalysisCompletedEvent event);
-
-
 }

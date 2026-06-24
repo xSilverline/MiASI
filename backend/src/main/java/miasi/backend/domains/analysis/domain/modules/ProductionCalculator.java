@@ -4,8 +4,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import miasi.backend.domains.analysis.domain.core.ResourceType;
 import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
 
 public class ProductionCalculator {
 

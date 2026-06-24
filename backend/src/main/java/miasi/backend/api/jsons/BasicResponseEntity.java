@@ -1,9 +1,6 @@
 package miasi.backend.api.jsons;
 
-public record BasicResponseEntity(
-    String status,
-    String message
-) {
+public record BasicResponseEntity(String status, String message) {
   public static BasicResponseEntity success(String message) {
     return new BasicResponseEntity("success", message);
   }

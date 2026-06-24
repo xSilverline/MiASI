@@ -6,47 +6,41 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import miasi.backend.domains.analysis.domain.modules.ProductionCalculator;
-import miasi.backend.domains.analysis.domain.core.ResourceType;
 import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
 import miasi.backend.domains.analysis.domain.modules.Module;
 import miasi.backend.domains.analysis.domain.modules.ModuleState;
+import miasi.backend.domains.analysis.domain.modules.ProductionCalculator;
 import org.junit.jupiter.api.Test;
 
 class ProductionCalculatorTest {
 
   @Test
-  void shouldCalculateProductionOnlyForActiveModules() {// Given
+  void shouldCalculateProductionOnlyForActiveModules() { // Given
     ProductionCalculator calculator = new ProductionCalculator();
 
     Module module = mock(Module.class);
 
     when(module.getStatus()).thenReturn(ModuleState.ACTIVE);
     when(module.getEfficiency()).thenReturn(0.8f);
-    when(module.getProduction()).thenReturn(
-        List.of(new Resource(ResourceType.OXYGEN, 10))
-    );
+    when(module.getProduction()).thenReturn(List.of(new Resource(ResourceType.OXYGEN, 10)));
 
     // When
-    List<Resource> result = calculator.calculateModulesProduction(
-        List.of(module)
-    );
+    List<Resource> result = calculator.calculateModulesProduction(List.of(module));
 
     // Then
     assertEquals(8, result.getFirst().getAmount());
   }
 
   @Test
-  void shouldIgnoreInactiveModules() {// Given
+  void shouldIgnoreInactiveModules() { // Given
     ProductionCalculator calculator = new ProductionCalculator();
     Module module = mock(Module.class);
 
     when(module.getStatus()).thenReturn(ModuleState.INACTIVE);
 
     // When
-    List<Resource> result = calculator.calculateModulesProduction(
-        List.of(module)
-    );
+    List<Resource> result = calculator.calculateModulesProduction(List.of(module));
 
     // Then
     assertTrue(result.isEmpty());

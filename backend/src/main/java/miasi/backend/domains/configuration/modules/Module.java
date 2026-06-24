@@ -1,5 +1,6 @@
 package miasi.backend.domains.configuration.modules;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +11,6 @@ import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.configuration.Resources;
 import miasi.backend.domains.configuration.enums.ModuleState;
 import miasi.backend.domains.configuration.enums.ResourceType;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -32,25 +31,15 @@ public class Module {
     status = ModuleState.ACTIVE;
     category = ModuleCategory.UTILITY_MODULE;
     weight = 2137;
-    resourceConsumption = List.of(new Resources[]{
-        new Resources(
-            ResourceType.ENERGY,
-            1f
-        ),
-        new Resources(
-            ResourceType.WATER,
-            1f
-        )
-    });
-    resourceProduction = List.of(new Resources[]{
-        new Resources(
-            ResourceType.FOOD,
-            2.5f
-        ),
-        new Resources(
-            ResourceType.OXYGEN,
-            15
-        )
-    });
+    resourceConsumption =
+        List.of(
+            new Resources[] {
+              new Resources(ResourceType.ENERGY, 1f), new Resources(ResourceType.WATER, 1f)
+            });
+    resourceProduction =
+        List.of(
+            new Resources[] {
+              new Resources(ResourceType.FOOD, 2.5f), new Resources(ResourceType.OXYGEN, 15)
+            });
   }
 }

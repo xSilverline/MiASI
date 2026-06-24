@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 @ComponentScan(basePackages = "miasi.backend.domains.analysis")
 public class AnalysisConfig {
@@ -52,14 +51,14 @@ public class AnalysisConfig {
   }
 
   @Bean
-  public PowerGridSimulator powerGridSimulator(ProductionCalculator prodCalc,
-      DemandCalculator demandCalc) {
+  public PowerGridSimulator powerGridSimulator(
+      ProductionCalculator prodCalc, DemandCalculator demandCalc) {
     return new PowerGridSimulator(prodCalc, demandCalc);
   }
 
   @Bean
-  public SurvivalPredictor survivalPredictor(DemandCalculator demandCalc,
-      ProductionCalculator prodCalc) {
+  public SurvivalPredictor survivalPredictor(
+      DemandCalculator demandCalc, ProductionCalculator prodCalc) {
     return new SurvivalPredictor(demandCalc, prodCalc);
   }
 
@@ -69,21 +68,21 @@ public class AnalysisConfig {
   }
 
   @Bean
-  public PowerGridPlanner powerGridPlanner(ProductionCalculator prodCalc,
-      DemandCalculator demandCalc) {
+  public PowerGridPlanner powerGridPlanner(
+      ProductionCalculator prodCalc, DemandCalculator demandCalc) {
     return new PowerGridPlanner(prodCalc, demandCalc);
   }
+
   // === DOMAIN "ENGINES" ===
 
   @Bean
-  public PayloadWeightOptimizer payloadWeightOptimizer(WeightCalculator weightCalculator,
+  public PayloadWeightOptimizer payloadWeightOptimizer(
+      WeightCalculator weightCalculator,
       TimelineSimulator timelineSimulator,
       PowerGridPlanner powerGridPlanner,
       SimulationOutcomeEvaluator evaluato) {
-    return new PayloadWeightOptimizer(weightCalculator,
-        timelineSimulator,
-        powerGridPlanner,
-        evaluato);
+    return new PayloadWeightOptimizer(
+        weightCalculator, timelineSimulator, powerGridPlanner, evaluato);
   }
 
   @Bean
@@ -101,15 +100,17 @@ public class AnalysisConfig {
       SurvivalPredictor survivalPredictor) {
 
     return new TimelineSimulator(
-        demandCalculator, productionCalculator, deliveryProcessor,
-        threatProcessor, powerGridSimulator, survivalPredictor
-    );
+        demandCalculator,
+        productionCalculator,
+        deliveryProcessor,
+        threatProcessor,
+        powerGridSimulator,
+        survivalPredictor);
   }
 
   @Bean
   public ScenariosSimulator scenariosSimulator(
-      TimelineSimulator timelineSimulator,
-      SimulationOutcomeEvaluator outcomeEvaluator) {
+      TimelineSimulator timelineSimulator, SimulationOutcomeEvaluator outcomeEvaluator) {
 
     return new ScenariosSimulator(timelineSimulator, outcomeEvaluator);
   }
@@ -134,8 +135,8 @@ public class AnalysisConfig {
       SimulationOutcomeEvaluator outcomeEvaluator,
       IAnalysisEventPublisherPort eventPublisher) {
 
-    return new NominalSimulationAppService(dataProvider, sessionRepository, timelineSimulator,
-        outcomeEvaluator, eventPublisher);
+    return new NominalSimulationAppService(
+        dataProvider, sessionRepository, timelineSimulator, outcomeEvaluator, eventPublisher);
   }
 
   @Bean
@@ -145,7 +146,7 @@ public class AnalysisConfig {
       IAnalysisEventPublisherPort eventPublisher,
       ScenariosSimulator scenariosSimulator) {
 
-    return new ScenariosSimulationAppService(dataProvider, sessionRepository, eventPublisher,
-        scenariosSimulator);
+    return new ScenariosSimulationAppService(
+        dataProvider, sessionRepository, eventPublisher, scenariosSimulator);
   }
 }

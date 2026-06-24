@@ -32,19 +32,15 @@ public class PayloadAppService implements IOptimizePayloadUseCase {
 
     OptimalConfiguration optimalConfig = optimizer.optimizeConfiguration(manifest, catalog);
 
-    PayloadOptimizationSession session = new PayloadOptimizationSession(
-        UUID.randomUUID().toString(),
-        manifest,
-        optimalConfig,
-        LocalDateTime.now()
-    );
+    PayloadOptimizationSession session =
+        new PayloadOptimizationSession(
+            UUID.randomUUID().toString(), manifest, optimalConfig, LocalDateTime.now());
 
     sessionRepository.save(session);
 
     // EDA
     eventPublisher.publishPayloadOptimizationCompleted(
-        new PayloadOptimizationCompletedEvent(session)
-    );
+        new PayloadOptimizationCompletedEvent(session));
 
     return session;
   }

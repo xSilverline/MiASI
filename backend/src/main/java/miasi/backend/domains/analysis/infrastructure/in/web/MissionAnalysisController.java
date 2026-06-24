@@ -49,38 +49,43 @@ public class MissionAnalysisController {
   public ResponseEntity<NominalSimulationResponse> simulateNominal(
       @RequestBody RunNominalSimulationRequest request) {
 
-    List<Module> domainModules = request.customizedModules().stream()
-        .map(dto -> Module.builder()
-            .name(dto.name())
-            .weight(dto.weight())
-            .status(ModuleState.valueOf(dto.status()))
-            .consumption(dto.resourceConsumption().stream()
-                .map(r -> new Resource(
-                    ResourceType.valueOf(r.resourceType()),
-                    r.quantity()
-                ))
-                .toList())
-            .production(dto.resourceProduction().stream()
-                .map(r -> new Resource(
-                    ResourceType.valueOf(r.resourceType()),
-                    r.quantity()
-                ))
-                .toList())
-            .build()
-        ).toList();
+    List<RunNominalSimulationRequest.ModuleDto> customizedModules =
+        request.customizedModules() == null ? List.of() : request.customizedModules();
+    List<RunNominalSimulationRequest.SupplyDto> customizedSupplies =
+        request.customizedSupplies() == null ? List.of() : request.customizedSupplies();
 
-    List<Resource> domainSupplies = request.customizedSupplies().stream()
-        .map(dto -> new Resource(
-            ResourceType.valueOf(dto.type()),
-            dto.amount()
-        ))
-        .toList();
+    List<Module> domainModules =
+        customizedModules.stream()
+            .map(
+                dto ->
+                    Module.builder()
+                        .name(dto.name())
+                        .weight(dto.weight())
+                        .status(ModuleState.valueOf(dto.status()))
+                        .consumption(
+                            safeResources(dto.resourceConsumption()).stream()
+                                .map(
+                                    r ->
+                                        new Resource(
+                                            ResourceType.valueOf(r.resourceType()), r.quantity()))
+                                .toList())
+                        .production(
+                            safeResources(dto.resourceProduction()).stream()
+                                .map(
+                                    r ->
+                                        new Resource(
+                                            ResourceType.valueOf(r.resourceType()), r.quantity()))
+                                .toList())
+                        .build())
+            .toList();
 
-    var command = new RunNominalSimulationCommand(
-        request.payloadSessionId(),
-        domainModules,
-        domainSupplies
-    );
+    List<Resource> domainSupplies =
+        customizedSupplies.stream()
+            .map(dto -> new Resource(ResourceType.valueOf(dto.type()), dto.amount()))
+            .toList();
+
+    var command =
+        new RunNominalSimulationCommand(request.payloadSessionId(), domainModules, domainSupplies);
 
     var session = runNominalSimulationUseCase.simulate(command);
 
@@ -91,12 +96,15 @@ public class MissionAnalysisController {
   public ResponseEntity<ScenariosSimulationResponse> simulateScenarios(
       @RequestBody RunScenariosSimulationRequest request) {
 
-    var command = new RunScenariosSimulationCommand(
-        request.nominalSessionId(),
-        request.scheduleId()
-    );
+    var command =
+        new RunScenariosSimulationCommand(request.nominalSessionId(), request.scheduleId());
     var session = runScenariosSimulationUseCase.simulate(command);
 
     return ResponseEntity.ok(ScenariosSimulationResponse.fromDomain(session));
+  }
+
+  private List<RunNominalSimulationRequest.ResourceDto> safeResources(
+      List<RunNominalSimulationRequest.ResourceDto> resources) {
+    return resources == null ? List.of() : resources;
   }
 }

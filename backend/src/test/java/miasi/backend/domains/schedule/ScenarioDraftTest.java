@@ -1,17 +1,16 @@
 package miasi.backend.domains.schedule;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.ArrayList;
+import java.util.List;
 import miasi.backend.domains.schedule.enums.DifficultyLevel;
 import miasi.backend.domains.schedule.enums.EventType;
 import miasi.backend.domains.schedule.enums.ScenarioGenerationMode;
 import miasi.backend.domains.schedule.enums.ScheduleStatus;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ScenarioDraftTest {
 
@@ -64,9 +63,10 @@ class ScenarioDraftTest {
     ScenarioDraft draft = draftWithEvents(new ArrayList<>(List.of()));
 
     // When + Then (Valid data)
-    assertDoesNotThrow(() -> {
-      draft.approve();
-    });
+    assertDoesNotThrow(
+        () -> {
+          draft.approve();
+        });
 
     // When + Then (MissionPlanId is blank)
     draft.setMissionPlanId("");

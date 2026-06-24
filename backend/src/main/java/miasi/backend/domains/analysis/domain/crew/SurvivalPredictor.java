@@ -15,23 +15,36 @@ public class SurvivalPredictor {
   private final DemandCalculator demandCalculator;
   private final ProductionCalculator productionCalculator;
 
-  public ConsumptionMode evaluateCrewConsumptionMode(int currentSol, int targetSol,
-      List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest) {
-    if (willDieBeforeTarget(currentSol, targetSol, warehouse, currentModules, manifest,
-        ConsumptionMode.OPTIMAL)) {
+  public ConsumptionMode evaluateCrewConsumptionMode(
+      int currentSol,
+      int targetSol,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest) {
+    if (willDieBeforeTarget(
+        currentSol, targetSol, warehouse, currentModules, manifest, ConsumptionMode.OPTIMAL)) {
       return ConsumptionMode.MINIMAL;
     }
     return ConsumptionMode.OPTIMAL;
   }
 
-  public boolean checkIfEvacuationIsNeeded(int currentSol, int targetSol, List<Resource> warehouse,
-      List<Module> currentModules, MissionManifest manifest) {
-    return willDieBeforeTarget(currentSol, targetSol, warehouse, currentModules, manifest,
-        ConsumptionMode.MINIMAL);
+  public boolean checkIfEvacuationIsNeeded(
+      int currentSol,
+      int targetSol,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest) {
+    return willDieBeforeTarget(
+        currentSol, targetSol, warehouse, currentModules, manifest, ConsumptionMode.MINIMAL);
   }
 
-  private boolean willDieBeforeTarget(int currentSol, int missionEndSol, List<Resource> warehouse,
-      List<Module> currentModules, MissionManifest manifest, ConsumptionMode modeToCheck) {
+  private boolean willDieBeforeTarget(
+      int currentSol,
+      int missionEndSol,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest,
+      ConsumptionMode modeToCheck) {
     List<Resource> demand = demandCalculator.calculateCrewDemand(manifest.getCrew(), modeToCheck);
     List<Resource> modulesDemand = demandCalculator.calculateModulesDemand(currentModules);
     List<Resource> production = productionCalculator.calculateModulesProduction(currentModules);
@@ -54,8 +67,8 @@ public class SurvivalPredictor {
 
       float daysLeftUntilEmpty = currentAmount / Math.abs(netBalance);
 
-      int nextDeliverySol = findNextDeliverySolForResource(currentSol, type,
-          manifest.getDeliveries());
+      int nextDeliverySol =
+          findNextDeliverySolForResource(currentSol, type, manifest.getDeliveries());
 
       int daysUntilTarget;
       if (nextDeliverySol != -1) {
@@ -71,8 +84,8 @@ public class SurvivalPredictor {
     return false;
   }
 
-  private int findNextDeliverySolForResource(int currentSol, ResourceType type,
-      List<Delivery> deliveries) {
+  private int findNextDeliverySolForResource(
+      int currentSol, ResourceType type, List<Delivery> deliveries) {
     if (deliveries == null) {
       return -1;
     }

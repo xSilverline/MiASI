@@ -1,12 +1,12 @@
 package miasi.backend.architecture;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
-
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
-import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @AnalyzeClasses(packages = "miasi.backend", importOptions = ImportOption.DoNotIncludeTests.class)
 public class PackageArchTests {
@@ -22,13 +22,12 @@ public class PackageArchTests {
   @ArchTest
   static final ArchRule repositories_should_be_only_in_ports_or_database =
       classes()
-          .that().areNotInterfaces()
-          .and().haveSimpleNameContaining("Repository")
+          .that()
+          .areNotInterfaces()
+          .and()
+          .haveSimpleNameContaining("Repository")
           .should()
-          .resideInAnyPackage(
-              "..database..",
-              "..ports.."
-          );
+          .resideInAnyPackage("..database..", "..ports..");
 
   @ArchTest
   static final ArchRule controllers_should_be_in_api =
@@ -56,4 +55,3 @@ public class PackageArchTests {
           .should()
           .resideInAnyPackage("..api.jsons..", "..infrastructure.in.web.dto..");
 }
-

@@ -11,17 +11,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
-import miasi.backend.domains.schedule.EventEffect;
 import miasi.backend.domains.schedule.EventDefinition;
-import miasi.backend.domains.schedule.MissionSchedule;
-import miasi.backend.domains.schedule.ScenarioDraft;
-import miasi.backend.domains.schedule.ScheduleService;
-import miasi.backend.domains.schedule.ScheduledEvent;
-import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.EventEffect;
 import miasi.backend.domains.schedule.enums.EventType;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,17 +37,6 @@ class SimplifiedEventsApiIT {
   @Autowired private MockMvc mvc;
 
   @Autowired private ObjectMapper objectMapper;
-
-  @Autowired private ScheduleService scheduleService;
-
-  private MissionSchedule schedule;
-  private ScenarioDraft draft;
-
-  @BeforeEach
-  void setUp() {
-    schedule = scheduleService.createSchedule("0", 30);
-    draft = scheduleService.generateScenario("0", 30, DifficultyLevel.LEVEL_I);
-  }
 
   @AfterEach
   void restoreDatabaseFiles(
@@ -82,100 +66,11 @@ class SimplifiedEventsApiIT {
   }
 
   @Test
-  void getEvents_shouldReturnScheduleEventsForCalendar() throws Exception {
-    ScheduledEvent event = new ScheduledEvent("calendar-event", EventType.THREAT, 3, "calendar");
-    scheduleService.addEvent(schedule.getId(), event);
-
-    ResultActions result =
-        mvc.perform(
-            MockMvcRequestBuilders.get("/api/events")
-                .param("context", "schedule")
-                .param("contextId", schedule.getId()));
-
-    result
+  void eventCatalog_shouldSupportFrontendCrudAndBatchFlow() throws Exception {
+    mvc.perform(MockMvcRequestBuilders.get("/api/event-catalog/types"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].id").value(event.getId()))
-        .andExpect(jsonPath("$[0].type").value(event.getType().name()));
-  }
+        .andExpect(jsonPath("$[0]").value(EventType.SUPPLY_DELIVERY.name()));
 
-  @Test
-  void postAndDeleteEvents_shouldWorkForScheduleAndReturnUpdatedList() throws Exception {
-    ScheduledEvent event =
-        new ScheduledEvent("schedule-event", EventType.THREAT, 4, "schedule event");
-
-    ResultActions added =
-        mvc.perform(
-            MockMvcRequestBuilders.post("/api/events")
-                .param("context", "schedule")
-                .param("contextId", schedule.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(event)));
-
-    added
-        .andExpect(status().isCreated())
-        .andExpect(header().exists("Location"))
-        .andExpect(jsonPath("$[0].id").value(event.getId()));
-
-    ResultActions deleted =
-        mvc.perform(
-            MockMvcRequestBuilders.delete("/api/events/%s".formatted(event.getId()))
-                .param("context", "schedule")
-                .param("contextId", schedule.getId()));
-
-    deleted.andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
-  }
-
-  @Test
-  void postAndDeleteEvents_shouldWorkForScenarioAndReturnUpdatedList() throws Exception {
-    ScheduledEvent event =
-        new ScheduledEvent("scenario-event", EventType.THREAT, 5, "scenario event");
-
-    ResultActions added =
-        mvc.perform(
-            MockMvcRequestBuilders.post("/api/events")
-                .param("context", "scenario")
-                .param("contextId", draft.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(event)));
-
-    added
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$[?(@.id == 'scenario-event')]").exists());
-
-    ResultActions deleted =
-        mvc.perform(
-            MockMvcRequestBuilders.delete("/api/events/%s".formatted(event.getId()))
-                .param("context", "scenario")
-                .param("contextId", draft.getId()));
-
-    deleted
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$[?(@.id == 'scenario-event')]").isEmpty());
-  }
-
-  @Test
-  void putEvents_shouldUpdateEventInSelectedContext() throws Exception {
-    ScheduledEvent event = new ScheduledEvent("editable-event", EventType.THREAT, 7, "old");
-    scheduleService.addEvent(schedule.getId(), event);
-    ScheduledEvent updated = new ScheduledEvent("editable-event", EventType.THREAT, 8, "updated");
-
-    ResultActions result =
-        mvc.perform(
-            MockMvcRequestBuilders.put("/api/events/%s".formatted(event.getId()))
-                .param("context", "schedule")
-                .param("contextId", schedule.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updated)));
-
-    result
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].id").value(updated.getId()))
-        .andExpect(jsonPath("$[0].sol").value(updated.getSol()))
-        .andExpect(jsonPath("$[0].description").value(updated.getDescription()));
-  }
-
-  @Test
-  void eventDefinitions_shouldSupportFrontendCrudFlow() throws Exception {
     EventDefinition event =
         new EventDefinition(
             null,
@@ -184,22 +79,19 @@ class SimplifiedEventsApiIT {
             "Created from frontend",
             "solar-panels",
             "reduced solar energy production",
-            List.of(
-                new EventEffect(
-                    "ENERGY",
-                    -10.0,
-                    "PERCENT",
-                    "reduced solar energy production")));
+            List.of(new EventEffect("ENERGY", -10.0, "PERCENT", "lower energy production")));
 
     ResultActions created =
         mvc.perform(
-            MockMvcRequestBuilders.post("/api/event-definitions")
+            MockMvcRequestBuilders.post("/api/event-catalog")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(event)));
 
     created
         .andExpect(status().isCreated())
-        .andExpect(header().exists("Location"))
+        .andExpect(
+            header()
+                .string("Location", org.hamcrest.Matchers.containsString("/api/event-catalog/")))
         .andExpect(jsonPath("$.id").isNotEmpty())
         .andExpect(jsonPath("$.affectedElement").value(event.getAffectedElement()))
         .andExpect(jsonPath("$.consequence").value(event.getConsequence()))
@@ -209,9 +101,27 @@ class SimplifiedEventsApiIT {
     String eventDefinitionId =
         JsonPath.read(created.andReturn().getResponse().getContentAsString(), "$.id");
 
-    mvc.perform(MockMvcRequestBuilders.get("/api/event-definitions"))
+    mvc.perform(MockMvcRequestBuilders.get("/api/event-catalog"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[?(@.id == '%s')]".formatted(eventDefinitionId)).exists());
+
+    EventDefinition batchEvent =
+        new EventDefinition(
+            null,
+            "Resupply",
+            EventType.SUPPLY_DELIVERY,
+            "Batch delivery",
+            "warehouse",
+            "food added",
+            List.of(new EventEffect("FOOD", 20.0, "KG", "extra food")));
+
+    mvc.perform(
+            MockMvcRequestBuilders.post("/api/event-catalog/batch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(List.of(batchEvent))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").isNotEmpty())
+        .andExpect(jsonPath("$[0].type").value(EventType.SUPPLY_DELIVERY.name()));
 
     EventDefinition updated =
         new EventDefinition(
@@ -224,7 +134,7 @@ class SimplifiedEventsApiIT {
             List.of(new EventEffect("ENERGY", -20.0, "PERCENT", "lower power output")));
 
     mvc.perform(
-            MockMvcRequestBuilders.put("/api/event-definitions/%s".formatted(eventDefinitionId))
+            MockMvcRequestBuilders.put("/api/event-catalog/%s".formatted(eventDefinitionId))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updated)))
         .andExpect(status().isOk())
@@ -232,10 +142,96 @@ class SimplifiedEventsApiIT {
         .andExpect(jsonPath("$.consequence").value(updated.getConsequence()))
         .andExpect(jsonPath("$.effects[0].value").value(-20.0));
 
-    mvc.perform(
-            MockMvcRequestBuilders.delete(
-                "/api/event-definitions/%s".formatted(eventDefinitionId)))
+    mvc.perform(MockMvcRequestBuilders.delete("/api/event-catalog/%s".formatted(eventDefinitionId)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("success"));
+  }
+
+  @Test
+  void timeline_shouldUseCatalogEventsAndExposeDeliveriesThreatsAndDailyTimeline()
+      throws Exception {
+    String threatDefinitionId =
+        createEventDefinition(
+            new EventDefinition(
+                null,
+                "Dust storm",
+                EventType.THREAT,
+                "Dust storm on solar panels",
+                "solar-panels",
+                "energy production reduced",
+                List.of(new EventEffect("ENERGY", -15.0, "PERCENT", "lower power output"))));
+    String deliveryDefinitionId =
+        createEventDefinition(
+            new EventDefinition(
+                null,
+                "Food delivery",
+                EventType.SUPPLY_DELIVERY,
+                "Food delivery lands",
+                "warehouse",
+                "food stock increased",
+                List.of(new EventEffect("FOOD", 30.0, "KG", "extra food"))));
+
+    ResultActions createdThreat =
+        mvc.perform(
+            MockMvcRequestBuilders.post("/api/timeline/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    objectMapper.writeValueAsString(
+                        Map.of("sol", 15, "eventDefinitionId", threatDefinitionId))));
+
+    createdThreat
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.type").value(EventType.THREAT.name()))
+        .andExpect(jsonPath("$.sol").value(15))
+        .andExpect(jsonPath("$.effects[0].target").value("ENERGY"));
+
+    String threatEventId =
+        JsonPath.read(createdThreat.andReturn().getResponse().getContentAsString(), "$.id");
+
+    mvc.perform(
+            MockMvcRequestBuilders.post("/api/timeline/events/batch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    objectMapper.writeValueAsString(
+                        List.of(Map.of("sol", 10, "eventDefinitionId", deliveryDefinitionId)))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].type").value(EventType.SUPPLY_DELIVERY.name()))
+        .andExpect(jsonPath("$[0].sol").value(10));
+
+    mvc.perform(MockMvcRequestBuilders.get("/api/timeline"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].sol").value(1))
+        .andExpect(jsonPath("$[0].events").isEmpty())
+        .andExpect(jsonPath("$[9].sol").value(10))
+        .andExpect(jsonPath("$[9].events[0].type").value(EventType.SUPPLY_DELIVERY.name()))
+        .andExpect(jsonPath("$[14].sol").value(15))
+        .andExpect(jsonPath("$[14].events[0].type").value(EventType.THREAT.name()));
+
+    mvc.perform(MockMvcRequestBuilders.get("/api/timeline/deliveries"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].sol").value(10))
+        .andExpect(jsonPath("$[0].events[0].type").value(EventType.SUPPLY_DELIVERY.name()));
+
+    mvc.perform(MockMvcRequestBuilders.get("/api/timeline/threats"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].sol").value(15))
+        .andExpect(jsonPath("$[0].events[0].id").value(threatEventId));
+
+    mvc.perform(
+            MockMvcRequestBuilders.delete(
+                "/api/timeline/sols/15/events/%s".formatted(threatEventId)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("success"));
+  }
+
+  private String createEventDefinition(EventDefinition event) throws Exception {
+    ResultActions created =
+        mvc.perform(
+            MockMvcRequestBuilders.post("/api/event-catalog")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(event)));
+
+    created.andExpect(status().isCreated());
+    return JsonPath.read(created.andReturn().getResponse().getContentAsString(), "$.id");
   }
 }

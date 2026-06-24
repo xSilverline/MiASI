@@ -12,5 +12,4 @@ public class OptimalConfiguration {
   List<Resource> startingResources;
   float totalWeight;
   Boolean isWeightLimitExceeded;
-
 }

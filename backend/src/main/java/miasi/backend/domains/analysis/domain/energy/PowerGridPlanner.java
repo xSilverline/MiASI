@@ -47,8 +47,8 @@ public class PowerGridPlanner {
   }
 
   private float getNetPower(Module module) {
-    float produced = getEnergyAmount(
-        productionCalculator.calculateModulesProduction(List.of(module)));
+    float produced =
+        getEnergyAmount(productionCalculator.calculateModulesProduction(List.of(module)));
     float consumed = getEnergyAmount(demandCalculator.calculateModulesDemand(List.of(module)));
     return produced - consumed;
   }

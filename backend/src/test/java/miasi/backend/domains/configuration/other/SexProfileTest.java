@@ -1,12 +1,12 @@
 package miasi.backend.domains.configuration.other;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import miasi.backend.domains.configuration.SexProfile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SexProfileTest {
 
@@ -35,5 +35,4 @@ class SexProfileTest {
       assertEquals(start + number, profile.getPopulation());
     }
   }
-
 }

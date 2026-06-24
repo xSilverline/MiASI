@@ -6,7 +6,10 @@ import miasi.backend.domains.analysis.domain.modules.Module;
 
 public class DeliveryProcessor {
 
-  public void process(int currentSol, List<Delivery> deliveries, List<Module> currentModules,
+  public void process(
+      int currentSol,
+      List<Delivery> deliveries,
+      List<Module> currentModules,
       List<Resource> warehouse) {
     if (deliveries == null) {
       return;
@@ -29,9 +32,10 @@ public class DeliveryProcessor {
               Resource existingResource = warehouse.get(i);
 
               if (existingResource.getType() == deliveredResource.getType()) {
-                warehouse.set(i, existingResource.withAmount(
-                    existingResource.getAmount() + deliveredResource.getAmount()
-                ));
+                warehouse.set(
+                    i,
+                    existingResource.withAmount(
+                        existingResource.getAmount() + deliveredResource.getAmount()));
                 resourceExists = true;
                 break;
               }

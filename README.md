@@ -39,7 +39,14 @@ verification executes `tsc -b && vite build`.
 Start the backend from `MiASI/backend`:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\verify-backend.ps1 -MavenArgs spring-boot:run
+powershell -ExecutionPolicy Bypass -File .\scripts\run-backend.ps1
+```
+
+The run script keeps the backend working directory at the repository root, so paths such as
+`backend/src/main/resources/database/missionPlans.json` resolve correctly. To use another port:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\run-backend.ps1 -Port 8081
 ```
 
 Start the frontend from `MiASI/frontend`:

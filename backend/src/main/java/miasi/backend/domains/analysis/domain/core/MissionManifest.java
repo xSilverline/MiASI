@@ -30,8 +30,7 @@ public class MissionManifest {
         this.maxWeightSolZero,
         this.crew,
         this.deliveries,
-        newThreats
-    );
+        newThreats);
   }
 
   public MissionManifest copyWithDeliveries(List<Delivery> newDeliveries) {
@@ -42,7 +41,6 @@ public class MissionManifest {
         this.maxWeightSolZero,
         this.crew,
         newDeliveries,
-        this.threats
-    );
+        this.threats);
   }
 }

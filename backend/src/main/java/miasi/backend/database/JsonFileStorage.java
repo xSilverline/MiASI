@@ -28,8 +28,7 @@ public class JsonFileStorage<T> {
       return null;
     }
 
-    JavaType listType = objectMapper.getTypeFactory()
-        .constructCollectionType(List.class, type);
+    JavaType listType = objectMapper.getTypeFactory().constructCollectionType(List.class, type);
     return objectMapper.readValue(file, listType);
   }
 }
