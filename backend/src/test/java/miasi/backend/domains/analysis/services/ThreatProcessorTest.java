@@ -2,6 +2,7 @@ package miasi.backend.domains.analysis.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyFloat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -9,13 +10,13 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import miasi.backend.domains.analysis.domain.schedule.ThreatProcessor;
-import miasi.backend.domains.analysis.domain.core.ResourceType;
 import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
 import miasi.backend.domains.analysis.domain.modules.Module;
 import miasi.backend.domains.analysis.domain.modules.ModuleState;
 import miasi.backend.domains.analysis.domain.schedule.ImpactType;
 import miasi.backend.domains.analysis.domain.schedule.Threat;
+import miasi.backend.domains.analysis.domain.schedule.ThreatProcessor;
 import org.junit.jupiter.api.Test;
 
 class ThreatProcessorTest {
@@ -97,12 +98,13 @@ class ThreatProcessorTest {
 
     when(module.getName()).thenReturn("DRILL");
     when(module.getEfficiency()).thenReturn(0.8f);
+    when(module.withEfficiency(anyFloat())).thenReturn(module);
 
     // When
     processor.process(2, List.of(threat), List.of(module), null);
 
     // Then
-    verify(module).setEfficiency(0.5f);
+    verify(module).withEfficiency(0.5f);
   }
 
   @Test
@@ -125,7 +127,7 @@ class ThreatProcessorTest {
     processor.process(2, List.of(threat), List.of(module), null);
 
     // Then
-    verify(module).setEfficiency(0f);
+    verify(module).withEfficiency(0f);
   }
 
 
@@ -163,8 +165,8 @@ class ThreatProcessorTest {
     processor.process(2, List.of(threat), List.of(module), null);
 
     // Then
-    verify(module).setStatus(ModuleState.DESTROYED);
-    verify(module).setEfficiency(0f);
+    verify(module).withStatus(ModuleState.DESTROYED);
+    verify(module).withEfficiency(0f);
   }
 
   @Test

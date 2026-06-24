@@ -42,8 +42,8 @@ class SurvivalPredictorTest {
   void setUp() {
     // Standardowa misja trwająca 10 dni (na potrzeby horyzontu planowania)
     mockManifest = new MissionManifest(
-        null, 10, 0, 20000f,
-        new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
+        0, 10, 0, 20000f,
+        new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
     );
 
     // Baza domyślnie nic nie produkuje
@@ -102,8 +102,7 @@ class SurvivalPredictorTest {
     // Ale w Sol 2 (czyli jutro) przylatuje zrzut zapasów
     Delivery delivery = new Delivery(2, List.of(new Resource(ResourceType.OXYGEN, 50.0f)),
         new ArrayList<>());
-    mockManifest.setDeliveries(List.of(delivery));
-
+    mockManifest = mockManifest.copyWithDeliveries(List.of(delivery));
     // --- WHEN ---
     // Jesteśmy w Sol 1. Do celu (dostawy) mamy 2 - 1 + 1 = 2 dni. Zapasy starczą na 10/5 = 2 dni.
     ConsumptionMode mode = survivalPredictor.evaluateCrewConsumptionMode(
@@ -150,7 +149,7 @@ class SurvivalPredictorTest {
     // Dostawa jest w Sol 4 (za 3 dni od Sol 1)
     Delivery delivery = new Delivery(4, List.of(new Resource(ResourceType.OXYGEN, 50.0f)),
         new ArrayList<>());
-    mockManifest.setDeliveries(List.of(delivery));
+    mockManifest.copyWithDeliveries(List.of(delivery));
 
     // --- WHEN ---
     boolean evacuationNeeded = survivalPredictor.checkIfEvacuationIsNeeded(

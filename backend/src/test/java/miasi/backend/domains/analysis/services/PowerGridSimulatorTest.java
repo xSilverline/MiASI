@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import miasi.backend.domains.analysis.domain.core.Resource;
 import miasi.backend.domains.analysis.domain.core.ResourceType;
@@ -33,12 +34,15 @@ class PowerGridSimulatorTest {
     when(demandCalculator.calculateModulesDemand(any()))
         .thenReturn(List.of(new Resource(ResourceType.ENERGY, 50)));
 
+    when(module.withStatus(any())).thenReturn(module);
+    List<Module> currentModules = new ArrayList<>(List.of(module));
+
     // When
     boolean result = processor.process(0, List.of(module));
 
     // Then
     assertTrue(result);
-    verify(module).setStatus(ModuleState.INACTIVE);
+    verify(module).withStatus(ModuleState.INACTIVE);
   }
 
   @Test
