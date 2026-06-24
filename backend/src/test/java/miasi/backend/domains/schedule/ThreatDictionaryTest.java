@@ -64,6 +64,12 @@ class ThreatDictionaryTest {
 
   private ThreatDefinition definition(String affectedElement, DifficultyLevel difficulty) {
     return new ThreatDefinition(
-        ThreatType.DUST_STORM, difficulty, affectedElement, 1.0, 3.0, "days");
+        ThreatType.DUST_STORM,
+        difficulty,
+        affectedElement,
+        "reduced operational capacity",
+        1.0,
+        3.0,
+        "days");
   }
 }

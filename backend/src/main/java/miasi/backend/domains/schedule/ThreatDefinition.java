@@ -16,6 +16,7 @@ public class ThreatDefinition {
   ThreatType type;
   DifficultyLevel difficulty;
   String affectedElement;
+  String consequence;
   double minImpactValue;
   double maxImpactValue;
   String impactUnit;

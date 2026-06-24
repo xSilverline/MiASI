@@ -16,6 +16,7 @@ public class ThreatScheduled {
   int sol;
   ThreatType threatType;
   String affectedElement;
+  String consequence;
   double impactValue;
   String impactUnit;
 }

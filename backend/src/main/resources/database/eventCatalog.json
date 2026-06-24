@@ -3,7 +3,9 @@
     "id": "dust-storm",
     "name": "Dust storm",
     "type": "THREAT",
-    "description": "Dust storm event available as a mission schedule preset."
+    "description": "Dust storm event available as a mission schedule preset.",
+    "affectedElement": "solar-panels",
+    "consequence": "Reduced solar energy production during the storm."
   },
   {
     "id": "supply-delivery",

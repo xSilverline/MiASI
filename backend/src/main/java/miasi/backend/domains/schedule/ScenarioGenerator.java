@@ -76,21 +76,27 @@ public class ScenarioGenerator {
         new Threat(
             definition.getType(),
             definition.getAffectedElement(),
+            definition.getConsequence(),
             impactValue,
             threatDuration,
             definition.getImpactUnit());
     threat.setId(UUID.randomUUID().toString());
     threat.setType(EventType.THREAT);
     threat.setSol(randomIntBetween(1, durationSols, effectiveRandom));
-    threat.setDescription(
+    threat.setDescription(buildThreatDescription(definition, threatDuration));
+    return threat;
+  }
+
+  private String buildThreatDescription(ThreatDefinition definition, int threatDuration) {
+    String description =
         "Threat "
             + definition.getType()
             + " affects "
-            + definition.getAffectedElement()
-            + " for "
-            + threatDuration
-            + " sols");
-    return threat;
+            + definition.getAffectedElement();
+    if (definition.getConsequence() != null && !definition.getConsequence().isBlank()) {
+      description += ": " + definition.getConsequence();
+    }
+    return description + " for " + threatDuration + " sols";
   }
 
   private void validateThreatDefinition(ThreatDefinition definition) {

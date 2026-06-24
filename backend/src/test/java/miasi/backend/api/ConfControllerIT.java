@@ -151,7 +151,13 @@ class ConfControllerIT {
   void postEventDefinition() throws Exception {
     // Given
     EventDefinition event =
-        new EventDefinition(null, "Custom threat", EventType.THREAT, "Custom user event");
+        new EventDefinition(
+            null,
+            "Custom threat",
+            EventType.THREAT,
+            "Custom user event",
+            "solar-panels",
+            "reduced solar energy production");
 
     // When
     ResultActions result = mvc.perform(
@@ -167,7 +173,9 @@ class ConfControllerIT {
         .andExpect(jsonPath("$.id").isNotEmpty())
         .andExpect(jsonPath("$.name").value(event.getName()))
         .andExpect(jsonPath("$.type").value(event.getType().name()))
-        .andExpect(jsonPath("$.description").value(event.getDescription()));
+        .andExpect(jsonPath("$.description").value(event.getDescription()))
+        .andExpect(jsonPath("$.affectedElement").value(event.getAffectedElement()))
+        .andExpect(jsonPath("$.consequence").value(event.getConsequence()));
   }
 
   @Test
@@ -178,7 +186,13 @@ class ConfControllerIT {
     ctx.addEventDefinition(original);
 
     EventDefinition updated =
-        new EventDefinition(null, "Updated", EventType.SUPPLY_DELIVERY, "Updated event");
+        new EventDefinition(
+            null,
+            "Updated",
+            EventType.THREAT,
+            "Updated event",
+            "food-production",
+            "food production is interrupted");
 
     // When
     ResultActions result = mvc.perform(
@@ -193,7 +207,9 @@ class ConfControllerIT {
         .andExpect(jsonPath("$.id").value(original.getId()))
         .andExpect(jsonPath("$.name").value(updated.getName()))
         .andExpect(jsonPath("$.type").value(updated.getType().name()))
-        .andExpect(jsonPath("$.description").value(updated.getDescription()));
+        .andExpect(jsonPath("$.description").value(updated.getDescription()))
+        .andExpect(jsonPath("$.affectedElement").value(updated.getAffectedElement()))
+        .andExpect(jsonPath("$.consequence").value(updated.getConsequence()));
   }
 
   @Test
