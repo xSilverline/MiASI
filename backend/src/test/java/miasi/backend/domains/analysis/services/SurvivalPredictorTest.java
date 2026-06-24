@@ -149,8 +149,7 @@ class SurvivalPredictorTest {
     // Dostawa jest w Sol 4 (za 3 dni od Sol 1)
     Delivery delivery = new Delivery(4, List.of(new Resource(ResourceType.OXYGEN, 50.0f)),
         new ArrayList<>());
-    mockManifest.copyWithDeliveries(List.of(delivery));
-
+    mockManifest = mockManifest.copyWithDeliveries(List.of(delivery));
     // --- WHEN ---
     boolean evacuationNeeded = survivalPredictor.checkIfEvacuationIsNeeded(
         1, 10, warehouse, new ArrayList<>(), mockManifest
