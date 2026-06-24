@@ -4,3 +4,5 @@ backend/target
 /out/
 !port/out/
 !port/out/**
+backend/.mvn/apache-maven-*/
+backend/.mvn/apache-maven-*.zip

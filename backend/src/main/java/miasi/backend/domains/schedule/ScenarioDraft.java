@@ -40,6 +40,22 @@ public class ScenarioDraft {
     throw new IllegalArgumentException("Scenario draft event not found: " + eventId);
   }
 
+  public void addEvent(ScheduledEvent event) {
+    validateEvent(event);
+    ensureProposedEvents();
+    proposedEvents.add(event);
+  }
+
+  public void removeEvent(String eventId) {
+    validateEventId(eventId);
+    ensureProposedEvents();
+
+    boolean removed = proposedEvents.removeIf(event -> eventId.equals(event.getId()));
+    if (!removed) {
+      throw new IllegalArgumentException("Scenario draft event not found: " + eventId);
+    }
+  }
+
   public MissionSchedule approve() {
     if (missionPlanId == null || missionPlanId.isBlank()) {
       throw new IllegalArgumentException("Mission plan id is required");

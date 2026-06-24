@@ -43,6 +43,7 @@ class ScenarioGeneratorTest {
             ThreatType.DUST_STORM,
             DifficultyLevel.LEVEL_II,
             "solar-panels",
+            "reduced solar energy production",
             2.0,
             5.0,
             "days");
@@ -51,6 +52,7 @@ class ScenarioGeneratorTest {
             ThreatType.RESOURCE_LOSS,
             DifficultyLevel.LEVEL_V,
             "water",
+            "water reserves decrease",
             5.0,
             8.0,
             "kg");
@@ -67,6 +69,7 @@ class ScenarioGeneratorTest {
             ThreatType.MODULE_FAILURE,
             DifficultyLevel.LEVEL_III,
             "habitat",
+            "habitat operations are limited",
             2.0,
             4.0,
             "days");
@@ -89,15 +92,33 @@ class ScenarioGeneratorTest {
     assertTrue(threat.getImpactValue() <= definition.getMaxImpactValue());
     assertTrue(threat.getDurationSols() >= 2);
     assertTrue(threat.getDurationSols() <= 4);
+    assertEquals(definition.getAffectedElement(), threat.getAffectedElement());
+    assertEquals(definition.getConsequence(), threat.getConsequence());
+    assertEquals(1, threat.getEffects().size());
+    assertEquals(definition.getAffectedElement(), threat.getEffects().getFirst().getTarget());
+    assertEquals(definition.getImpactUnit(), threat.getEffects().getFirst().getUnit());
+    assertEquals(definition.getConsequence(), threat.getEffects().getFirst().getDescription());
   }
 
   @Test
   void validateThreatDefinition_exceptionsThrowTest() throws NoSuchMethodException {
     // Given
     ThreatDefinition valid = new ThreatDefinition(
-        ThreatType.DUST_STORM, DifficultyLevel.LEVEL_I, "test", 2.0, 5.0, "days");
+        ThreatType.DUST_STORM,
+        DifficultyLevel.LEVEL_I,
+        "test",
+        "test consequence",
+        2.0,
+        5.0,
+        "days");
     ThreatDefinition invalid = new ThreatDefinition(
-        ThreatType.DUST_STORM, DifficultyLevel.LEVEL_I, "test", 10.0, 5.0, "days");
+        ThreatType.DUST_STORM,
+        DifficultyLevel.LEVEL_I,
+        "test",
+        "test consequence",
+        10.0,
+        5.0,
+        "days");
     ScenarioGenerator generator = new ScenarioGenerator(
         "plan-1", new ThreatDictionary(List.of()), new Random(0));
     java.lang.reflect.Method method = ScenarioGenerator.class.getDeclaredMethod(

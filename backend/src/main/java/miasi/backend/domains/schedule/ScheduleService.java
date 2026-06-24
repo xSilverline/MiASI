@@ -35,6 +35,10 @@ public class ScheduleService {
     return getSchedule(scheduleId).timeline();
   }
 
+  public List<ScheduledEvent> getScheduleEvents(String scheduleId) {
+    return getTimeline(scheduleId).getEventsSortedBySol();
+  }
+
   public MissionSchedule addEvent(String scheduleId, ScheduledEvent event) {
     MissionSchedule schedule = getSchedule(scheduleId);
     validateEventScheduling(schedule, event);
@@ -85,6 +89,22 @@ public class ScheduleService {
     return draft;
   }
 
+  public List<ScheduledEvent> getScenarioEvents(String draftId) {
+    ScenarioDraft draft = getScenarioDraft(draftId);
+    List<ScheduledEvent> events = draft.getProposedEvents();
+    return events == null ? List.of() : List.copyOf(events);
+  }
+
+  public ScenarioDraft addScenarioEvent(String draftId, ScheduledEvent event) {
+    ScenarioDraft draft = getScenarioDraft(draftId);
+    draft.addEvent(event);
+    return draft;
+  }
+
+  public void removeScenarioEvent(String draftId, String eventId) {
+    getScenarioDraft(draftId).removeEvent(eventId);
+  }
+
   public ScenarioDraft correctScenarioEvent(
       String draftId, String eventId, ScheduledEvent correctedEvent) {
     ScenarioDraft draft = getScenarioDraft(draftId);
@@ -113,6 +133,7 @@ public class ScheduleService {
                 ThreatType.DUST_STORM,
                 DifficultyLevel.LEVEL_I,
                 "solar-panels",
+                "reduced solar energy production",
                 1.0,
                 2.0,
                 "days"),
@@ -120,6 +141,7 @@ public class ScheduleService {
                 ThreatType.MODULE_FAILURE,
                 DifficultyLevel.LEVEL_II,
                 "habitat-module",
+                "limited habitat availability",
                 2.0,
                 4.0,
                 "days"),
@@ -127,6 +149,7 @@ public class ScheduleService {
                 ThreatType.RESOURCE_LOSS,
                 DifficultyLevel.LEVEL_III,
                 "water-storage",
+                "water reserves decrease",
                 3.0,
                 6.0,
                 "percent"),
@@ -134,6 +157,7 @@ public class ScheduleService {
                 ThreatType.PRODUCTION_DISRUPTION,
                 DifficultyLevel.LEVEL_IV,
                 "food-production",
+                "food production is interrupted",
                 4.0,
                 8.0,
                 "days"),
@@ -141,6 +165,7 @@ public class ScheduleService {
                 ThreatType.MODULE_FAILURE,
                 DifficultyLevel.LEVEL_V,
                 "life-support",
+                "life support capacity drops",
                 6.0,
                 10.0,
                 "days")));
