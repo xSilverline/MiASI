@@ -1,21 +1,21 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.simulation.Status;
-import miasi.backend.domains.analysis.types.ResourceType;
-import miasi.backend.domains.analysis.types.core.DailyState;
-import miasi.backend.domains.analysis.types.core.ObservationType;
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.input.MissionManifest;
-import miasi.backend.domains.analysis.types.result.SimulationOutcome;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Set;
+import miasi.backend.domains.analysis.domain._simulation.SimulationOutcome;
+import miasi.backend.domains.analysis.domain._simulation.SimulationOutcomeEvaluator;
+import miasi.backend.domains.analysis.domain.core.DailyState;
+import miasi.backend.domains.analysis.domain.core.MissionManifest;
+import miasi.backend.domains.analysis.domain.core.ObservationType;
+import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
+import miasi.backend.domains.analysis.domain.core.Status;
+import org.junit.jupiter.api.Test;
 
 class SimulationOutcomeEvaluatorTest {
 

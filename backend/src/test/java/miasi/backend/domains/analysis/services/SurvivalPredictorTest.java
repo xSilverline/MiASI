@@ -1,10 +1,22 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.types.ResourceType;
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.crew.ConsumptionMode;
-import miasi.backend.domains.analysis.types.input.MissionManifest;
-import miasi.backend.domains.analysis.types.schedule.Delivery;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+
+import java.util.ArrayList;
+import java.util.List;
+import miasi.backend.domains.analysis.domain.core.MissionManifest;
+import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
+import miasi.backend.domains.analysis.domain.crew.ConsumptionMode;
+import miasi.backend.domains.analysis.domain.crew.DemandCalculator;
+import miasi.backend.domains.analysis.domain.crew.SurvivalPredictor;
+import miasi.backend.domains.analysis.domain.modules.ProductionCalculator;
+import miasi.backend.domains.analysis.domain.schedule.Delivery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,16 +24,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class SurvivalPredictorTest {
@@ -98,7 +100,8 @@ class SurvivalPredictorTest {
         .thenReturn(List.of(new Resource(ResourceType.OXYGEN, 5.0f)));
 
     // Ale w Sol 2 (czyli jutro) przylatuje zrzut zapasów
-    Delivery delivery = new Delivery(2, List.of(new Resource(ResourceType.OXYGEN, 50.0f)), new ArrayList<>());
+    Delivery delivery = new Delivery(2, List.of(new Resource(ResourceType.OXYGEN, 50.0f)),
+        new ArrayList<>());
     mockManifest.setDeliveries(List.of(delivery));
 
     // --- WHEN ---
@@ -129,7 +132,8 @@ class SurvivalPredictorTest {
     );
 
     // --- THEN ---
-    assertTrue(evacuationNeeded, "Sytuacja jest beznadziejna, system powinien natychmiast zażądać ewakuacji");
+    assertTrue(evacuationNeeded,
+        "Sytuacja jest beznadziejna, system powinien natychmiast zażądać ewakuacji");
   }
 
   @Test
@@ -144,7 +148,8 @@ class SurvivalPredictorTest {
         .thenReturn(List.of(new Resource(ResourceType.OXYGEN, 2.0f)));
 
     // Dostawa jest w Sol 4 (za 3 dni od Sol 1)
-    Delivery delivery = new Delivery(4, List.of(new Resource(ResourceType.OXYGEN, 50.0f)), new ArrayList<>());
+    Delivery delivery = new Delivery(4, List.of(new Resource(ResourceType.OXYGEN, 50.0f)),
+        new ArrayList<>());
     mockManifest.setDeliveries(List.of(delivery));
 
     // --- WHEN ---
@@ -153,6 +158,7 @@ class SurvivalPredictorTest {
     );
 
     // --- THEN ---
-    assertFalse(evacuationNeeded, "Alarm ewakuacyjny nie powinien się włączyć, bo tryb MINIMAL daje szansę na doczekanie dostawy");
+    assertFalse(evacuationNeeded,
+        "Alarm ewakuacyjny nie powinien się włączyć, bo tryb MINIMAL daje szansę na doczekanie dostawy");
   }
 }

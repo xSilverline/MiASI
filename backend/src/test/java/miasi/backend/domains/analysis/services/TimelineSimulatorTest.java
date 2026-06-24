@@ -9,15 +9,23 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import miasi.backend.domains.analysis.simulation.Status;
-import miasi.backend.domains.analysis.types.ResourceType;
-import miasi.backend.domains.analysis.types.core.DailyState;
-import miasi.backend.domains.analysis.types.core.ObservationType;
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.crew.ConsumptionMode;
-import miasi.backend.domains.analysis.types.input.MissionManifest;
-import miasi.backend.domains.analysis.types.result.SimulationOutcome;
-import miasi.backend.domains.analysis.types.schedule.Delivery;
+import miasi.backend.domains.analysis.domain._simulation.SimulationOutcome;
+import miasi.backend.domains.analysis.domain._simulation.SimulationOutcomeEvaluator;
+import miasi.backend.domains.analysis.domain._simulation.TimelineSimulator;
+import miasi.backend.domains.analysis.domain.core.DailyState;
+import miasi.backend.domains.analysis.domain.core.MissionManifest;
+import miasi.backend.domains.analysis.domain.core.ObservationType;
+import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
+import miasi.backend.domains.analysis.domain.core.Status;
+import miasi.backend.domains.analysis.domain.crew.ConsumptionMode;
+import miasi.backend.domains.analysis.domain.crew.DemandCalculator;
+import miasi.backend.domains.analysis.domain.crew.SurvivalPredictor;
+import miasi.backend.domains.analysis.domain.energy.PowerGridSimulator;
+import miasi.backend.domains.analysis.domain.modules.ProductionCalculator;
+import miasi.backend.domains.analysis.domain.schedule.Delivery;
+import miasi.backend.domains.analysis.domain.schedule.DeliveryProcessor;
+import miasi.backend.domains.analysis.domain.schedule.ThreatProcessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +49,7 @@ class TimelineSimulatorTest {
   @Mock
   private ThreatProcessor threatProcessor;
   @Mock
-  private EnergyProcessor energyProcessor;
+  private PowerGridSimulator powerGridSimulator;
   @Mock
   private SurvivalPredictor survivalPredictor;
 
@@ -54,8 +62,8 @@ class TimelineSimulatorTest {
   void setUp() {
     // Mission: 5 days main + 2 days rescue = 7 days target
     mockManifest = new MissionManifest(
-        null, 5, 2, 20000f,
-        new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
+        0, 5, 2, 20000f,
+        new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
     );
 
     lenient().when(productionCalculator.calculateModulesProduction(any()))
@@ -71,7 +79,7 @@ class TimelineSimulatorTest {
     lenient().when(
             survivalPredictor.checkIfEvacuationIsNeeded(anyInt(), anyInt(), any(), any(), any()))
         .thenReturn(false);
-    lenient().when(energyProcessor.process(any(Float.class), any()))
+    lenient().when(powerGridSimulator.process(any(Float.class), any()))
         .thenReturn(false);
   }
 
@@ -156,7 +164,7 @@ class TimelineSimulatorTest {
     // Manifest with delivery set on Sol 3
     Delivery delivery = new Delivery(3, List.of(new Resource(ResourceType.FOOD, 100f)),
         new ArrayList<>());
-    mockManifest.setDeliveries(List.of(delivery));
+    mockManifest = mockManifest.copyWithDeliveries(List.of(delivery));
 
     // --- WHEN ---
     List<DailyState> timeline = timelineSimulator.simulate(
@@ -219,7 +227,7 @@ class TimelineSimulatorTest {
   void shouldTagTotalBlackoutWhenEnergyProcessorFails() {
     // --- GIVEN ---
     // Energy processor reports power is out!
-    when(energyProcessor.process(any(Float.class), any())).thenReturn(true);
+    when(powerGridSimulator.process(any(Float.class), any())).thenReturn(true);
 
     // --- WHEN ---
     List<DailyState> timeline = timelineSimulator.simulate(

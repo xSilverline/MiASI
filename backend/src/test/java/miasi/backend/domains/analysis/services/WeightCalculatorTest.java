@@ -1,17 +1,17 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.types.ResourceType;
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.modules.Module;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+import miasi.backend.domains.analysis.domain._payload.WeightCalculator;
+import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
+import miasi.backend.domains.analysis.domain.modules.Module;
+import org.junit.jupiter.api.Test;
 
 class WeightCalculatorTest {
 

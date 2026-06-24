@@ -1,22 +1,22 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.types.ResourceType;
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.modules.Module;
-import miasi.backend.domains.analysis.types.modules.ModuleState;
-import miasi.backend.domains.analysis.types.schedule.ImpactType;
-import miasi.backend.domains.analysis.types.schedule.Threat;
-import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import miasi.backend.domains.analysis.domain.schedule.ThreatProcessor;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
+import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.modules.Module;
+import miasi.backend.domains.analysis.domain.modules.ModuleState;
+import miasi.backend.domains.analysis.domain.schedule.ImpactType;
+import miasi.backend.domains.analysis.domain.schedule.Threat;
+import org.junit.jupiter.api.Test;
 
 class ThreatProcessorTest {
 
