@@ -5,7 +5,6 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-//@ToString
 public enum ResourceType {
 
   FOOD(0.5f),

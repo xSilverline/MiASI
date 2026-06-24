@@ -45,7 +45,7 @@ public class TimelineSimulator {
       previousMode = dailyState.getMode();
     }
 
-    return timeline; // Zwracamy tylko czystą historię!
+    return timeline;
   }
 
   private DailyState simulateSingleDay(int sol, int totalDays, List<Resource> warehouse,
@@ -122,7 +122,6 @@ public class TimelineSimulator {
     warehouse.addAll(updated);
   }
 
-  // --- METODY POMOCNICZE ---
 
   private List<Resource> copyResources(List<Resource> source) {
     if (source == null) {

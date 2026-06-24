@@ -9,10 +9,10 @@ import miasi.backend.domains.analysis.domain.schedule.Threat;
 public class ScenariosAnalysisSession {
 
   String id;
-  String nominalSessionId;             // Odniesienie do Fazy 2 (ostatecznie zatwierdzony układ)
-  String scheduleId;                   // Skąd wzięliśmy zagrożenia
-  List<Threat> appliedThreats;         // WEJŚCIE: Jakie awarie uderzyły w bazę
-  SimulationVariant idealVariant;      // Skopiowane z Fazy 2 (żeby frontend miał to w 1 JSONie)
-  SimulationVariant realVariant;       // Nowa oś czasu uwzględniająca appliedThreats
+  String nominalSessionId;
+  String scheduleId;
+  List<Threat> appliedThreats;
+  SimulationVariant idealVariant;
+  SimulationVariant realVariant;
   LocalDateTime createdAt;
 }

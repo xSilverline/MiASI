@@ -14,5 +14,5 @@ import miasi.backend.domains.analysis.domain.core.Resource;
 @AllArgsConstructor
 public class ConsumptionProfile {
 
-  List<Resource> dailyConsumption; // lista zasobów określająca zapotrzebowanie (np. profil minimalny lub optymalny)
+  List<Resource> dailyConsumption;
 }

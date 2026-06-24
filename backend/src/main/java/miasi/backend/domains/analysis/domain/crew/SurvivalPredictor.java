@@ -15,7 +15,6 @@ public class SurvivalPredictor {
   private final DemandCalculator demandCalculator;
   private final ProductionCalculator productionCalculator;
 
-  // Kiedy przechodzimy na MINIMAL? Kiedy OPTIMAL nas zabije przed dostawą.
   public ConsumptionMode evaluateCrewConsumptionMode(int currentSol, int targetSol,
       List<Resource> warehouse, List<Module> currentModules, MissionManifest manifest) {
     if (willDieBeforeTarget(currentSol, targetSol, warehouse, currentModules, manifest,
@@ -25,14 +24,12 @@ public class SurvivalPredictor {
     return ConsumptionMode.OPTIMAL;
   }
 
-  // Kiedy wzywamy SOS? Kiedy nawet MINIMAL nas zabije przed dostawą!
   public boolean checkIfEvacuationIsNeeded(int currentSol, int targetSol, List<Resource> warehouse,
       List<Module> currentModules, MissionManifest manifest) {
     return willDieBeforeTarget(currentSol, targetSol, warehouse, currentModules, manifest,
         ConsumptionMode.MINIMAL);
   }
 
-  // --- Silnik liczący przewidywaną śmierć ---
   private boolean willDieBeforeTarget(int currentSol, int missionEndSol, List<Resource> warehouse,
       List<Module> currentModules, MissionManifest manifest, ConsumptionMode modeToCheck) {
     List<Resource> demand = demandCalculator.calculateCrewDemand(manifest.getCrew(), modeToCheck);
@@ -52,7 +49,7 @@ public class SurvivalPredictor {
       float netBalance = dailyProd - (dailyModDemand + res.getAmount());
 
       if (netBalance >= 0) {
-        continue; // Mamy nadwyżkę lub zero, jesteśmy bezpieczni
+        continue;
       }
 
       float daysLeftUntilEmpty = currentAmount / Math.abs(netBalance);
@@ -62,14 +59,11 @@ public class SurvivalPredictor {
 
       int daysUntilTarget;
       if (nextDeliverySol != -1) {
-        // Cel to DOSTAWA: Wystarczy dotrwać do poranka w dniu dostawy (bez dodawania +1)
         daysUntilTarget = nextDeliverySol - currentSol;
       } else {
-        // Cel to KONIEC MISJI: Trzeba przeżyć pełne dni, łącznie z ostatnim dniem misji (wymaga +1)
         daysUntilTarget = missionEndSol - currentSol + 1;
       }
 
-      // Zginiemy szybciej, niż nadejdzie cel (wynik 0.0 w magazynie to wciąż życie)
       if (daysLeftUntilEmpty < daysUntilTarget) {
         return true;
       }

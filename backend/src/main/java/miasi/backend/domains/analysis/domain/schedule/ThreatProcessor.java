@@ -10,29 +10,24 @@ public class ThreatProcessor {
   public void process(int currentSol, List<Threat> threats, List<Module> currentModules,
       List<Resource> warehouse) {
 
-    // find active failures in currentSol and apply their effects
     if (threats == null) {
       return;
     }
 
     for (Threat threat : threats) {
-      // check if the threat is active on the current day
       if (currentSol >= threat.getSol()
           && currentSol < threat.getSol() + threat.getDurationSols()) {
 
-        // apply effects based on ImpactType
         switch (threat.getType().name()) {
 
           case "QUANTITY_CHANGE":
             if (warehouse != null) {
-              // FUNKCYJNA ZMIANA: Podmieniamy zasób w liście na nową kopię z nową wartością
               warehouse.replaceAll(res -> {
                 if (res.getType().name().equalsIgnoreCase(threat.getTargetIdentifier())) {
                   float newAmount = res.getAmount() - threat.getImpactValue();
-                  // the amount cannot drop below zero only due to a leak
                   return res.withAmount(Math.max(0.0f, newAmount));
                 }
-                return res; // Jeśli to nie ten zasób, zostawiamy go w spokoju
+                return res;
               });
             }
             break;
@@ -42,7 +37,6 @@ public class ThreatProcessor {
               currentModules.replaceAll(module -> {
                 if (module.getName().equalsIgnoreCase(threat.getTargetIdentifier())) {
                   float newEfficiency = module.getEfficiency() - threat.getImpactValue();
-                  // efficiency cannot be negative
                   return module.withEfficiency(Math.max(0.0f, newEfficiency));
                 }
                 return module;
@@ -54,7 +48,6 @@ public class ThreatProcessor {
             if (currentModules != null) {
               currentModules.replaceAll(module -> {
                 if (module.getName().equalsIgnoreCase(threat.getTargetIdentifier())) {
-                  // status change to destroyed AND efficiency to 0
                   return module.withStatus(ModuleState.DESTROYED).withEfficiency(0.0f);
                 }
                 return module;

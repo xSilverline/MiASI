@@ -17,8 +17,8 @@ public class PayloadWeightOptimizer {
 
   private final WeightCalculator weightCalculator;
   private final TimelineSimulator timelineSimulator;
-  private final PowerGridPlanner powerGridPlanner; // Nasz nowy pomocnik od prądu!
-  private final SimulationOutcomeEvaluator evaluator; // Nasz pomocnik od szukania dołka!
+  private final PowerGridPlanner powerGridPlanner;
+  private final SimulationOutcomeEvaluator evaluator;
 
   public OptimalConfiguration optimizeConfiguration(MissionManifest manifest,
       List<Module> catalog) {

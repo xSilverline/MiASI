@@ -16,19 +16,16 @@ public class SimulationOutcomeEvaluator {
     Integer deathSol = null;
 
     for (DailyState state : timeline) {
-      // 1. Szukamy dnia śmierci (pierwszy dzień z ujemnymi zasobami krytycznymi)
       if (deathSol == null && hasAnyResourceDeficit(state.getWarehouse())) {
         deathSol = state.getSol();
       }
 
-      // 2. Szukamy dnia wezwania SOS
       if (sosCalledSol == null && state.getObservations()
           .contains(ObservationType.EVACUATION_ALERT)) {
         sosCalledSol = state.getSol();
       }
     }
 
-    // Kalkulujemy dzień przylotu ewakuacji
     Integer evacuationSol = (sosCalledSol != null) ? sosCalledSol + manifest.getRescueSols() : null;
     Status status;
 
@@ -43,10 +40,7 @@ public class SimulationOutcomeEvaluator {
     return new SimulationOutcome(status, deathSol, evacuationSol);
   }
 
-  /**
-   * Metoda przeniesiona z BaselineModuleRecommender. Oblicza, ile zasobów potrzeba zabrać na start,
-   * znajdując największe dołki na osi czasu.
-   */
+
   public List<Resource> calculateMinimumSurvivalSupplies(List<DailyState> timeline) {
     float minOxygen = 0, minWater = 0, minFood = 0;
 
@@ -56,15 +50,12 @@ public class SimulationOutcomeEvaluator {
       minFood = Math.min(minFood, getResourceAmount(state.getWarehouse(), ResourceType.FOOD));
     }
 
-    // Zwracamy wartości absolutne – skoro spadliśmy np. do -50, to na start potrzebujemy +50.
     return List.of(
         new Resource(ResourceType.OXYGEN, Math.abs(minOxygen)),
         new Resource(ResourceType.WATER, Math.abs(minWater)),
         new Resource(ResourceType.FOOD, Math.abs(minFood))
     );
   }
-
-  // --- METODY POMOCNICZE ---
 
   private boolean hasAnyResourceDeficit(List<Resource> warehouse) {
     return warehouse.stream().anyMatch(r ->
