@@ -1,0 +1,87 @@
+package miasi.backend.schedule.infrastructure.out.event;
+
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import miasi.backend.common.domain.model.event.MissionScheduleCreated;
+import miasi.backend.common.domain.model.event.MissionScheduleUpdated;
+import miasi.backend.common.domain.model.event.ModuleStateChangeScheduled;
+import miasi.backend.common.domain.model.event.SupplyDeliveryScheduled;
+import miasi.backend.common.domain.model.event.ThreatScheduled;
+import miasi.backend.schedule.application.port.out.ScheduleEventPublisherPort;
+import miasi.backend.schedule.domain.model.DeliveryContent;
+import miasi.backend.schedule.domain.model.DeliveryItem;
+import miasi.backend.schedule.domain.model.MissionSchedule;
+import miasi.backend.schedule.domain.model.ModuleStateChange;
+import miasi.backend.schedule.domain.model.ScheduledEvent;
+import miasi.backend.schedule.domain.model.SupplyDelivery;
+import miasi.backend.schedule.domain.model.Threat;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class SpringScheduleEventAdapter implements ScheduleEventPublisherPort {
+  private final ApplicationEventPublisher applicationEventPublisher;
+
+  @Override
+  public void publishScheduleCreated(MissionSchedule schedule) {
+    applicationEventPublisher.publishEvent(
+        MissionScheduleCreated.create(schedule.getId(), schedule.getMissionPlanId()));
+  }
+
+  @Override
+  public void publishScheduleUpdated(MissionSchedule schedule) {
+    applicationEventPublisher.publishEvent(MissionScheduleUpdated.create(schedule.getId()));
+  }
+
+  @Override
+  public void publishScheduledEventAdded(String scheduleId, ScheduledEvent event) {
+    if (event instanceof Threat threat) {
+      publishThreat(scheduleId, threat);
+      return;
+    }
+    if (event instanceof SupplyDelivery delivery) {
+      publishDelivery(scheduleId, delivery);
+      return;
+    }
+    if (event instanceof ModuleStateChange stateChange) {
+      applicationEventPublisher.publishEvent(
+          ModuleStateChangeScheduled.create(
+              scheduleId,
+              stateChange.getSol(),
+              stateChange.getModuleId(),
+              stateChange.getNewState()));
+    }
+  }
+
+  private void publishThreat(String scheduleId, Threat threat) {
+    applicationEventPublisher.publishEvent(
+        ThreatScheduled.create(
+            scheduleId,
+            threat.getSol(),
+            threat.getThreatType(),
+            threat.getAffectedElement(),
+            threat.getImpactValue(),
+            threat.getDurationSols(),
+            threat.getImpactUnit()));
+  }
+
+  private void publishDelivery(String scheduleId, SupplyDelivery delivery) {
+    DeliveryContent content = delivery.getContent();
+    List<SupplyDeliveryScheduled.DeliveryItemSnapshot> items =
+        content == null || content.getItems() == null
+            ? List.of()
+            : content.getItems().stream().map(this::toSnapshot).toList();
+    applicationEventPublisher.publishEvent(
+        SupplyDeliveryScheduled.create(
+            scheduleId,
+            delivery.getSol(),
+            items,
+            content == null ? 0.0 : content.getTotalWeight()));
+  }
+
+  private SupplyDeliveryScheduled.DeliveryItemSnapshot toSnapshot(DeliveryItem item) {
+    return new SupplyDeliveryScheduled.DeliveryItemSnapshot(
+        item.getItemId(), item.getItemType(), item.getQuantity(), item.getWeight());
+  }
+}
