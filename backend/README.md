@@ -4,7 +4,7 @@ Spring Boot API for Mars Mission Planner.
 
 ## Prerequisites
 
-- JDK 21
+- JDK 21+
 - Maven 3.9+ or PowerShell with network access for `scripts/verify-backend.ps1`
 
 The project is pinned to Java 21 in `pom.xml`. On Windows, the verify script will prefer
@@ -43,8 +43,20 @@ With a local Maven installation and Java 21 active:
 mvn spring-boot:run
 ```
 
+For a quick local run while skipping Spotless:
+
+```powershell
+mvn "-Djava.version=21" "-Dspotless.check.skip=true" spring-boot:run
+```
+
 The backend listens on `http://localhost:8080` by default. Controllers currently allow localhost
 frontend origins and the Vite frontend proxies `/api` to this port in development.
+
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
 
 ## Main API groups
 
@@ -52,9 +64,20 @@ frontend origins and the Vite frontend proxies `/api` to this port in developmen
 - `/api/conf` - mission plans, resource types, module states and module catalog.
 - `/api/schedule` - schedule creation, timeline, manual events, scenario drafts and approvals.
 
+## Focused API tests
+
+```powershell
+mvn "-Djava.version=21" "-Dspotless.check.skip=true" "-Dtest=ConfControllerIT,ScheduleControllerIT" test
+```
+
 ## Data and tests
 
 Runtime and test JSON storage paths are configured through `application.properties`. Tests that use
 JSON persistence should avoid permanent mutation of `src/test/resources`; current integration tests
 restore the test database hardcopy after changes, and lower-level persistence tests use temporary
 directories where possible.
+
+## Full verification
+
+`mvn clean verify` runs Spotless for the whole codebase. If it fails on formatting, run the
+backend verifier or format the backend before repeating the full check.

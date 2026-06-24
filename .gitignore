@@ -46,5 +46,7 @@ replay_pid*
 
 # Local build output
 /out/
+!port/out/
+!port/out/**
 backend/out/
 frontend/out/

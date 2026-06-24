@@ -1,0 +1,31 @@
+package miasi.backend.domains.schedule;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+
+import java.util.List;
+
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+public class ThreatDictionary {
+  List<ThreatDefinition> definitions;
+
+  public List<ThreatDefinition> findForDifficulty(DifficultyLevel difficulty) {
+    if (difficulty == null) {
+      throw new IllegalArgumentException("Difficulty level is required");
+    }
+    if (definitions == null) {
+      return List.of();
+    }
+
+    return definitions.stream()
+        .filter(definition -> difficulty.equals(definition.getDifficulty()))
+        .toList();
+  }
+}
