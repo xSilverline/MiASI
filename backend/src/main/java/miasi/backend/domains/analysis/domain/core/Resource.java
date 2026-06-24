@@ -1,8 +1,12 @@
 package miasi.backend.domains.analysis.domain.core;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
 
 @Value
+@Builder
+@AllArgsConstructor
 public class Resource {
 
   ResourceType type;

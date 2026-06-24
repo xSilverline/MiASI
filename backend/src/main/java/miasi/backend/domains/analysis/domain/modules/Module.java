@@ -1,12 +1,14 @@
 package miasi.backend.domains.analysis.domain.modules;
 
 import java.util.List;
+import lombok.Builder;
 import lombok.Value;
 import lombok.With;
 import miasi.backend.domains.analysis.domain.core.DailyBalance;
 import miasi.backend.domains.analysis.domain.core.Resource;
 
 @Value
+@Builder
 public class Module {
 
   String id;
@@ -24,9 +26,6 @@ public class Module {
   @With
   float efficiency;
 
-  public DailyBalance getDailyBalance() {
-    return new DailyBalance(production, consumption);
-  }
 
   public Module copy() {
     List<Resource> productionCopy = this.production != null ?

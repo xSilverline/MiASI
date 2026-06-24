@@ -1,12 +1,16 @@
 package miasi.backend.domains.analysis.domain.core;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
 import miasi.backend.domains.analysis.domain.crew.CrewGroup;
 import miasi.backend.domains.analysis.domain.schedule.Delivery;
 import miasi.backend.domains.analysis.domain.schedule.Threat;
 
 @Value
+@Builder
+@AllArgsConstructor
 public class MissionManifest {
 
   int id;

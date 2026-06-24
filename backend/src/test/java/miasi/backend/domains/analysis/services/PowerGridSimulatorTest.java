@@ -3,9 +3,8 @@ package miasi.backend.domains.analysis.services;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -26,56 +25,73 @@ class PowerGridSimulatorTest {
     // Given
     ProductionCalculator productionCalculator = mock(ProductionCalculator.class);
     DemandCalculator demandCalculator = mock(DemandCalculator.class);
-    Module module = mock(Module.class);
     PowerGridSimulator processor = new PowerGridSimulator(productionCalculator, demandCalculator);
 
     when(productionCalculator.calculateModulesProduction(any()))
-        .thenReturn(List.of(new Resource(ResourceType.ENERGY, 10)));
+        .thenReturn(List.of(new Resource(ResourceType.ENERGY, 10f)));
     when(demandCalculator.calculateModulesDemand(any()))
-        .thenReturn(List.of(new Resource(ResourceType.ENERGY, 50)));
+        .thenReturn(List.of(new Resource(ResourceType.ENERGY, 50f)));
 
-    when(module.withStatus(any())).thenReturn(module);
-    List<Module> currentModules = new ArrayList<>(List.of(module));
+    Module realModule = Module.builder()
+        .name("Wiertnica")
+        .status(ModuleState.ACTIVE)
+        .build();
+
+    List<Module> currentModules = new ArrayList<>(List.of(realModule));
 
     // When
-    boolean result = processor.process(0, List.of(module));
+    boolean blackoutOccurred = processor.process(0f, currentModules);
 
     // Then
-    assertTrue(result);
-    verify(module).withStatus(ModuleState.INACTIVE);
+    assertTrue(blackoutOccurred, "Powinien wystąpić blackout (zwrócić true)");
+
+    assertEquals(ModuleState.INACTIVE, currentModules.get(0).getStatus(),
+        "Moduł powinien zostać wyłączony z powodu braku energii");
   }
 
   @Test
-  void shouldReturnFalseWhenEnergyIsEnough() {// Given
-    ProductionCalculator productionCalculator = mock();
-    DemandCalculator demandCalculator = mock();
+  void shouldReturnFalseWhenEnergyIsEnough() {
+    // Given
+    ProductionCalculator productionCalculator = mock(ProductionCalculator.class);
+    DemandCalculator demandCalculator = mock(DemandCalculator.class);
     PowerGridSimulator processor = new PowerGridSimulator(productionCalculator, demandCalculator);
 
     when(productionCalculator.calculateModulesProduction(any()))
-        .thenReturn(List.of(new Resource(ResourceType.ENERGY, 100)));
+        .thenReturn(List.of(new Resource(ResourceType.ENERGY, 100f)));
     when(demandCalculator.calculateModulesDemand(any()))
-        .thenReturn(List.of(new Resource(ResourceType.ENERGY, 50)));
+        .thenReturn(List.of(new Resource(ResourceType.ENERGY, 50f)));
+
+    Module realModule = Module.builder()
+        .name("Farma Hydroponiczna")
+        .status(ModuleState.ACTIVE)
+        .build();
+
+    List<Module> currentModules = new ArrayList<>(List.of(realModule));
 
     // When
-    boolean result = processor.process(0, List.of());
+    boolean blackoutOccurred = processor.process(0f, currentModules);
 
     // Then
-    assertFalse(result);
+    assertFalse(blackoutOccurred, "Blackout nie powinien wystąpić (zwrócić false)");
+    assertEquals(ModuleState.ACTIVE, currentModules.get(0).getStatus(),
+        "Moduł powinien pozostać aktywny");
   }
 
   @Test
-  void shouldReturnZeroWhenResourcesAreNull() {// Given
+  void shouldReturnZeroWhenResourcesAreNull() {
+    // Given
     PowerGridSimulator processor = new PowerGridSimulator(mock(), mock());
 
     // When
     float result = processor.getEnergyAmount(null);
 
     // Then
-    assertEquals(0f, result);
+    assertEquals(0f, result, "Dla null lista zasobów powinna zwrócić 0 energii");
   }
 
   @Test
-  void shouldReturnEnergyAmount() {// Given
+  void shouldReturnEnergyAmount() {
+    // Given
     PowerGridSimulator processor = new PowerGridSimulator(mock(), mock());
 
     List<Resource> resources = List.of(
@@ -87,6 +103,6 @@ class PowerGridSimulatorTest {
     float result = processor.getEnergyAmount(resources);
 
     // Then
-    assertEquals(25f, result);
+    assertEquals(25, result, "Powinien poprawnie wyciągnąć wartość energii z listy");
   }
 }

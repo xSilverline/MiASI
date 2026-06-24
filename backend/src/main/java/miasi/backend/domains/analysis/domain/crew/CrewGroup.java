@@ -1,10 +1,14 @@
 package miasi.backend.domains.analysis.domain.crew;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
 import miasi.backend.domains.analysis.domain.core.Resource;
 
 @Value
+@Builder
+@AllArgsConstructor
 public class CrewGroup {
 
   String name;
