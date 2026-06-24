@@ -100,6 +100,47 @@ class SimplifiedEventsApiIT {
   }
 
   @Test
+  void getTimeline_shouldReturnScheduleEventsDayByDay() throws Exception {
+    ScheduledEvent first = new ScheduledEvent("timeline-a", EventType.THREAT, 3, "first");
+    ScheduledEvent second =
+        new ScheduledEvent("timeline-b", EventType.SUPPLY_DELIVERY, 3, "second");
+    ScheduledEvent third = new ScheduledEvent("timeline-c", EventType.THREAT, 5, "third");
+    scheduleService.addEvent(schedule.getId(), first);
+    scheduleService.addEvent(schedule.getId(), second);
+    scheduleService.addEvent(schedule.getId(), third);
+
+    mvc.perform(
+            MockMvcRequestBuilders.get("/api/events/timeline")
+                .param("context", "schedule")
+                .param("contextId", schedule.getId()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(30))
+        .andExpect(jsonPath("$[0].sol").value(1))
+        .andExpect(jsonPath("$[0].events").isEmpty())
+        .andExpect(jsonPath("$[2].sol").value(3))
+        .andExpect(jsonPath("$[2].events[0].id").value(first.getId()))
+        .andExpect(jsonPath("$[2].events[1].id").value(second.getId()))
+        .andExpect(jsonPath("$[4].sol").value(5))
+        .andExpect(jsonPath("$[4].events[0].id").value(third.getId()));
+  }
+
+  @Test
+  void getTimeline_shouldReturnScenarioEventsDayByDay() throws Exception {
+    ScheduledEvent event =
+        new ScheduledEvent("scenario-timeline-event", EventType.THREAT, 6, "scenario timeline");
+    scheduleService.addScenarioEvent(draft.getId(), event);
+
+    mvc.perform(
+            MockMvcRequestBuilders.get("/api/events/timeline")
+                .param("context", "scenario")
+                .param("contextId", draft.getId()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(30))
+        .andExpect(jsonPath("$[5].sol").value(6))
+        .andExpect(jsonPath("$[5].events[?(@.id == 'scenario-timeline-event')]").exists());
+  }
+
+  @Test
   void postAndDeleteEvents_shouldWorkForScheduleAndReturnUpdatedList() throws Exception {
     ScheduledEvent event =
         new ScheduledEvent("schedule-event", EventType.THREAT, 4, "schedule event");

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import miasi.backend.api.jsons.EventTimelineDayResponse;
 import miasi.backend.domains.schedule.ScheduleService;
 import miasi.backend.domains.schedule.ScheduledEvent;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,20 @@ public class CalendarEventsController {
       @RequestParam String context, @RequestParam String contextId) {
     EventContext parsedContext = EventContext.from(context);
     return ResponseEntity.ok(getEventsFor(parsedContext, contextId));
+  }
+
+  @GetMapping("/timeline")
+  @Operation(
+      summary = "Pobiera eventy dzień po dniu",
+      description =
+          "Zwraca timeline z wpisem dla każdego solu. Każdy dzień zawiera listę eventów z planu"
+              + " misji albo draftu scenariusza.")
+  public ResponseEntity<List<EventTimelineDayResponse>> getTimeline(
+      @RequestParam String context, @RequestParam String contextId) {
+    EventContext parsedContext = EventContext.from(context);
+    return ResponseEntity.ok(
+        EventTimelineDayResponse.from(
+            getEventsFor(parsedContext, contextId), getDurationFor(parsedContext, contextId)));
   }
 
   @PostMapping
@@ -98,6 +113,13 @@ public class CalendarEventsController {
     return switch (context) {
       case SCHEDULE -> scheduleService.getScheduleEvents(contextId);
       case SCENARIO -> scheduleService.getScenarioEvents(contextId);
+    };
+  }
+
+  private int getDurationFor(EventContext context, String contextId) {
+    return switch (context) {
+      case SCHEDULE -> scheduleService.getSchedule(contextId).getDurationSols();
+      case SCENARIO -> scheduleService.getScenarioDraft(contextId).getDurationSols();
     };
   }
 
