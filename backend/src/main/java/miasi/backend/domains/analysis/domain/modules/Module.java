@@ -4,7 +4,6 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
-import miasi.backend.domains.analysis.domain.core.DailyBalance;
 import miasi.backend.domains.analysis.domain.core.Resource;
 
 @Value
@@ -14,8 +13,11 @@ public class Module {
   String id;
   String name;
   float weight;
+
   int minCount;
-  Integer maxCount;
+
+  @Builder.Default
+  int maxCount = -1;
 
   List<Resource> production;
   List<Resource> consumption;
@@ -25,7 +27,6 @@ public class Module {
 
   @With
   float efficiency;
-
 
   public Module copy() {
     List<Resource> productionCopy = this.production != null ?

@@ -11,6 +11,6 @@ public class OptimalConfiguration {
   List<Module> optimalModules;
   List<Resource> startingResources;
   float totalWeight;
-  boolean isWeightLimitExceeded;
+  Boolean isWeightLimitExceeded;
 
 }

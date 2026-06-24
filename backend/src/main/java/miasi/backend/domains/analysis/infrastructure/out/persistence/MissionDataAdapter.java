@@ -59,7 +59,6 @@ public class MissionDataAdapter implements IMissionDataProviderPort {
             .name(oldMod.getName())
             .weight(oldMod.getWeight())
             .minCount(0)
-            .maxCount(null)
             .production(mapResources(oldMod.getResourceProduction()))
             .consumption(mapResources(oldMod.getResourceConsumption()))
             .status(ModuleState.ACTIVE)
