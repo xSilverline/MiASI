@@ -5,10 +5,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import java.net.URI;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.OptionalInt;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.common.domain.model.ModuleState;
 import miasi.backend.common.domain.model.ResourceType;
@@ -18,14 +14,26 @@ import miasi.backend.configuration.application.port.in.GetModuleCatalogUseCase;
 import miasi.backend.configuration.application.port.in.ManageMissionPlanUseCase;
 import miasi.backend.configuration.application.port.in.ManageModuleCatalogUseCase;
 import miasi.backend.configuration.domain.model.MissionPlan;
-import miasi.backend.configuration.domain.model.ModuleCatalog;
+import miasi.backend.configuration.domain.model.Module;
 import miasi.backend.configuration.domain.model.ModuleCategory;
 import miasi.backend.configuration.infrastructure.in.web.dto.ConfigurationRequestMapper;
 import miasi.backend.configuration.infrastructure.in.web.dto.MissionPlanRequest;
-import miasi.backend.configuration.infrastructure.in.web.dto.ModuleRequest;
-import miasi.backend.configuration.infrastructure.in.web.dto.ModuleTypeRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.OptionalInt;
+
 
 @CrossOrigin(origins = "http://localhost:*") // TODO: do zmiany gdy będą znane porty frontendu
 @RestController
@@ -45,11 +53,11 @@ public class ConfController {
 
   @GetMapping("/{missionId}/plan")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Plan misji został znaleziony"),
-    @ApiResponse(
-        responseCode = "404",
-        description = "Nie znaleziono planu misji o podanym id",
-        content = @Content)
+      @ApiResponse(responseCode = "200", description = "Plan misji został znaleziony"),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Nie znaleziono planu misji o podanym id",
+          content = @Content)
   })
   @Operation(
       summary = "Pobiera plan misji o podanym id",
@@ -67,7 +75,7 @@ public class ConfController {
       description =
           "Zwraca dostępne moduły oraz typy modułów. Typ opisuje produkcję i zużycie zasobów,"
               + " a kategoria jest stałym enumem przypisanym do konkretnego modułu.")
-  public ResponseEntity<ModuleCatalog> getModuleCatalog() {
+  public ResponseEntity<List<Module>> getModuleCatalog() {
     return ResponseEntity.ok(getModuleCatalogUseCase.getModuleCatalog());
   }
 
@@ -78,11 +86,11 @@ public class ConfController {
               + " Jeżeli podano błedne id, zwrócony zostaje komunikat NOT FOUND."
               + " Zwraca id utworzonego/nadpisanego planu jako 'message'")
   @ApiResponses({
-    @ApiResponse(responseCode = "201", description = "Plan został utworzony"),
-    @ApiResponse(
-        responseCode = "404",
-        description = "Nie znaleziono planu do nadpisania",
-        content = @Content)
+      @ApiResponse(responseCode = "201", description = "Plan został utworzony"),
+      @ApiResponse(
+          responseCode = "404",
+          description = "Nie znaleziono planu do nadpisania",
+          content = @Content)
   })
   @PostMapping("/plan")
   public ResponseEntity<BasicResponseEntity> postMissionPlan(
@@ -117,24 +125,13 @@ public class ConfController {
       description =
           "Dodaje moduł do bazy danych, jeżeli nazwa będzie taka sama,"
               + " jak element w bazie, zostanie on nadpisany")
-  public ResponseEntity<BasicResponseEntity> postModule(@Valid @RequestBody ModuleRequest request) {
-    int id = manageModuleCatalogUseCase.addModule(ConfigurationRequestMapper.toDomain(request));
+  public ResponseEntity<BasicResponseEntity> postModule(
+      @RequestBody Module module
+  ) {
+    int id = manageModuleCatalogUseCase.addModule(module);
 
-    return ResponseEntity.created(URI.create("/api/conf/module-catalog"))
-        .body(BasicResponseEntity.success(Integer.toString(id)));
-  }
-
-  @PostMapping("/module-type")
-  @ApiResponses({@ApiResponse(responseCode = "201", description = "Typ modułu został dodany")})
-  @Operation(
-      description =
-          "Dodaje typ moduły do bazy danych, jeżeli nazwa będzie taka sama,"
-              + " jak element w bazie, zostanie on nadpisany")
-  public ResponseEntity<BasicResponseEntity> postModuleType(
-      @Valid @RequestBody ModuleTypeRequest request) {
-    int id = manageModuleCatalogUseCase.addModuleType(ConfigurationRequestMapper.toDomain(request));
-
-    return ResponseEntity.created(URI.create("/api/conf/module-catalog"))
+    return ResponseEntity
+        .created(URI.create("/api/conf/module-catalog"))
         .body(BasicResponseEntity.success(Integer.toString(id)));
   }
 

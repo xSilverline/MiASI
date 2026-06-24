@@ -1,8 +1,16 @@
 package miasi.backend.configuration.domain.model;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.common.domain.model.ModuleState;
+import miasi.backend.common.domain.model.ResourceType;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,18 +22,34 @@ public class Module {
   String name;
   ModuleState status;
   ModuleCategory category;
-  ModuleType type;
   float weight;
+  List<Resources> resourceConsumption;
+  List<Resources> resourceProduction;
 
   public Module() {
     name = "default_laboratory";
     status = ModuleState.ACTIVE;
-    category = ModuleCategory.SCIENCE_MODULE;
-    type = ModuleType.genSample();
+    category = ModuleCategory.UTILITY_MODULE;
     weight = 2137;
-  }
-
-  public Module(String name, ModuleState status, ModuleType type, float weight) {
-    this(name, status, ModuleCategory.UTILITY_MODULE, type, weight);
+    resourceConsumption = List.of(new Resources[]{
+        new Resources(
+            ResourceType.ENERGY,
+            1f
+        ),
+        new Resources(
+            ResourceType.WATER,
+            1f
+        )
+    });
+    resourceProduction = List.of(new Resources[]{
+        new Resources(
+            ResourceType.FOOD,
+            2.5f
+        ),
+        new Resources(
+            ResourceType.OXYGEN,
+            15
+        )
+    });
   }
 }

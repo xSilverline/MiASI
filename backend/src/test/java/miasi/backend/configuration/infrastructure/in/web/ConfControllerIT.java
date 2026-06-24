@@ -1,21 +1,12 @@
 package miasi.backend.configuration.infrastructure.in.web;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import com.jayway.jsonpath.JsonPath;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.stream.Stream;
 import miasi.backend.common.domain.model.ModuleState;
 import miasi.backend.common.domain.model.ResourceType;
 import miasi.backend.configuration.application.service.ConfigurationApplicationService;
 import miasi.backend.configuration.domain.model.MissionPlan;
 import miasi.backend.configuration.domain.model.Module;
 import miasi.backend.configuration.domain.model.ModuleCategory;
-import miasi.backend.configuration.domain.model.ModuleType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -30,16 +21,31 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @AutoConfigureMockMvc
 @SpringBootTest
 @ActiveProfiles("test")
 class ConfControllerIT {
 
-  @Autowired private MockMvc mvc;
+  @Autowired
+  private MockMvc mvc;
 
-  @Autowired private ObjectMapper objectMapper;
+  @Autowired
+  private ObjectMapper objectMapper;
 
-  @Autowired private ConfigurationApplicationService ctx;
+  @Autowired
+  private ConfigurationApplicationService ctx;
 
   // Przywracanie plików testowego database do stanu początkowego
   @AfterEach
@@ -160,34 +166,7 @@ class ConfControllerIT {
         .andExpect(jsonPath("$.status").value("success"));
     JSONAssert.assertEquals(
         objectMapper.writeValueAsString(module),
-        objectMapper.writeValueAsString(ctx.getModuleCatalog().moduleList().get(id)),
-        true);
-  }
-
-  @Test
-  void postModuleType() throws Exception {
-    // Given
-    ModuleType type = ModuleType.genSample();
-    String requestJson = objectMapper.writeValueAsString(type);
-
-    // When
-    ResultActions result =
-        mvc.perform(
-            MockMvcRequestBuilders.post("/api/conf/module-type")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestJson));
-    int id =
-        Integer.parseInt(
-            JsonPath.read(result.andReturn().getResponse().getContentAsString(), "$.message"));
-
-    // Then
-    result
-        .andExpect(status().isCreated())
-        .andExpect(header().exists("Location"))
-        .andExpect(jsonPath("$.status").value("success"));
-    JSONAssert.assertEquals(
-        objectMapper.writeValueAsString(type),
-        objectMapper.writeValueAsString(ctx.getModuleCatalog().typeList().get(id)),
+        objectMapper.writeValueAsString(ctx.getModuleCatalog().get(id)),
         true);
   }
 

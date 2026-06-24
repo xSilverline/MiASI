@@ -1,13 +1,11 @@
 package miasi.backend.configuration.application.port.out;
 
 import miasi.backend.configuration.domain.model.Module;
-import miasi.backend.configuration.domain.model.ModuleCatalog;
-import miasi.backend.configuration.domain.model.ModuleType;
+
+import java.util.List;
 
 public interface ModuleRepositoryPort {
   int add(Module module);
 
-  int add(ModuleType type);
-
-  ModuleCatalog getCatalog();
+  List<Module> getCatalog();
 }

@@ -1,7 +1,5 @@
 package miasi.backend.configuration.application.service;
 
-import java.util.Optional;
-import java.util.OptionalInt;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.configuration.application.port.in.GetMissionPlanUseCase;
 import miasi.backend.configuration.application.port.in.GetModuleCatalogUseCase;
@@ -12,15 +10,17 @@ import miasi.backend.configuration.application.port.out.MissionPlanRepositoryPor
 import miasi.backend.configuration.application.port.out.ModuleRepositoryPort;
 import miasi.backend.configuration.domain.model.MissionPlan;
 import miasi.backend.configuration.domain.model.Module;
-import miasi.backend.configuration.domain.model.ModuleCatalog;
-import miasi.backend.configuration.domain.model.ModuleType;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 
 @RequiredArgsConstructor
 public class ConfigurationApplicationService
     implements GetMissionPlanUseCase,
-        ManageMissionPlanUseCase,
-        GetModuleCatalogUseCase,
-        ManageModuleCatalogUseCase {
+    ManageMissionPlanUseCase,
+    GetModuleCatalogUseCase,
+    ManageModuleCatalogUseCase {
 
   private final MissionPlanRepositoryPort missionPlansRepository;
   private final ModuleRepositoryPort moduleRepository;
@@ -42,7 +42,7 @@ public class ConfigurationApplicationService
   }
 
   @Override
-  public ModuleCatalog getModuleCatalog() {
+  public List<Module> getModuleCatalog() {
     return moduleRepository.getCatalog();
   }
 
@@ -68,10 +68,5 @@ public class ConfigurationApplicationService
   @Override
   public int addModule(Module module) {
     return moduleRepository.add(module);
-  }
-
-  @Override
-  public int addModuleType(ModuleType type) {
-    return moduleRepository.add(type);
   }
 }

@@ -1,11 +1,5 @@
 package miasi.backend.analysis.application;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import miasi.backend.analysis.application.service.MissionManifestMapper;
 import miasi.backend.analysis.domain.model.input.MissionManifest;
 import miasi.backend.analysis.domain.model.schedule.ImpactTarget;
@@ -14,8 +8,7 @@ import miasi.backend.common.domain.model.ModuleState;
 import miasi.backend.common.domain.model.ResourceType;
 import miasi.backend.configuration.domain.model.MissionPlan;
 import miasi.backend.configuration.domain.model.Module;
-import miasi.backend.configuration.domain.model.ModuleCatalog;
-import miasi.backend.configuration.domain.model.ModuleType;
+import miasi.backend.configuration.domain.model.ModuleCategory;
 import miasi.backend.configuration.domain.model.Resources;
 import miasi.backend.configuration.domain.model.SexProfile;
 import miasi.backend.schedule.domain.model.DeliveryContent;
@@ -30,17 +23,25 @@ import miasi.backend.schedule.domain.model.Threat;
 import miasi.backend.schedule.domain.model.ThreatType;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 class MissionManifestMapperTest {
 
   @Test
   void toManifest_shouldMapConfigurationAndScheduleIntoAnalysisInput() {
     // given
-    ModuleType habitatType =
-        new ModuleType(
-            "habitat",
-            List.of(new Resources(ResourceType.ENERGY, 2f)),
-            List.of(new Resources(ResourceType.OXYGEN, 4f)));
-    Module habitat = new Module("habitat-1", ModuleState.ACTIVE, habitatType, 100f);
+    Module habitat = new Module(
+        "habitat-1",
+        ModuleState.ACTIVE,
+        ModuleCategory.UTILITY_MODULE,
+        100f,
+        List.of(new Resources(ResourceType.ENERGY, 2f)),
+        List.of(new Resources(ResourceType.OXYGEN, 4f)));
     MissionPlan missionPlan =
         new MissionPlan(
             List.of(
@@ -64,7 +65,7 @@ class MissionManifestMapperTest {
             .toManifest(
                 UUID.fromString("00000000-0000-0000-0000-000000000001"),
                 missionPlan,
-                new ModuleCatalog(List.of(habitat), List.of(habitatType)),
+                List.of(habitat),
                 schedule);
 
     // then

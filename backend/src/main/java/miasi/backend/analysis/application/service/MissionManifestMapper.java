@@ -1,10 +1,5 @@
 package miasi.backend.analysis.application.service;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import miasi.backend.analysis.domain.model.core.Resource;
 import miasi.backend.analysis.domain.model.crew.ConsumptionProfile;
 import miasi.backend.analysis.domain.model.crew.CrewGroup;
@@ -16,7 +11,6 @@ import miasi.backend.analysis.domain.model.schedule.ImpactType;
 import miasi.backend.common.domain.model.ModuleState;
 import miasi.backend.common.domain.model.ResourceType;
 import miasi.backend.configuration.domain.model.MissionPlan;
-import miasi.backend.configuration.domain.model.ModuleCatalog;
 import miasi.backend.configuration.domain.model.Resources;
 import miasi.backend.configuration.domain.model.SexProfile;
 import miasi.backend.schedule.domain.model.DeliveryItem;
@@ -26,12 +20,18 @@ import miasi.backend.schedule.domain.model.ScheduledEvent;
 import miasi.backend.schedule.domain.model.SupplyDelivery;
 import miasi.backend.schedule.domain.model.ThreatType;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 public class MissionManifestMapper {
 
   public MissionManifest toManifest(
       UUID manifestId,
       MissionPlan missionPlan,
-      ModuleCatalog moduleCatalog,
+      List<miasi.backend.configuration.domain.model.Module> moduleCatalog,
       MissionSchedule schedule) {
     if (manifestId == null) {
       throw new IllegalArgumentException("Manifest id is required");
@@ -42,16 +42,16 @@ public class MissionManifestMapper {
     if (schedule == null) {
       throw new IllegalArgumentException("Mission schedule is required");
     }
+    List<Module> moduleList = mapCatalog(moduleCatalog, missionPlan);
 
-    List<Module> catalog = mapCatalog(moduleCatalog, missionPlan);
     return new MissionManifest(
         manifestId,
         resolveDuration(missionPlan, schedule),
         0,
         missionPlan.getMaxStartingWeight(),
         mapCrew(missionPlan.getCrew()),
-        catalog,
-        mapDeliveries(schedule.getEvents(), catalog),
+        moduleList,
+        mapDeliveries(schedule.getEvents(), moduleList),
         mapThreats(schedule.getEvents()));
   }
 
@@ -87,10 +87,10 @@ public class MissionManifestMapper {
         .toList();
   }
 
-  private List<Module> mapCatalog(ModuleCatalog moduleCatalog, MissionPlan missionPlan) {
+  private List<Module> mapCatalog(List<miasi.backend.configuration.domain.model.Module> moduleCatalog, MissionPlan missionPlan) {
     List<miasi.backend.configuration.domain.model.Module> sourceModules =
-        moduleCatalog != null && moduleCatalog.moduleList() != null
-            ? moduleCatalog.moduleList()
+        moduleCatalog != null
+            ? moduleCatalog
             : safeModules(missionPlan);
     Map<String, Integer> selectedCounts = selectedModuleCounts(missionPlan);
 
@@ -106,8 +106,8 @@ public class MissionManifestMapper {
         module.getWeight(),
         selectedCount,
         null,
-        mapResources(module.getType().getResourceProduction()),
-        mapResources(module.getType().getResourceConsumption()),
+        mapResources(module.getResourceProduction()),
+        mapResources(module.getResourceConsumption()),
         module.getStatus() == null ? ModuleState.ACTIVE : module.getStatus(),
         1.0f);
   }

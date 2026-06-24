@@ -1,26 +1,9 @@
 package miasi.backend.configuration.application;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.OptionalInt;
-import java.util.stream.Stream;
 import miasi.backend.common.domain.model.ModuleState;
-import miasi.backend.common.domain.model.ResourceType;
 import miasi.backend.configuration.application.service.ConfigurationApplicationService;
 import miasi.backend.configuration.domain.model.MissionPlan;
 import miasi.backend.configuration.domain.model.Module;
-import miasi.backend.configuration.domain.model.ModuleType;
-import miasi.backend.configuration.domain.model.Resources;
 import miasi.backend.configuration.infrastructure.out.persistence.json.MissionPlansRepository;
 import miasi.backend.configuration.infrastructure.out.persistence.json.ModuleRepository;
 import org.junit.jupiter.api.AfterAll;
@@ -30,16 +13,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.OptionalInt;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SpringBootTest
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ConfigurationApplicationServiceTest {
 
-  @Autowired private ConfigurationApplicationService configurationApplicationService;
+  @Autowired
+  private ConfigurationApplicationService configurationApplicationService;
 
-  @Autowired private MissionPlansRepository missionPlansRepository;
+  @Autowired
+  private MissionPlansRepository missionPlansRepository;
 
-  @Autowired private ModuleRepository moduleRepository;
+  @Autowired
+  private ModuleRepository moduleRepository;
 
   @AfterAll
   void restoreDatabaseFiles() throws IOException {
@@ -122,7 +121,10 @@ class ConfigurationApplicationServiceTest {
   @Test
   void addModule_shouldPersistInRepository() {
     // given
-    Module module = new Module("test2", ModuleState.PARTIALLY_DAMAGED, ModuleType.genSample(), 12);
+    Module module = new Module();
+    module.setName("test2");
+    module.setStatus(ModuleState.PARTIALLY_DAMAGED);
+    module.setWeight(12);
     int sizeBefore = moduleRepository.getModules().size();
 
     // when
@@ -138,7 +140,10 @@ class ConfigurationApplicationServiceTest {
   @Test
   void addModule_shouldOverrideSameName() {
     // given
-    Module module = new Module("test", ModuleState.PARTIALLY_DAMAGED, ModuleType.genSample(), 12);
+    Module module = new Module();
+    module.setName("test");
+    module.setStatus(ModuleState.PARTIALLY_DAMAGED);
+    module.setWeight(12);
     configurationApplicationService.addModule(module);
     int sizeBefore = moduleRepository.getModules().size();
 
@@ -152,43 +157,6 @@ class ConfigurationApplicationServiceTest {
     assertEquals(sizeBefore, moduleRepository.getModules().size());
     assertNotNull(moduleRepository.getModules().get(id));
     assertEquals(changedState, moduleRepository.getModules().get(id).getStatus());
-  }
-
-  @Test
-  void addModuleType_shouldPersistInRepository() {
-    // given
-    ModuleType type = new ModuleType();
-    int sizeBefore = moduleRepository.getModuleTypes().size();
-
-    // when
-    int id = configurationApplicationService.addModuleType(type);
-
-    // then
-    assertTrue(id >= 0);
-    assertTrue(moduleRepository.getModuleTypes().size() >= sizeBefore);
-    assertNotNull(moduleRepository.getModuleTypes().get(id));
-    assertEquals(type, moduleRepository.getModuleTypes().get(id));
-  }
-
-  @Test
-  void addModuleType_shouldOverrideSameName() {
-    // given
-    ModuleType type = ModuleType.genSample();
-    type.setName("test");
-    configurationApplicationService.addModuleType(type);
-    int sizeBefore = moduleRepository.getModuleTypes().size();
-
-    // when
-    List<Resources> changedState = new ArrayList<>();
-    changedState.add(new Resources(ResourceType.OXYGEN, 12));
-    type.setResourceConsumption(changedState);
-    int id = configurationApplicationService.addModuleType(type);
-
-    // then
-    assertTrue(id >= 0);
-    assertEquals(sizeBefore, moduleRepository.getModuleTypes().size());
-    assertNotNull(moduleRepository.getModuleTypes().get(id));
-    assertEquals(changedState, moduleRepository.getModuleTypes().get(id).getResourceConsumption());
   }
 
   @Test

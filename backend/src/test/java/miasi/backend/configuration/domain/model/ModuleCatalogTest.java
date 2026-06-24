@@ -9,11 +9,11 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 class ModuleCatalogTest {
-  @Autowired ConfigurationApplicationService ctx;
+  @Autowired
+  ConfigurationApplicationService ctx;
 
   @Test
   void saveModule() {
     ctx.addModule(new Module());
-    ctx.addModuleType(ModuleType.genSample());
   }
 }
