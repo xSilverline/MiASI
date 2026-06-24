@@ -1,9 +1,9 @@
 package miasi.backend.eventListners;
 
 import lombok.RequiredArgsConstructor;
-import miasi.backend.domains.analysis.baseline.BaselineAnalysisCompletedEvent;
-import miasi.backend.domains.analysis.simulation.MissionFailureDetectedEvent;
-import miasi.backend.domains.analysis.simulation.SimulationAnalysisCompletedEvent;
+import miasi.backend.domains.analysis.domain._payload.PayloadOptimizationCompletedEvent;
+import miasi.backend.domains.analysis.domain._simulation.NominalSimulationCompletedEvent;
+import miasi.backend.domains.analysis.domain._simulation.ScenariosAnalysisCompletedEvent;
 import miasi.backend.domains.visualization.VisualizationAnalysisEventInbox;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -11,20 +11,21 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class VisualizationAnalysisEventListener {
+
   private final VisualizationAnalysisEventInbox inbox;
 
   @EventListener
-  public void onBaselineAnalysisCompleted(BaselineAnalysisCompletedEvent event) {
+  public void onPayloadOptimizationCompleted(PayloadOptimizationCompletedEvent event) {
     inbox.record(event);
   }
 
   @EventListener
-  public void onSimulationAnalysisCompleted(SimulationAnalysisCompletedEvent event) {
+  public void onNominalSimulationCompleted(NominalSimulationCompletedEvent event) {
     inbox.record(event);
   }
 
   @EventListener
-  public void onMissionFailureDetected(MissionFailureDetectedEvent event) {
+  public void onScenariosAnalysisCompleted(ScenariosAnalysisCompletedEvent event) {
     inbox.record(event);
   }
 }

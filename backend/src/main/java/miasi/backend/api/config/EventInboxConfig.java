@@ -1,6 +1,6 @@
 package miasi.backend.api.config;
 
-import miasi.backend.domains.analisis.AnalysisScheduleEventInbox;
+import miasi.backend.domains.analysis.AnalysisScheduleEventInbox;
 import miasi.backend.domains.schedule.MissionPlanEventInbox;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
