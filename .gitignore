@@ -2,3 +2,5 @@
 *.iml
 backend/target
 out
+backend/.mvn/apache-maven-*/
+backend/.mvn/apache-maven-*.zip

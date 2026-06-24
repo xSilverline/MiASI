@@ -12,11 +12,15 @@ import miasi.backend.domains.configuration.enums.ResourceType;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
 import miasi.backend.domains.configuration.modules.ModuleCategory;
+import miasi.backend.domains.schedule.EventDefinition;
+import miasi.backend.domains.schedule.enums.EventType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,12 +64,63 @@ public class ConfController {
   }
 
   @GetMapping("/module-catalog")
-  @Operation(
-      summary = "Pobiera katalog modułów",
-      description = "Zwraca moduły dostępne do konfiguracji misji. Kategoria modułu jest stałą wartością enum ModuleCategory przypisaną do modułu, a produkcja i zużycie zasobów są osobnymi polami modułu."
-  )
   public ResponseEntity<List<Module>> getModuleCatalog() {
     return ResponseEntity.ok(confService.getModuleCatalog());
+  }
+
+  @GetMapping("/event-catalog")
+  @Operation(
+      summary = "Pobiera katalog predefiniowanych eventów",
+      description = "Zwraca słownik eventów zdefiniowanych przez użytkownika. Te definicje nie są jeszcze wpisami w harmonogramie; frontend może wybrać definicję i dopiero potem dodać ją do schedule albo scenario z konkretnym solem."
+  )
+  public ResponseEntity<List<EventDefinition>> getEventCatalog() {
+    return ResponseEntity.ok(confService.getEventCatalog());
+  }
+
+  @PostMapping("/event-catalog")
+  @Operation(
+      summary = "Dodaje predefinicję eventu",
+      description = "Dodaje event do katalogu konfiguracyjnego. Jeżeli id nie zostanie podane, backend wygeneruje je automatycznie."
+  )
+  public ResponseEntity<EventDefinition> postEventDefinition(
+      @RequestBody EventDefinition event
+  ) {
+    EventDefinition saved = confService.addEventDefinition(event);
+    return ResponseEntity
+        .created(URI.create("/api/conf/event-catalog/%s".formatted(saved.getId())))
+        .body(saved);
+  }
+
+  @PutMapping("/event-catalog/{eventId}")
+  @Operation(
+      summary = "Aktualizuje predefinicję eventu",
+      description = "Aktualizuje zapisaną w katalogu definicję eventu. Operacja nie zmienia eventów już dodanych do harmonogramów ani draftów scenariuszy."
+  )
+  public ResponseEntity<EventDefinition> updateEventDefinition(
+      @PathVariable String eventId,
+      @RequestBody EventDefinition event
+  ) {
+    return ResponseEntity.ok(confService.updateEventDefinition(eventId, event));
+  }
+
+  @DeleteMapping("/event-catalog/{eventId}")
+  @Operation(
+      summary = "Usuwa predefinicję eventu",
+      description = "Usuwa event z katalogu konfiguracyjnego. Operacja nie usuwa eventów już wpisanych do harmonogramów ani draftów scenariuszy."
+  )
+  public ResponseEntity<BasicResponseEntity> deleteEventDefinition(@PathVariable String eventId) {
+    return confService.deleteEventDefinition(eventId)
+        ? ResponseEntity.ok(BasicResponseEntity.success("Event definition removed"))
+        : ResponseEntity.notFound().build();
+  }
+
+  @GetMapping("/event-types")
+  @Operation(
+      summary = "Pobiera typy eventów",
+      description = "Zwraca stałą listę typów eventów używaną przy tworzeniu predefinicji i wpisów harmonogramu."
+  )
+  public ResponseEntity<EventType[]> getEventTypes() {
+    return ResponseEntity.ok(EventType.values());
   }
 
   @Operation(
@@ -134,10 +189,6 @@ public class ConfController {
   }
 
   @GetMapping("/module-categories")
-  @Operation(
-      summary = "Pobiera dostępne kategorie modułów",
-      description = "Kategorie modułów nie są tworzone przez API. Frontend powinien korzystać z tej stałej listy enumów przy dodawaniu modułu."
-  )
   public ResponseEntity<ModuleCategory[]> getCategories() {
     return ResponseEntity.ok(ModuleCategory.values());
   }

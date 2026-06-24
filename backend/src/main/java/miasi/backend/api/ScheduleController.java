@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:*")
 @RestController
@@ -53,6 +54,15 @@ public class ScheduleController {
       @PathVariable String scheduleId, @RequestParam(required = false) EventType type) {
     MissionTimeline timeline = scheduleService.getTimeline(scheduleId);
     return ResponseEntity.ok(type == null ? timeline : timeline.filterByType(type));
+  }
+
+  @GetMapping("/{scheduleId}/events")
+  @Operation(
+      summary = "Pobiera eventy harmonogramu",
+      description = "Zwraca listę eventów przypisanych do konkretnego harmonogramu, posortowaną po solu."
+  )
+  public ResponseEntity<List<ScheduledEvent>> getScheduleEvents(@PathVariable String scheduleId) {
+    return ResponseEntity.ok(scheduleService.getScheduleEvents(scheduleId));
   }
 
   @PostMapping("/{scheduleId}/events")
@@ -118,6 +128,38 @@ public class ScheduleController {
   )
   public ResponseEntity<ScenarioDraft> getScenarioDraft(@PathVariable String draftId) {
     return ResponseEntity.ok(scheduleService.getScenarioDraft(draftId));
+  }
+
+  @GetMapping("/scenario/{draftId}/events")
+  @Operation(
+      summary = "Pobiera eventy draftu scenariusza",
+      description = "Zwraca eventy z tymczasowego draftu scenariusza wskazanego przez draftId."
+  )
+  public ResponseEntity<List<ScheduledEvent>> getScenarioEvents(@PathVariable String draftId) {
+    return ResponseEntity.ok(scheduleService.getScenarioEvents(draftId));
+  }
+
+  @PostMapping("/scenario/{draftId}/events")
+  @Operation(
+      summary = "Dodaje event do draftu scenariusza",
+      description = "Dodaje konkretne wystąpienie eventu do tymczasowego draftu scenariusza. Predefinicje eventów są zarządzane osobno w /api/conf/event-catalog."
+  )
+  public ResponseEntity<ScenarioDraft> addScenarioEvent(
+      @PathVariable String draftId,
+      @RequestBody ScheduledEvent event) {
+    return ResponseEntity.ok(scheduleService.addScenarioEvent(draftId, event));
+  }
+
+  @DeleteMapping("/scenario/{draftId}/events/{eventId}")
+  @Operation(
+      summary = "Usuwa event z draftu scenariusza",
+      description = "Usuwa konkretne wystąpienie eventu z tymczasowego draftu scenariusza."
+  )
+  public ResponseEntity<BasicResponseEntity> removeScenarioEvent(
+      @PathVariable String draftId,
+      @PathVariable String eventId) {
+    scheduleService.removeScenarioEvent(draftId, eventId);
+    return ResponseEntity.ok(BasicResponseEntity.success("Scenario event removed"));
   }
 
   @PutMapping("/scenario/{draftId}/events/{eventId}")

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "dust-storm",
+    "name": "Dust storm",
+    "type": "THREAT",
+    "description": "Dust storm event available as a mission schedule preset."
+  },
+  {
+    "id": "supply-delivery",
+    "name": "Supply delivery",
+    "type": "SUPPLY_DELIVERY",
+    "description": "Supply delivery event available as a mission schedule preset."
+  }
+]

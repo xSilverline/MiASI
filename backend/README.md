@@ -2,11 +2,32 @@
 - JDK 21+
 - Maven 3.9+
 
-# Tests:
+# Local run
 
-0. Make sure you are in terminal "MiASI/backend" directory
-1. Run:
-    ```bash
-   mvn clean verify 
-   ```
-2. Open [target/site/jacoco/index.html](target/site/jacoco/index.html) and check % coverage of tests
+Run commands from the backend directory (`MiASI/backend`), because JSON database
+paths are configured relative to that module.
+
+```powershell
+cd backend
+mvn "-Djava.version=21" "-Dspotless.check.skip=true" spring-boot:run
+```
+
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+# Focused API tests
+
+```powershell
+cd backend
+mvn "-Djava.version=21" "-Dspotless.check.skip=true" "-Dtest=ConfControllerIT,ScheduleControllerIT" test
+```
+
+# Full verification
+
+`mvn clean verify` currently runs Spotless for the whole codebase. On the current
+branch it can fail on pre-existing formatting violations in files unrelated to
+the catalog API changes. Run it only after formatting the whole backend or after
+updating the Spotless configuration.

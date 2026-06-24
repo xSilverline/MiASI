@@ -35,6 +35,10 @@ public class ScheduleService {
     return getSchedule(scheduleId).timeline();
   }
 
+  public List<ScheduledEvent> getScheduleEvents(String scheduleId) {
+    return getTimeline(scheduleId).getEventsSortedBySol();
+  }
+
   public MissionSchedule addEvent(String scheduleId, ScheduledEvent event) {
     MissionSchedule schedule = getSchedule(scheduleId);
     validateEventScheduling(schedule, event);
@@ -83,6 +87,22 @@ public class ScheduleService {
       throw new NoSuchElementException("Scenario draft not found: " + draftId);
     }
     return draft;
+  }
+
+  public List<ScheduledEvent> getScenarioEvents(String draftId) {
+    ScenarioDraft draft = getScenarioDraft(draftId);
+    List<ScheduledEvent> events = draft.getProposedEvents();
+    return events == null ? List.of() : List.copyOf(events);
+  }
+
+  public ScenarioDraft addScenarioEvent(String draftId, ScheduledEvent event) {
+    ScenarioDraft draft = getScenarioDraft(draftId);
+    draft.addEvent(event);
+    return draft;
+  }
+
+  public void removeScenarioEvent(String draftId, String eventId) {
+    getScenarioDraft(draftId).removeEvent(eventId);
   }
 
   public ScenarioDraft correctScenarioEvent(

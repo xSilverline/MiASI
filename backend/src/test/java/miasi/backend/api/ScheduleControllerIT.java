@@ -134,6 +134,24 @@ class ScheduleControllerIT {
         ));
   }
 
+  @Test
+  void getScheduleEvents() throws Exception {
+    // Given
+    scheduleService.addEvent(schedule.getId(), event);
+
+    // When
+    ResultActions result = mvc.perform(
+        MockMvcRequestBuilders.get("/api/schedule/%s/events"
+            .formatted(schedule.getId()))
+    );
+
+    // Then
+    result
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(event.getId()))
+        .andExpect(jsonPath("$[0].type").value(event.getType().name()));
+  }
+
 
   @Test
   void addEvent() throws Exception {
@@ -204,6 +222,60 @@ class ScheduleControllerIT {
         .andExpect(content().json(
             objectMapper.writeValueAsString(draft)
         ));
+  }
+
+  @Test
+  void getScenarioEvents() throws Exception {
+    // Given
+    String eventId = draft.getProposedEvents().getFirst().getId();
+
+    // When
+    ResultActions result = mvc.perform(
+        MockMvcRequestBuilders.get("/api/schedule/scenario/%s/events"
+            .formatted(draft.getId()))
+    );
+
+    // Then
+    result
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(eventId));
+  }
+
+  @Test
+  void addScenarioEvent() throws Exception {
+    // Given
+    ScheduledEvent scenarioEvent =
+        new ScheduledEvent("scenario-custom-event", EventType.THREAT, 4, "custom scenario event");
+
+    // When
+    ResultActions result = mvc.perform(
+        MockMvcRequestBuilders.post("/api/schedule/scenario/%s/events"
+                .formatted(draft.getId()))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(scenarioEvent))
+    );
+
+    // Then
+    result
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.proposedEvents[?(@.id == 'scenario-custom-event')]").exists());
+  }
+
+  @Test
+  void removeScenarioEvent() throws Exception {
+    // Given
+    String eventId = draft.getProposedEvents().getFirst().getId();
+
+    // When
+    ResultActions result = mvc.perform(
+        MockMvcRequestBuilders.delete("/api/schedule/scenario/%s/events/%s"
+            .formatted(draft.getId(), eventId))
+    );
+
+    // Then
+    result
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("success"));
   }
 
   @Test
