@@ -5,4 +5,5 @@ backend/.mvn/apache-maven-*
 backend/.mvn/*.zip
 frontend/node_modules
 frontend/dist
-out
+.mvn
+backend/out
