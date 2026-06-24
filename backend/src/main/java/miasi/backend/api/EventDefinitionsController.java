@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.api.config.ConfService;
 import miasi.backend.api.jsons.BasicResponseEntity;
+import miasi.backend.api.jsons.EventDefinitionsCatalogResponse;
 import miasi.backend.domains.schedule.EventDefinition;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,6 +35,15 @@ public class EventDefinitionsController {
               + " umieszczone w kalendarzu.")
   public ResponseEntity<List<EventDefinition>> getEventDefinitions() {
     return ResponseEntity.ok(confService.getEventCatalog());
+  }
+
+  @GetMapping("/catalog")
+  @Operation(
+      summary = "Pobiera katalog definicji eventów podzielony na typy",
+      description =
+          "Zwraca obiekt z listami deliveries i threats, wygodny do zasilenia widoku frontendu.")
+  public ResponseEntity<EventDefinitionsCatalogResponse> getEventDefinitionsCatalog() {
+    return ResponseEntity.ok(EventDefinitionsCatalogResponse.from(confService.getEventCatalog()));
   }
 
   @PostMapping

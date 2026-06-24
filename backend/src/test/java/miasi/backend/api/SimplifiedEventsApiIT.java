@@ -1,5 +1,6 @@
 package miasi.backend.api;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -237,5 +238,49 @@ class SimplifiedEventsApiIT {
                 "/api/event-definitions/%s".formatted(eventDefinitionId)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status").value("success"));
+  }
+
+  @Test
+  void eventDefinitionsCatalog_shouldReturnDeliveriesAndThreatsObject() throws Exception {
+    EventDefinition delivery =
+        new EventDefinition(
+            "frontend-supply",
+            "Frontend supply",
+            EventType.SUPPLY_DELIVERY,
+            "Supply delivery",
+            null,
+            null,
+            List.of(
+                new EventEffect("WATER", 1000.0, "KG", "Water delivered"),
+                new EventEffect("FOOD", 2000.0, "KG", "Food delivered")));
+    EventDefinition threat =
+        new EventDefinition(
+            "frontend-threat",
+            "Frontend threat",
+            EventType.THREAT,
+            "Threat",
+            "solar-panels",
+            "reduced power",
+            List.of(new EventEffect("ENERGY", -10.0, "PERCENT", "Reduced power")));
+
+    mvc.perform(
+            MockMvcRequestBuilders.post("/api/event-definitions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(delivery)))
+        .andExpect(status().isCreated());
+    mvc.perform(
+            MockMvcRequestBuilders.post("/api/event-definitions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(threat)))
+        .andExpect(status().isCreated());
+
+    mvc.perform(MockMvcRequestBuilders.get("/api/event-definitions/catalog"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.deliveries[?(@.id == 'frontend-supply')]").exists())
+        .andExpect(jsonPath("$.deliveries[?(@.id == 'frontend-supply')].effects[0].target")
+            .value(hasItem("WATER")))
+        .andExpect(jsonPath("$.threats[?(@.id == 'frontend-threat')]").exists())
+        .andExpect(jsonPath("$.threats[?(@.id == 'frontend-threat')].effects[0].target")
+            .value(hasItem("ENERGY")));
   }
 }
