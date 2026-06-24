@@ -3,6 +3,7 @@ package miasi.backend.domains.schedule;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.schedule.enums.ScheduleStatus;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@NoArgsConstructor
 public class MissionSchedule {
   String id;
   String missionPlanId;

@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Stream;
+import miasi.backend.api.jsons.EventTimelineDayResponse;
 import miasi.backend.domains.schedule.EventEffect;
 import miasi.backend.domains.schedule.EventDefinition;
 import miasi.backend.domains.schedule.MissionSchedule;
@@ -22,6 +23,7 @@ import miasi.backend.domains.schedule.ScheduledEvent;
 import miasi.backend.domains.schedule.enums.DifficultyLevel;
 import miasi.backend.domains.schedule.enums.EventType;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,12 @@ class SimplifiedEventsApiIT {
   @Autowired private ObjectMapper objectMapper;
 
   @Autowired private ScheduleService scheduleService;
+
+  @Value("${database.filename.schedules}")
+  private String schedulesFile;
+
+  @Value("${database.filename.scenario.drafts}")
+  private String scenarioDraftsFile;
 
   private MissionSchedule schedule;
   private ScenarioDraft draft;
@@ -138,6 +146,65 @@ class SimplifiedEventsApiIT {
         .andExpect(jsonPath("$.length()").value(30))
         .andExpect(jsonPath("$[5].sol").value(6))
         .andExpect(jsonPath("$[5].events[?(@.id == 'scenario-timeline-event')]").exists());
+  }
+
+  @Test
+  void putTimeline_shouldReplaceScheduleEventsDayByDayAndPersist() throws Exception {
+    scheduleService.addEvent(
+        schedule.getId(), new ScheduledEvent("old-event", EventType.THREAT, 1, "old"));
+    List<EventTimelineDayResponse> timeline =
+        List.of(
+            new EventTimelineDayResponse(
+                2, List.of(new ScheduledEvent("put-threat", EventType.THREAT, 99, "put threat"))),
+            new EventTimelineDayResponse(
+                4,
+                List.of(
+                    new ScheduledEvent(
+                        "put-delivery", EventType.SUPPLY_DELIVERY, 4, "put delivery"))));
+
+    mvc.perform(
+            MockMvcRequestBuilders.put("/api/events/timeline")
+                .param("context", "schedule")
+                .param("contextId", schedule.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(timeline)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(30))
+        .andExpect(jsonPath("$[0].events").isEmpty())
+        .andExpect(jsonPath("$[1].events[0].id").value("put-threat"))
+        .andExpect(jsonPath("$[1].events[0].sol").value(2))
+        .andExpect(jsonPath("$[3].events[0].id").value("put-delivery"));
+
+    String savedSchedules = Files.readString(Path.of(schedulesFile));
+    Assertions.assertTrue(savedSchedules.contains("put-threat"));
+    Assertions.assertFalse(savedSchedules.contains("old-event"));
+  }
+
+  @Test
+  void patchTimelineDay_shouldReplaceScenarioDayAndPersist() throws Exception {
+    scheduleService.addScenarioEvent(
+        draft.getId(), new ScheduledEvent("patch-old", EventType.THREAT, 10, "old"));
+    scheduleService.addScenarioEvent(
+        draft.getId(), new ScheduledEvent("patch-keep", EventType.THREAT, 11, "keep"));
+    EventTimelineDayResponse patchedDay =
+        new EventTimelineDayResponse(
+            10, List.of(new ScheduledEvent("patch-new", EventType.THREAT, 1, "new")));
+
+    mvc.perform(
+            MockMvcRequestBuilders.patch("/api/events/timeline/10")
+                .param("context", "scenario")
+                .param("contextId", draft.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patchedDay)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[9].events[?(@.id == 'patch-old')]").isEmpty())
+        .andExpect(jsonPath("$[9].events[?(@.id == 'patch-new')]").exists())
+        .andExpect(jsonPath("$[9].events[?(@.id == 'patch-new')].sol").value(hasItem(10)))
+        .andExpect(jsonPath("$[10].events[?(@.id == 'patch-keep')]").exists());
+
+    String savedDrafts = Files.readString(Path.of(scenarioDraftsFile));
+    Assertions.assertTrue(savedDrafts.contains("patch-new"));
+    Assertions.assertFalse(savedDrafts.contains("patch-old"));
   }
 
   @Test
