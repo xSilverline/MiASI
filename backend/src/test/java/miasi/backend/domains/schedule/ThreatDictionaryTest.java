@@ -1,14 +1,13 @@
 package miasi.backend.domains.schedule;
 
-import miasi.backend.domains.schedule.enums.DifficultyLevel;
-import miasi.backend.domains.schedule.enums.ThreatType;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.ThreatType;
+import org.junit.jupiter.api.Test;
 
 class ThreatDictionaryTest {
 
@@ -64,6 +63,12 @@ class ThreatDictionaryTest {
 
   private ThreatDefinition definition(String affectedElement, DifficultyLevel difficulty) {
     return new ThreatDefinition(
-        ThreatType.DUST_STORM, difficulty, affectedElement, 1.0, 3.0, "days");
+        ThreatType.DUST_STORM,
+        difficulty,
+        affectedElement,
+        "reduced operational capacity",
+        1.0,
+        3.0,
+        "days");
   }
 }

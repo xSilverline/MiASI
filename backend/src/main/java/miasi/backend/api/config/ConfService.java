@@ -1,5 +1,6 @@
 package miasi.backend.api.config;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.modules.Module;
@@ -7,8 +8,6 @@ import miasi.backend.domains.configuration.ports.IConfigurationEventPublisherPor
 import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
 import miasi.backend.domains.configuration.ports.IModuleRepositoryPort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

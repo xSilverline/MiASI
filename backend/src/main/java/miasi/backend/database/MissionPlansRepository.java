@@ -1,12 +1,11 @@
 package miasi.backend.database;
 
+import java.util.ArrayList;
+import java.util.List;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import miasi.backend.domains.configuration.ports.IMissionPlanRepositoryPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 public class MissionPlansRepository implements IMissionPlanRepositoryPort {
@@ -15,15 +14,9 @@ public class MissionPlansRepository implements IMissionPlanRepositoryPort {
 
   JsonFileStorage<MissionPlan> database = new JsonFileStorage<>(MissionPlan.class);
 
-  public MissionPlansRepository(
-      @Value("${database.filename.missions}") String filePath
-  ) {
-    List<MissionPlan> plansTemp =
-        database.loadListFromFile(
-            filePath
-        );
-    if (plansTemp != null)
-      plans = plansTemp;
+  public MissionPlansRepository(@Value("${database.filename.missions}") String filePath) {
+    List<MissionPlan> plansTemp = database.loadListFromFile(filePath);
+    if (plansTemp != null) plans = plansTemp;
     this.filePath = filePath;
   }
 

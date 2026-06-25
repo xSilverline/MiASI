@@ -1,14 +1,14 @@
 package miasi.backend.domains.schedule;
 
-import miasi.backend.domains.schedule.enums.DifficultyLevel;
-import miasi.backend.domains.schedule.enums.EventType;
-import miasi.backend.domains.schedule.enums.ScheduleStatus;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.EventType;
+import miasi.backend.domains.schedule.enums.ScheduleStatus;
+import org.junit.jupiter.api.Test;
 
 class ScheduleServiceTest {
 

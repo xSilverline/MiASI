@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.net.URI;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.api.config.ConfService;
 import miasi.backend.api.jsons.BasicResponseEntity;
@@ -22,9 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.List;
-
 @CrossOrigin(origins = "http://localhost:*") // TODO: do zmiany gdy będą znane porty frontendu
 @RestController
 @RequestMapping("/api/conf")
@@ -40,20 +39,16 @@ public class ConfController {
 
   @GetMapping("/{missionId}/plan")
   @ApiResponses({
-      @ApiResponse(
-          responseCode = "200",
-          description = "Plan misji został znaleziony"
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Nie znaleziono planu misji o podanym id",
-          content = @Content
-      )
+    @ApiResponse(responseCode = "200", description = "Plan misji został znaleziony"),
+    @ApiResponse(
+        responseCode = "404",
+        description = "Nie znaleziono planu misji o podanym id",
+        content = @Content)
   })
   @Operation(
       summary = "Pobiera plan misji o podanym id",
-      description = "Plany misji mają id w przedziale [0;X), gdzie X to wynik zapytania /api/conf/plans-count"
-  )
+      description =
+          "Plany misji mają id w przedziale [0;X), gdzie X to wynik zapytania /api/conf/plans-count")
   public ResponseEntity<MissionPlan> getMissionPlan(@PathVariable int missionId) {
     MissionPlan plan = confService.getMissionPlan(missionId);
     return plan != null ? ResponseEntity.ok(plan) : ResponseEntity.notFound().build();
@@ -66,26 +61,20 @@ public class ConfController {
 
   @Operation(
       summary = "Wysyła do bazy danych nowy plan misji",
-      description = "Jeżeli parametr 'override' jest ustawiony, to plan nadpisze istniejacy plan na podanym id." +
-          " Jeżeli podano błedne id, zwrócony zostaje komunikat NOT FOUND." +
-          " Zwraca id utworzonego/nadpisanego planu jako 'message'"
-  )
+      description =
+          "Jeżeli parametr 'override' jest ustawiony, to plan nadpisze istniejacy plan na podanym id."
+              + " Jeżeli podano błedne id, zwrócony zostaje komunikat NOT FOUND."
+              + " Zwraca id utworzonego/nadpisanego planu jako 'message'")
   @ApiResponses({
-      @ApiResponse(
-          responseCode = "201",
-          description = "Plan został utworzony"
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "Nie znaleziono planu do nadpisania",
-          content = @Content
-      )
+    @ApiResponse(responseCode = "201", description = "Plan został utworzony"),
+    @ApiResponse(
+        responseCode = "404",
+        description = "Nie znaleziono planu do nadpisania",
+        content = @Content)
   })
   @PostMapping("/plan")
   public ResponseEntity<BasicResponseEntity> postMissionPlan(
-      @RequestBody MissionPlan missionPlan,
-      @RequestParam(required = false) Integer override
-  ) {
+      @RequestBody MissionPlan missionPlan, @RequestParam(required = false) Integer override) {
     Integer id;
     if (override != null) {
       id = confService.overrideMissionPlan(override, missionPlan);
@@ -96,36 +85,27 @@ public class ConfController {
       id = confService.saveMissionPlan(missionPlan);
     }
 
-    return ResponseEntity
-        .created(URI.create("/api/conf/%d/plan".formatted(id)))
+    return ResponseEntity.created(URI.create("/api/conf/%d/plan".formatted(id)))
         .body(BasicResponseEntity.success(Integer.toString(id)));
   }
 
-
   @GetMapping("plans-count")
-  @Operation(
-      description = "Zwraca ilość planów misji w bazie danych w polu 'message'"
-  )
+  @Operation(description = "Zwraca ilość planów misji w bazie danych w polu 'message'")
   public ResponseEntity<BasicResponseEntity> getMissionsCount() {
     return ResponseEntity.ok()
         .body(BasicResponseEntity.success(Integer.toString(confService.getPlansCount())));
   }
 
   @PostMapping("/module")
-  @ApiResponses({
-      @ApiResponse(responseCode = "201", description = "Moduł został dodany")
-  })
+  @ApiResponses({@ApiResponse(responseCode = "201", description = "Moduł został dodany")})
   @Operation(
-      description = "Dodaje moduł do bazy danych, jeżeli nazwa będzie taka sama," +
-          " jak element w bazie, zostanie on nadpisany"
-  )
-  public ResponseEntity<BasicResponseEntity> postModule(
-      @RequestBody Module module
-  ) {
+      description =
+          "Dodaje moduł do bazy danych, jeżeli nazwa będzie taka sama,"
+              + " jak element w bazie, zostanie on nadpisany")
+  public ResponseEntity<BasicResponseEntity> postModule(@RequestBody Module module) {
     int id = confService.addModule(module);
 
-    return ResponseEntity
-        .created(URI.create("/api/conf/module-catalog"))
+    return ResponseEntity.created(URI.create("/api/conf/module-catalog"))
         .body(BasicResponseEntity.success(Integer.toString(id)));
   }
 

@@ -1,5 +1,12 @@
 package miasi.backend.domains.configuration;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.stream.Stream;
 import miasi.backend.api.config.ConfService;
 import miasi.backend.database.MissionPlansRepository;
 import miasi.backend.database.ModuleRepository;
@@ -16,35 +23,22 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.stream.Stream;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ConfServiceTest {
 
-  @Autowired
-  private ConfService confService;
+  @Autowired private ConfService confService;
 
-  @Autowired
-  private MissionPlansRepository missionPlansRepository;
+  @Autowired private MissionPlansRepository missionPlansRepository;
 
-  @Autowired
-  private ModuleRepository moduleRepository;
+  @Autowired private ModuleRepository moduleRepository;
 
   @AfterAll
   void restoreDatabaseFiles(
-      @Value("${database.path.realdb}")
-      String changedCopy,
-      @Value("${database.path.hardcopy}")
-      String hardCopy
-  ) throws IOException {
+      @Value("${database.path.realdb}") String changedCopy,
+      @Value("${database.path.hardcopy}") String hardCopy)
+      throws IOException {
     Path sourceDir = Path.of(hardCopy);
     Path targetDir = Path.of(changedCopy);
 
@@ -52,18 +46,19 @@ class ConfServiceTest {
       files
           .filter(Files::isRegularFile)
           .filter(path -> path.toString().endsWith(".json"))
-          .forEach(source -> {
-            try {
-              Path relative = sourceDir.relativize(source);
-              Path target = targetDir.resolve(relative);
+          .forEach(
+              source -> {
+                try {
+                  Path relative = sourceDir.relativize(source);
+                  Path target = targetDir.resolve(relative);
 
-              Files.createDirectories(target.getParent());
+                  Files.createDirectories(target.getParent());
 
-              Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-              throw new UncheckedIOException(e);
-            }
-          });
+                  Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                  throw new UncheckedIOException(e);
+                }
+              });
     }
   }
 
@@ -120,24 +115,14 @@ class ConfServiceTest {
   @Test
   void addModule_shouldPersistInRepository() {
     // given
-    Module module = new Module(
-        "test2",
-        ModuleState.PARTIALLY_DAMAGED,
-        ModuleCategory.ENERGY_MODULE,
-        12,
-        List.of(new Resources[]{
-            new Resources(
-                ResourceType.WATER,
-                1f
-            )
-        }),
-        List.of(new Resources[]{
-            new Resources(
-                ResourceType.ENERGY,
-                1f
-            )
-        })
-    );
+    Module module =
+        new Module(
+            "test2",
+            ModuleState.PARTIALLY_DAMAGED,
+            ModuleCategory.ENERGY_MODULE,
+            12,
+            List.of(new Resources[] {new Resources(ResourceType.WATER, 1f)}),
+            List.of(new Resources[] {new Resources(ResourceType.ENERGY, 1f)}));
     int sizeBefore = moduleRepository.getModules().size();
 
     // when
@@ -152,24 +137,14 @@ class ConfServiceTest {
   @Test
   void addModule_shouldOverrideSameName() {
     // given
-    Module module = new Module(
-        "test",
-        ModuleState.PARTIALLY_DAMAGED,
-        ModuleCategory.ENERGY_MODULE,
-        12,
-        List.of(new Resources[]{
-            new Resources(
-                ResourceType.WATER,
-                1f
-            )
-        }),
-        List.of(new Resources[]{
-            new Resources(
-                ResourceType.ENERGY,
-                1f
-            )
-        })
-    );
+    Module module =
+        new Module(
+            "test",
+            ModuleState.PARTIALLY_DAMAGED,
+            ModuleCategory.ENERGY_MODULE,
+            12,
+            List.of(new Resources[] {new Resources(ResourceType.WATER, 1f)}),
+            List.of(new Resources[] {new Resources(ResourceType.ENERGY, 1f)}));
     confService.addModule(module);
     int sizeBefore = moduleRepository.getModules().size();
 
@@ -192,7 +167,6 @@ class ConfServiceTest {
     }
     return i;
   }
-
 
   @Test
   void getPlansCount() {

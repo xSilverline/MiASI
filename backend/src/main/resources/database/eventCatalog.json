@@ -1,0 +1,97 @@
+[ {
+  "affectedElement" : "solar-panels",
+  "consequence" : "Reduced solar energy production during the storm.",
+  "description" : "Dust storm event available as a mission schedule preset.",
+  "effects" : [ {
+    "target" : "ENERGY",
+    "value" : -10.0,
+    "unit" : "PERCENT",
+    "description" : "Reduced solar energy production during the storm."
+  } ],
+  "id" : "dust-storm",
+  "name" : "Dust storm",
+  "type" : "THREAT"
+}, {
+  "affectedElement" : null,
+  "consequence" : null,
+  "description" : "Supply delivery event available as a mission schedule preset.",
+  "effects" : [ {
+    "target" : "WATER",
+    "value" : 1000.0,
+    "unit" : "KG",
+    "description" : "Water delivered to mission storage."
+  }, {
+    "target" : "FOOD",
+    "value" : 2000.0,
+    "unit" : "KG",
+    "description" : "Food delivered to mission storage."
+  } ],
+  "id" : "supply-delivery",
+  "name" : "Supply delivery",
+  "type" : "SUPPLY_DELIVERY"
+}, {
+  "affectedElement" : "warehouse",
+  "consequence" : "Food stock increased.",
+  "description" : "Cargo lander delivers food supplies.",
+  "effects" : [ {
+    "target" : "FOOD",
+    "value" : 30.0,
+    "unit" : "KG",
+    "description" : "Extra food supply."
+  } ],
+  "id" : "fb4d380f-451f-4008-853e-3b04c777e197",
+  "name" : "Food delivery",
+  "type" : "SUPPLY_DELIVERY"
+}, {
+  "affectedElement" : "life-support",
+  "consequence" : "Oxygen reserves increased.",
+  "description" : "Cargo lander delivers oxygen tanks.",
+  "effects" : [ {
+    "target" : "OXYGEN",
+    "value" : 80.0,
+    "unit" : "L",
+    "description" : "Extra oxygen supply."
+  } ],
+  "id" : "541f9435-24da-4ef5-be23-922984bf7e3f",
+  "name" : "Oxygen delivery",
+  "type" : "SUPPLY_DELIVERY"
+}, {
+  "affectedElement" : "solar-panels",
+  "consequence" : "Energy production reduced.",
+  "description" : "Dust storm hits solar panels.",
+  "effects" : [ {
+    "target" : "ENERGY",
+    "value" : -15.0,
+    "unit" : "PERCENT",
+    "description" : "Lower energy production."
+  } ],
+  "id" : "777a8487-1bbb-47f6-9a33-03a7636681ee",
+  "name" : "Dust storm",
+  "type" : "THREAT"
+}, {
+  "affectedElement" : "water-storage",
+  "consequence" : "Water stock reduced.",
+  "description" : "Water storage leak detected.",
+  "effects" : [ {
+    "target" : "WATER",
+    "value" : -20.0,
+    "unit" : "L",
+    "description" : "Lost water."
+  } ],
+  "id" : "1d9173eb-c92d-41c1-8c26-9a7a8d07d51a",
+  "name" : "Water leak",
+  "type" : "THREAT"
+}, {
+  "affectedElement" : "habitat",
+  "consequence" : "Habitat module requires inspection.",
+  "description" : "Habitat pressure is unstable.",
+  "effects" : [ {
+    "target" : "habitat",
+    "value" : -1.0,
+    "unit" : "STATE",
+    "description" : "Module state changed."
+  } ],
+  "id" : "8c231505-6589-4962-b9db-e62f70decae2",
+  "name" : "Habitat pressure drop",
+  "type" : "MODULE_STATE_CHANGE"
+} ]

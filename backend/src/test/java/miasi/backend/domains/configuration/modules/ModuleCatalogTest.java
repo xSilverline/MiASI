@@ -9,8 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 class ModuleCatalogTest {
-  @Autowired
-  ConfService ctx;
+  @Autowired ConfService ctx;
 
   @Test
   void saveModule() {

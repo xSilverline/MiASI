@@ -1,5 +1,10 @@
 package miasi.backend.api;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.jayway.jsonpath.JsonPath;
 import miasi.backend.api.jsons.CreateScheduleRequest;
 import miasi.backend.api.jsons.GenerateScenarioRequest;
@@ -22,25 +27,16 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import tools.jackson.databind.ObjectMapper;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-
 @AutoConfigureMockMvc
 @SpringBootTest
 @ActiveProfiles("test")
 class ScheduleControllerIT {
 
-  @Autowired
-  private MockMvc mvc;
+  @Autowired private MockMvc mvc;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
-  @Autowired
-  private ScheduleService scheduleService;
+  @Autowired private ScheduleService scheduleService;
 
   private MissionSchedule schedule;
   private ScenarioDraft draft;
@@ -62,37 +58,34 @@ class ScheduleControllerIT {
     CreateScheduleRequest request = new CreateScheduleRequest("0", 10);
     String json = objectMapper.writeValueAsString(request);
 
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post("/api/schedule")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json)
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.post("/api/schedule")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json));
 
     // When
     String response = result.andReturn().getResponse().getContentAsString();
     String id = JsonPath.read(response, "$.id");
 
     // Then
-    result.andExpect(status().isCreated())
+    result
+        .andExpect(status().isCreated())
         .andExpect(header().exists("Location"))
         .andExpect(
-            content().json(objectMapper.writeValueAsString(scheduleService.getSchedule(id)))
-        );
+            content().json(objectMapper.writeValueAsString(scheduleService.getSchedule(id))));
   }
-
 
   @Test
   void getSchedule() throws Exception {
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.get("/api/schedule/" + schedule.getId())
-    );
+    ResultActions result =
+        mvc.perform(MockMvcRequestBuilders.get("/api/schedule/" + schedule.getId()));
     // Then
-    result.andExpect(status().isOk())
-        .andExpect(content().json(
-            objectMapper.writeValueAsString(schedule)
-        ));
+    result
+        .andExpect(status().isOk())
+        .andExpect(content().json(objectMapper.writeValueAsString(schedule)));
   }
 
   @Test
@@ -101,17 +94,14 @@ class ScheduleControllerIT {
     MissionTimeline timeline = scheduleService.getTimeline(schedule.getId());
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.get("/api/schedule/%s/timeline"
-            .formatted(schedule.getId()))
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.get("/api/schedule/%s/timeline".formatted(schedule.getId())));
 
     // Then
     result
         .andExpect(status().isOk())
-        .andExpect(content().json(
-            objectMapper.writeValueAsString(timeline)
-        ));
+        .andExpect(content().json(objectMapper.writeValueAsString(timeline)));
   }
 
   @Test
@@ -121,68 +111,81 @@ class ScheduleControllerIT {
     MissionTimeline timeline = scheduleService.getTimeline(schedule.getId()).filterByType(type);
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.get("/api/schedule/%s/timeline?type=%s"
-            .formatted(schedule.getId(), type))
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.get(
+                "/api/schedule/%s/timeline?type=%s".formatted(schedule.getId(), type)));
 
     // Then
     result
         .andExpect(status().isOk())
-        .andExpect(content().json(
-            objectMapper.writeValueAsString(timeline)
-        ));
+        .andExpect(content().json(objectMapper.writeValueAsString(timeline)));
   }
 
+  @Test
+  void getScheduleEvents() throws Exception {
+    // Given
+    scheduleService.addEvent(schedule.getId(), event);
+
+    // When
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.get("/api/schedule/%s/events".formatted(schedule.getId())));
+
+    // Then
+    result
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(event.getId()))
+        .andExpect(jsonPath("$[0].type").value(event.getType().name()));
+  }
 
   @Test
   void addEvent() throws Exception {
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post("/api/schedule/%s/events"
-                .formatted(schedule.getId()))
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(event))
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.post("/api/schedule/%s/events".formatted(schedule.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(event)));
 
     // Then
-    result.andExpect(status().isOk());
+    result
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.events[0].id").value(event.getId()))
+        .andExpect(jsonPath("$.events[0].type").value(event.getType().name()))
+        .andExpect(jsonPath("$.events[0].description").value(event.getDescription()));
   }
-
 
   @Test
   void removeEvent() throws Exception {
-    //Given
+    // Given
     schedule = scheduleService.addEvent(schedule.getId(), event);
     String eventId = schedule.getEvents().getFirst().getId();
 
-    //When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.delete("/api/schedule/%s/events/%s"
-            .formatted(schedule.getId(), eventId))
-    );
+    // When
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.delete(
+                "/api/schedule/%s/events/%s".formatted(schedule.getId(), eventId)));
 
     // Then
-    result.andExpect(status().isOk())
-        .andExpect(jsonPath("$.status").value("success"));
+    result.andExpect(status().isOk()).andExpect(jsonPath("$.status").value("success"));
   }
 
   @Test
   void generateScenario() throws Exception {
     // Given
-    GenerateScenarioRequest request =
-        new GenerateScenarioRequest("0", 10, DifficultyLevel.LEVEL_I);
+    GenerateScenarioRequest request = new GenerateScenarioRequest("0", 10, DifficultyLevel.LEVEL_I);
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post("/api/schedule/scenario")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request))
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.post("/api/schedule/scenario")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
 
     // Then
-    result.andExpect(status().isCreated())
-        .andExpect(header().exists("Location"));
+    result.andExpect(status().isCreated()).andExpect(header().exists("Location"));
   }
 
   @Test
@@ -191,15 +194,62 @@ class ScheduleControllerIT {
     ScenarioDraft draft = scheduleService.generateScenario("0", 10, DifficultyLevel.LEVEL_I);
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.get("/api/schedule/scenario/" + draft.getId())
-    );
+    ResultActions result =
+        mvc.perform(MockMvcRequestBuilders.get("/api/schedule/scenario/" + draft.getId()));
 
     // Then
-    result.andExpect(status().isOk())
-        .andExpect(content().json(
-            objectMapper.writeValueAsString(draft)
-        ));
+    result
+        .andExpect(status().isOk())
+        .andExpect(content().json(objectMapper.writeValueAsString(draft)));
+  }
+
+  @Test
+  void getScenarioEvents() throws Exception {
+    // Given
+    String eventId = draft.getProposedEvents().getFirst().getId();
+
+    // When
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.get(
+                "/api/schedule/scenario/%s/events".formatted(draft.getId())));
+
+    // Then
+    result.andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(eventId));
+  }
+
+  @Test
+  void addScenarioEvent() throws Exception {
+    // Given
+    ScheduledEvent scenarioEvent =
+        new ScheduledEvent("scenario-custom-event", EventType.THREAT, 4, "custom scenario event");
+
+    // When
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.post("/api/schedule/scenario/%s/events".formatted(draft.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(scenarioEvent)));
+
+    // Then
+    result
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.proposedEvents[?(@.id == 'scenario-custom-event')]").exists());
+  }
+
+  @Test
+  void removeScenarioEvent() throws Exception {
+    // Given
+    String eventId = draft.getProposedEvents().getFirst().getId();
+
+    // When
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.delete(
+                "/api/schedule/scenario/%s/events/%s".formatted(draft.getId(), eventId)));
+
+    // Then
+    result.andExpect(status().isOk()).andExpect(jsonPath("$.status").value("success"));
   }
 
   @Test
@@ -208,24 +258,22 @@ class ScheduleControllerIT {
     ScenarioDraft draft = scheduleService.generateScenario("0", 10, DifficultyLevel.LEVEL_I);
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post("/api/schedule/scenario/%s/approve"
-            .formatted(draft.getId()))
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.post(
+                "/api/schedule/scenario/%s/approve".formatted(draft.getId())));
 
     // Then
-    result.andExpect(status().isCreated())
-        .andExpect(header().exists("Location"));
+    result.andExpect(status().isCreated()).andExpect(header().exists("Location"));
   }
 
   @Test
   void approveScenarioIntoSchedule() throws Exception {
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.post("/api/schedule/%s/scenario/%s/approve"
-            .formatted(schedule.getId(), draft.getId())
-        )
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.post(
+                "/api/schedule/%s/scenario/%s/approve".formatted(schedule.getId(), draft.getId())));
 
     // Then
     result.andExpect(status().isOk());
@@ -240,21 +288,20 @@ class ScheduleControllerIT {
     ScheduledEvent updatedEvent = new ScheduledEvent("1", EventType.THREAT, 3, "updated");
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.put("/api/schedule/%s/events/%s"
-                .formatted(scheduleId, eventId))
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(updatedEvent))
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.put("/api/schedule/%s/events/%s".formatted(scheduleId, eventId))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(updatedEvent)));
 
     // Then
     result.andExpect(status().isOk());
 
     org.skyscreamer.jsonassert.JSONAssert.assertEquals(
         objectMapper.writeValueAsString(updatedEvent),
-        objectMapper.writeValueAsString(scheduleService.getSchedule(scheduleId).getEvents().getFirst()),
-        true
-    );
+        objectMapper.writeValueAsString(
+            scheduleService.getSchedule(scheduleId).getEvents().getFirst()),
+        true);
   }
 
   @Test
@@ -264,19 +311,21 @@ class ScheduleControllerIT {
     ScheduledEvent correctedEvent = new ScheduledEvent(eventId, EventType.THREAT, 20, "corrected");
 
     // When
-    ResultActions result = mvc.perform(
-        MockMvcRequestBuilders.put("/api/schedule/scenario/%s/events/%s"
-                .formatted(draft.getId(), eventId))
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(correctedEvent))
-    );
+    ResultActions result =
+        mvc.perform(
+            MockMvcRequestBuilders.put(
+                    "/api/schedule/scenario/%s/events/%s".formatted(draft.getId(), eventId))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(correctedEvent)));
 
     // Then
-    result.andExpect(status().isOk())
-        .andExpect(content().json(
-            objectMapper.writeValueAsString(
-                scheduleService.correctScenarioEvent(draft.getId(), eventId, correctedEvent)
-            )
-        ));
+    result
+        .andExpect(status().isOk())
+        .andExpect(
+            content()
+                .json(
+                    objectMapper.writeValueAsString(
+                        scheduleService.correctScenarioEvent(
+                            draft.getId(), eventId, correctedEvent))));
   }
 }

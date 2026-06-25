@@ -1,14 +1,13 @@
 package miasi.backend.domains.authorization;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 import org.mockito.Mockito;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class AuthorizationTest {
 
@@ -21,7 +20,6 @@ class AuthorizationTest {
 
   private Identity identity;
 
-
   @BeforeEach
   void setUp() {
     repository = Mockito.mock(IUserRepository.class);
@@ -30,7 +28,6 @@ class AuthorizationTest {
     when(repository.findAll()).thenReturn(List.of(identity));
     authorization = new Authorization(repository);
   }
-
 
   @Test
   void shouldLoginSuccessfully() throws Exception {
@@ -44,18 +41,14 @@ class AuthorizationTest {
     verify(repository, never()).findByLogin(login);
   }
 
-
   @Test
   void shouldFailLoginWithWrongPassword() {
     // when + then
-    Exception exception = assertThrows(
-        Exception.class,
-        () -> authorization.login(login, wrongPassword)
-    );
+    Exception exception =
+        assertThrows(Exception.class, () -> authorization.login(login, wrongPassword));
 
     assertEquals("Login failed.", exception.getMessage());
   }
-
 
   @Test
   void shouldFailLoginForUnknownUser() {
@@ -63,19 +56,14 @@ class AuthorizationTest {
     Authorization emptyAuth = new Authorization(repository);
 
     // cache miss
-    when(repository.findByLogin("unknown"))
-        .thenReturn(null);
+    when(repository.findByLogin("unknown")).thenReturn(null);
 
     // when
-    Exception exception = assertThrows(
-        Exception.class,
-        () -> emptyAuth.login("unknown", password)
-    );
+    Exception exception = assertThrows(Exception.class, () -> emptyAuth.login("unknown", password));
 
     // then
     assertEquals("Login failed.", exception.getMessage());
   }
-
 
   @Test
   void shouldPreventSecondActiveSession() throws Exception {
@@ -83,18 +71,11 @@ class AuthorizationTest {
     authorization.login(login, password);
 
     // when
-    Exception exception = assertThrows(
-        Exception.class,
-        () -> authorization.login(login, password)
-    );
+    Exception exception = assertThrows(Exception.class, () -> authorization.login(login, password));
 
     // then
-    assertEquals(
-        "Access denied. Another active session already exists.",
-        exception.getMessage()
-    );
+    assertEquals("Access denied. Another active session already exists.", exception.getMessage());
   }
-
 
   @Test
   void shouldLogoutSuccessfully() throws Exception {
@@ -108,33 +89,23 @@ class AuthorizationTest {
     assertFalse(authorization.isAuthenticated(token));
   }
 
-
   @Test
   void shouldFailLogoutWithInvalidToken() throws Exception {
     // given
     authorization.login(login, password);
 
     // when
-    Exception exception = assertThrows(
-        Exception.class,
-        () -> authorization.logout("invalid-token")
-    );
+    Exception exception =
+        assertThrows(Exception.class, () -> authorization.logout("invalid-token"));
 
     // then
-    assertEquals(
-        "Invalid session token.",
-        exception.getMessage()
-    );
+    assertEquals("Invalid session token.", exception.getMessage());
   }
-
 
   @Test
   void shouldReturnFalseForInvalidAuthenticationToken() {
-    assertFalse(
-        authorization.isAuthenticated("fake-token")
-    );
+    assertFalse(authorization.isAuthenticated("fake-token"));
   }
-
 
   @Test
   void shouldLoadUsersIntoCacheOnConstructor() throws Exception {
@@ -144,7 +115,6 @@ class AuthorizationTest {
     // then
     verify(repository, never()).findByLogin(login);
   }
-
 
   @Test
   void shouldLoadUserFromRepositoryWhenNotInCache() throws Exception {

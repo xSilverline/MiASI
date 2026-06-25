@@ -1,16 +1,15 @@
 package miasi.backend.database;
 
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -44,9 +43,7 @@ class JsonFileStorageTest {
   void loadFile() {
     File file = new File(realDbPath, FILE_NAME);
 
-    List<TestData> loaded = storage.loadListFromFile(
-        file.getAbsolutePath()
-    );
+    List<TestData> loaded = storage.loadListFromFile(file.getAbsolutePath());
 
     assertEquals("Jan", loaded.getFirst().name());
     assertEquals(123, loaded.getFirst().value());
@@ -58,6 +55,5 @@ class JsonFileStorageTest {
     file.delete();
   }
 
-  record TestData(String name, int value) {
-  }
+  record TestData(String name, int value) {}
 }

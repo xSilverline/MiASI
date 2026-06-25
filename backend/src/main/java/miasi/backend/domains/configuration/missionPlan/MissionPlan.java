@@ -1,5 +1,7 @@
 package miasi.backend.domains.configuration.missionPlan;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -10,9 +12,6 @@ import miasi.backend.domains.configuration.Resources;
 import miasi.backend.domains.configuration.SexProfile;
 import miasi.backend.domains.configuration.enums.ResourceType;
 import miasi.backend.domains.configuration.modules.Module;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter

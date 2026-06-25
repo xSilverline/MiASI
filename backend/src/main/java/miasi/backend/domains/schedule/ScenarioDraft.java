@@ -1,5 +1,8 @@
 package miasi.backend.domains.schedule;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,10 +11,6 @@ import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.schedule.enums.DifficultyLevel;
 import miasi.backend.domains.schedule.enums.ScenarioGenerationMode;
 import miasi.backend.domains.schedule.enums.ScheduleStatus;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -38,6 +37,22 @@ public class ScenarioDraft {
     }
 
     throw new IllegalArgumentException("Scenario draft event not found: " + eventId);
+  }
+
+  public void addEvent(ScheduledEvent event) {
+    validateEvent(event);
+    ensureProposedEvents();
+    proposedEvents.add(event);
+  }
+
+  public void removeEvent(String eventId) {
+    validateEventId(eventId);
+    ensureProposedEvents();
+
+    boolean removed = proposedEvents.removeIf(event -> eventId.equals(event.getId()));
+    if (!removed) {
+      throw new IllegalArgumentException("Scenario draft event not found: " + eventId);
+    }
   }
 
   public MissionSchedule approve() {

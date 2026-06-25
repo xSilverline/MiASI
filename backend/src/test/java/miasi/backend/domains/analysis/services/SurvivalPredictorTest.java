@@ -1,10 +1,13 @@
 package miasi.backend.domains.analysis.services;
 
-import miasi.backend.domains.analysis.types.ResourceType;
-import miasi.backend.domains.analysis.types.core.Resource;
-import miasi.backend.domains.analysis.types.crew.ConsumptionMode;
-import miasi.backend.domains.analysis.types.input.MissionManifest;
-import miasi.backend.domains.analysis.types.schedule.Delivery;
+import miasi.backend.domains.analysis.domain.core.MissionManifest;
+import miasi.backend.domains.analysis.domain.core.Resource;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
+import miasi.backend.domains.analysis.domain.crew.ConsumptionMode;
+import miasi.backend.domains.analysis.domain.crew.DemandCalculator;
+import miasi.backend.domains.analysis.domain.crew.SurvivalPredictor;
+import miasi.backend.domains.analysis.domain.modules.ProductionCalculator;
+import miasi.backend.domains.analysis.domain.schedule.Delivery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,8 +43,8 @@ class SurvivalPredictorTest {
   void setUp() {
     // Standardowa misja trwająca 10 dni (na potrzeby horyzontu planowania)
     mockManifest = new MissionManifest(
-        null, 10, 0, 20000f,
-        new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
+        0, 10, 0, 20000f,
+        new ArrayList<>(), new ArrayList<>(), new ArrayList<>()
     );
 
     // Baza domyślnie nic nie produkuje
@@ -98,9 +101,9 @@ class SurvivalPredictorTest {
         .thenReturn(List.of(new Resource(ResourceType.OXYGEN, 5.0f)));
 
     // Ale w Sol 2 (czyli jutro) przylatuje zrzut zapasów
-    Delivery delivery = new Delivery(2, List.of(new Resource(ResourceType.OXYGEN, 50.0f)), new ArrayList<>());
-    mockManifest.setDeliveries(List.of(delivery));
-
+    Delivery delivery = new Delivery(2, List.of(new Resource(ResourceType.OXYGEN, 50.0f)),
+        new ArrayList<>());
+    mockManifest = mockManifest.copyWithDeliveries(List.of(delivery));
     // --- WHEN ---
     // Jesteśmy w Sol 1. Do celu (dostawy) mamy 2 - 1 + 1 = 2 dni. Zapasy starczą na 10/5 = 2 dni.
     ConsumptionMode mode = survivalPredictor.evaluateCrewConsumptionMode(
@@ -129,7 +132,8 @@ class SurvivalPredictorTest {
     );
 
     // --- THEN ---
-    assertTrue(evacuationNeeded, "Sytuacja jest beznadziejna, system powinien natychmiast zażądać ewakuacji");
+    assertTrue(evacuationNeeded,
+        "Sytuacja jest beznadziejna, system powinien natychmiast zażądać ewakuacji");
   }
 
   @Test
@@ -144,15 +148,16 @@ class SurvivalPredictorTest {
         .thenReturn(List.of(new Resource(ResourceType.OXYGEN, 2.0f)));
 
     // Dostawa jest w Sol 4 (za 3 dni od Sol 1)
-    Delivery delivery = new Delivery(4, List.of(new Resource(ResourceType.OXYGEN, 50.0f)), new ArrayList<>());
-    mockManifest.setDeliveries(List.of(delivery));
-
+    Delivery delivery = new Delivery(4, List.of(new Resource(ResourceType.OXYGEN, 50.0f)),
+        new ArrayList<>());
+    mockManifest = mockManifest.copyWithDeliveries(List.of(delivery));
     // --- WHEN ---
     boolean evacuationNeeded = survivalPredictor.checkIfEvacuationIsNeeded(
         1, 10, warehouse, new ArrayList<>(), mockManifest
     );
 
     // --- THEN ---
-    assertFalse(evacuationNeeded, "Alarm ewakuacyjny nie powinien się włączyć, bo tryb MINIMAL daje szansę na doczekanie dostawy");
+    assertFalse(evacuationNeeded,
+        "Alarm ewakuacyjny nie powinien się włączyć, bo tryb MINIMAL daje szansę na doczekanie dostawy");
   }
 }

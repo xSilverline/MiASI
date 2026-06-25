@@ -1,5 +1,9 @@
 package miasi.backend.domains.schedule;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,11 +12,6 @@ import lombok.experimental.FieldDefaults;
 import miasi.backend.domains.schedule.enums.DifficultyLevel;
 import miasi.backend.domains.schedule.enums.EventType;
 import miasi.backend.domains.schedule.enums.ScenarioGenerationMode;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -65,7 +64,7 @@ public class ScenarioGenerator {
     double impactValue =
         definition.getMinImpactValue()
             + (definition.getMaxImpactValue() - definition.getMinImpactValue())
-            * effectiveRandom.nextDouble();
+                * effectiveRandom.nextDouble();
     int threatDuration =
         randomIntBetween(
             (int) Math.ceil(definition.getMinImpactValue()),
@@ -76,21 +75,31 @@ public class ScenarioGenerator {
         new Threat(
             definition.getType(),
             definition.getAffectedElement(),
+            definition.getConsequence(),
             impactValue,
             threatDuration,
             definition.getImpactUnit());
     threat.setId(UUID.randomUUID().toString());
     threat.setType(EventType.THREAT);
     threat.setSol(randomIntBetween(1, durationSols, effectiveRandom));
-    threat.setDescription(
-        "Threat "
-            + definition.getType()
-            + " affects "
-            + definition.getAffectedElement()
-            + " for "
-            + threatDuration
-            + " sols");
+    threat.setDescription(buildThreatDescription(definition, threatDuration));
+    threat.setEffects(
+        List.of(
+            new EventEffect(
+                definition.getAffectedElement(),
+                impactValue,
+                definition.getImpactUnit(),
+                definition.getConsequence())));
     return threat;
+  }
+
+  private String buildThreatDescription(ThreatDefinition definition, int threatDuration) {
+    String description =
+        "Threat " + definition.getType() + " affects " + definition.getAffectedElement();
+    if (definition.getConsequence() != null && !definition.getConsequence().isBlank()) {
+      description += ": " + definition.getConsequence();
+    }
+    return description + " for " + threatDuration + " sols";
   }
 
   private void validateThreatDefinition(ThreatDefinition definition) {
