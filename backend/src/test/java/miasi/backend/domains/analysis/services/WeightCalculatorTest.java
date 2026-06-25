@@ -29,10 +29,16 @@ class WeightCalculatorTest {
     Resource resource = new Resource(type, amountToAdd);
 
     // When
-    float result = calculator.calculateTotalWeight(List.of(module), List.of(resource));
+    float result = calculator.calculateTotalWeight(
+        List.of(module),
+        List.of(resource)
+    );
 
     // Then
-    assertEquals(startWeight + type.getWeightRatio() * amountToAdd, result);
+    assertEquals(
+        startWeight + type.getWeightRatio() * amountToAdd,
+        result
+    );
   }
 
   @Test
