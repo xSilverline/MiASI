@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Users, Clock, AlertTriangle, RefreshCw, Loader2 } from "lucide-react";
+import {
+  Users,
+  Clock,
+  AlertTriangle,
+  RefreshCw,
+  Loader2,
+  Settings,
+} from "lucide-react";
 import { Sidebar } from "./components/Sidebar.tsx";
 import { HeaderCard } from "./components/HeaderCard.tsx";
 import { DetailCard, type DetailItem } from "./components/DetailCard.tsx";
@@ -38,7 +45,7 @@ import type {
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>("login");
   const [isManualWizard, setIsManualWizard] = useState(false);
-
+  const [isInitializing, setIsInitializing] = useState(true);
   const {
     config,
     isLoading,
@@ -46,15 +53,39 @@ const App: React.FC = () => {
     isRecalculating,
     updateConfig,
     recalculate,
+    optimize,
+    isOptimizing,
+    payloadSessionId,
+    chartData,
+    loadConfig,
   } = useMissionData();
 
   const [isCrewModalOpen, setIsCrewModalOpen] = useState(false);
   const [isResourcesModalOpen, setIsResourcesModalOpen] = useState(false);
   const [isModulesModalOpen, setIsModulesModalOpen] = useState(false);
 
-  const handleLogin = () => {
+  React.useEffect(() => {
+    const initApp = async () => {
+      const token = localStorage.getItem("sessionToken");
+      if (token) {
+        // Jeśli jest token, próbujemy od razu pobrać konfigurację
+        const data = await loadConfig();
+        // Weryfikacja: jest config -> Dashboard, nie ma -> Kreator
+        setCurrentView(data ? "dashboard" : "configCreator");
+      } else {
+        setCurrentView("login");
+      }
+      setIsInitializing(false);
+    };
+
+    void initApp();
+  }, [loadConfig]);
+
+  const handleLogin = async () => {
     setIsManualWizard(false);
-    setCurrentView("dashboard");
+    // Weryfikacja: Pobieramy dane i decydujemy gdzie posłać usera
+    const data = await loadConfig();
+    setCurrentView(data ? "dashboard" : "configCreator");
   };
 
   const handleConfigFinish = (data?: {
@@ -62,16 +93,22 @@ const App: React.FC = () => {
     events?: EventData[];
     consumption?: ResourceConsumption;
   }) => {
-    if (data && config) {
+    if (data) {
       let hasChanges = false;
       const updates: Partial<MissionDashboardConfig> = {};
 
-      if (
-        data.modules &&
-        JSON.stringify(data.modules) !== JSON.stringify(config.modulesList)
-      ) {
+      // Jeśli config nie istnieje, tworzymy go i dodajemy domyślne parametry
+      if (!config) {
+        updates.crew = { men: 2, women: 2 };
+        updates.resources = { oxygen: 50000, water: 30000, food: 3100 };
+        updates.missionDuration = 700;
+        hasChanges = true;
+      }
+
+      if (data.modules) {
         updates.modulesList = data.modules.map((newMod) => {
-          const existing = config.modulesList.find((p) => p.id === newMod.id);
+          // Bezpieczne szukanie w configu (który może być nullem)
+          const existing = config?.modulesList?.find((p) => p.id === newMod.id);
           return {
             ...newMod,
             count: existing ? existing.count : 0,
@@ -79,18 +116,13 @@ const App: React.FC = () => {
         });
         hasChanges = true;
       }
-      if (
-        data.events &&
-        JSON.stringify(data.events) !== JSON.stringify(config.eventsList)
-      ) {
+
+      if (data.events) {
         updates.eventsList = data.events;
         hasChanges = true;
       }
-      if (
-        data.consumption &&
-        JSON.stringify(data.consumption) !==
-          JSON.stringify(config.consumptionRates)
-      ) {
+
+      if (data.consumption) {
         updates.consumptionRates = data.consumption;
         hasChanges = true;
       }
@@ -99,23 +131,25 @@ const App: React.FC = () => {
         void updateConfig(updates);
       }
     }
+
+    // Niezależnie od wszystkiego wymuszamy przejście do Dashboardu
     setCurrentView("dashboard");
   };
 
   React.useEffect(() => {
-    // Przekierowanie do kreatora, jeśli zalogowaliśmy się, skończyło się ładowanie, a nie ma configu
     if (!isLoading && !config && currentView === "dashboard") {
       setCurrentView("configCreator");
     }
   }, [isLoading, config, currentView]);
 
-  // 1. Loader wyświetlamy TYLKO podczas faktycznego ładowania danych
-  if (isLoading) {
+  if (isInitializing || isLoading) {
     return (
       <div className="h-screen w-screen bg-mars-background flex flex-col items-center justify-center text-mars-orange">
         <Loader2 size={48} className="animate-spin mb-4" />
         <p className="tracking-widest uppercase font-bold text-sm">
-          Nawiązywanie połączenia z bazą...
+          {isInitializing
+            ? "Inicjalizacja Systemów..."
+            : "Synchronizacja z Bazą..."}
         </p>
       </div>
     );
@@ -128,7 +162,6 @@ const App: React.FC = () => {
     return null;
   };
 
-  // 2. Widoki, które mogą działać BEZ załadowanego configu
   if (currentView === "login") return <LoginView onLogin={handleLogin} />;
 
   if (
@@ -224,7 +257,7 @@ const App: React.FC = () => {
             </div>
 
             <div className="flex-1 min-h-0 w-full flex flex-col relative">
-              {isDataModified ? (
+              {isDataModified || !payloadSessionId ? (
                 <div className="flex-1 flex flex-col justify-center items-center bg-mars-itemBackground rounded-3xl p-10 shadow-md border border-mars-orange/20 min-h-[300px]">
                   <div className="flex flex-col items-center text-center animate-in fade-in zoom-in duration-300">
                     <AlertTriangle
@@ -233,32 +266,51 @@ const App: React.FC = () => {
                       strokeWidth={1.5}
                     />
                     <h3 className="text-sm md:text-base font-bold tracking-widest text-white uppercase mb-3">
-                      Zmieniono Parametry Systemu
+                      Wymagana analiza i Optymalizacja
                     </h3>
                     <p className="text-xs md:text-sm text-slate-400 mb-8 max-w-lg leading-relaxed">
-                      Zaktualizowano dane. Przeprowadź rekalkulację, aby pobrać
-                      najnowsze dane telemetryczne.
+                      Wprowadzono zmiany w konfiguracji. System musi najpierw
+                      przeprowadzić Auto-Optymalizację pakietu startowego, zanim
+                      możliwa będzie rekalkulacja przebiegu misji.
                     </p>
-                    <button
-                      onClick={() => {
-                        void recalculate();
-                      }}
-                      disabled={isRecalculating}
-                      className="flex items-center gap-3 py-3.5 px-8 rounded-xl text-xs tracking-widest font-bold uppercase bg-mars-orange/10 text-mars-orange border border-mars-orange/30 hover:bg-mars-orange/20 hover:border-mars-orange transition-all disabled:opacity-50 disabled:cursor-wait"
-                    >
-                      {isRecalculating ? (
-                        <>
-                          <RefreshCw size={18} className="animate-spin" />
-                          Trwa Obliczanie...
-                        </>
-                      ) : (
-                        <>Rekalkuluj Wykresy</>
-                      )}
-                    </button>
+
+                    <div className="flex flex-wrap items-center justify-center gap-4">
+                      {/* PRZYCISK AUTO OPTYMALIZACJI */}
+                      <button
+                        onClick={() => void optimize()}
+                        disabled={isOptimizing || isRecalculating}
+                        className="flex items-center gap-3 py-3.5 px-8 rounded-xl text-xs tracking-widest font-bold uppercase bg-blue-500/10 text-blue-500 border border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500 transition-all disabled:opacity-50 disabled:cursor-wait"
+                      >
+                        {isOptimizing ? (
+                          <Loader2 size={18} className="animate-spin" />
+                        ) : (
+                          <Settings size={18} />
+                        )}
+                        Auto Optymalizacja
+                      </button>
+
+                      {/* PRZYCISK REKALKULACJI */}
+                      <button
+                        onClick={() => void recalculate()}
+                        disabled={
+                          !payloadSessionId || isRecalculating || isOptimizing
+                        }
+                        className="flex items-center gap-3 py-3.5 px-8 rounded-xl text-xs tracking-widest font-bold uppercase bg-mars-orange/10 text-mars-orange border border-mars-orange/30 hover:bg-mars-orange/20 hover:border-mars-orange transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isRecalculating ? (
+                          <>
+                            <RefreshCw size={18} className="animate-spin" />
+                            Trwa Obliczanie...
+                          </>
+                        ) : (
+                          <>Rekalkuluj Wykresy</>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (
-                <UsageChart />
+                <UsageChart data={chartData} />
               )}
             </div>
 

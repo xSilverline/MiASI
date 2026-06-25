@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin(origins = "http://localhost:*") // TODO: do zmiany gdy będą znane porty frontendu
+@CrossOrigin(origins = "http://localhost:5173") // TODO: do zmiany gdy będą znane porty frontendu
 @RestController
 @RequestMapping("/api/conf")
 @RequiredArgsConstructor

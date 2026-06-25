@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/analysis")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class MissionAnalysisController {
 
   private final IOptimizePayloadUseCase optimizePayloadUseCase;

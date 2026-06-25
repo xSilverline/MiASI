@@ -15,13 +15,16 @@ import {
   MIN_RESERVE,
   DELIVERY_SOL,
 } from "../../infrastructure/mock-data/config.ts";
-
+import type { ChartDataPoint } from "../../core/application/ports/IMissionRepository";
 interface CustomXAxisTickProps {
   x?: number;
   y?: number;
   payload?: {
     value: number;
   };
+}
+interface UsageChartProps {
+  data: ChartDataPoint[];
 }
 
 interface CustomTooltipProps {
@@ -34,31 +37,31 @@ interface CustomTooltipProps {
   label?: string | number;
 }
 
-const generateMockData = () => {
-  const data = [];
-  let woda = 100.0;
-  let tlen = 100.0;
-  let zywnosc = 100.0;
+// const generateMockData = () => {
+//   const data = [];
+//   let woda = 100.0;
+//   let tlen = 100.0;
+//   let zywnosc = 100.0;
+//
+//   for (let sol = 0; sol <= TOTAL_SIMULATION_DAYS; sol++) {
+//     if (sol > 0) {
+//       woda -= 0.12;
+//       tlen -= 0.13;
+//       if (sol === DELIVERY_SOL) zywnosc += 25;
+//       zywnosc -= 0.14;
+//     }
+//     data.push({
+//       sol,
+//       woda: Math.max(0, Number(woda.toFixed(2))),
+//       tlen: Math.max(0, Number(tlen.toFixed(2))),
+//       zywnosc: Math.max(0, Number(zywnosc.toFixed(2))),
+//       energia: 8.0,
+//     });
+//   }
+//   return data;
+// };
 
-  for (let sol = 0; sol <= TOTAL_SIMULATION_DAYS; sol++) {
-    if (sol > 0) {
-      woda -= 0.12;
-      tlen -= 0.13;
-      if (sol === DELIVERY_SOL) zywnosc += 25;
-      zywnosc -= 0.14;
-    }
-    data.push({
-      sol,
-      woda: Math.max(0, Number(woda.toFixed(2))),
-      tlen: Math.max(0, Number(tlen.toFixed(2))),
-      zywnosc: Math.max(0, Number(zywnosc.toFixed(2))),
-      energia: 8.0,
-    });
-  }
-  return data;
-};
-
-const chartData = generateMockData();
+// const chartData = generateMockData();
 
 const xMajorTicks: number[] = [];
 for (let i = 0; i <= TOTAL_SIMULATION_DAYS; i += 25) {
@@ -122,7 +125,14 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
   return null;
 };
 
-export const UsageChart: React.FC = () => {
+export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center text-slate-500 uppercase text-xs tracking-widest">
+        Brak danych - przeprowadź rekalkulację
+      </div>
+    );
+  }
   return (
     <div className="bg-mars-itemBackground p-6 rounded-xl shadow-md w-full flex flex-col flex-1 min-h-75">
       <div className="flex justify-between items-center mb-6 shrink-0">
@@ -148,7 +158,7 @@ export const UsageChart: React.FC = () => {
       <div className="flex-1 h-0 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
-            data={chartData}
+            data={data}
             margin={{ top: 10, right: 20, left: -20, bottom: 5 }}
           >
             <CartesianGrid stroke="none" />
