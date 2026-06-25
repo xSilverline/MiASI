@@ -1,8 +1,6 @@
 package miasi.backend.domains.analysis.infrastructure.out.persistence;
 
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import miasi.backend.api.config.ConfService;
 import miasi.backend.domains.analysis.application.port.out.IMissionDataProviderPort;
@@ -52,24 +50,33 @@ public class MissionDataAdapter implements IMissionDataProviderPort {
   }
 
   @Override
-  public List<Module> getModuleCatalog() {
-    List<miasi.backend.domains.configuration.modules.Module> oldCatalog =
-        confService.getModuleCatalog();
+  public List<Module> getMissionModules(int missionPlanId) {
+    miasi.backend.domains.configuration.missionPlan.MissionPlan oldPlan =
+        confService.getMissionPlan(missionPlanId);
 
-    return oldCatalog.stream()
+    if (oldPlan == null) {
+      throw new RuntimeException("Nie znaleziono planu misji o ID: " + missionPlanId);
+    }
+
+    if (oldPlan.getModules() == null) {
+      return List.of();
+    }
+
+    return oldPlan.getModules().stream()
         .map(
             oldMod ->
                 Module.builder()
-                    .id(UUID.randomUUID().toString())
+                    .id(moduleId(oldMod))
                     .name(oldMod.getName())
                     .weight(oldMod.getWeight())
                     .minCount(0)
+                    .maxCount(1)
                     .production(mapResources(oldMod.getResourceProduction()))
                     .consumption(mapResources(oldMod.getResourceConsumption()))
                     .status(ModuleState.ACTIVE)
                     .efficiency(1.0f)
                     .build())
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private List<Resource> mapResources(
@@ -84,6 +91,13 @@ public class MissionDataAdapter implements IMissionDataProviderPort {
                 new Resource(
                     ResourceType.valueOf(oldRes.getResourceType().name()), oldRes.getQuantity()))
         .toList();
+  }
+
+  private String moduleId(miasi.backend.domains.configuration.modules.Module module) {
+    if (module.getName() == null || module.getName().isBlank()) {
+      return "module";
+    }
+    return module.getName().trim().toLowerCase().replaceAll("[^a-z0-9]+", "-");
   }
 
   private List<Resource> mapDemandResources(
