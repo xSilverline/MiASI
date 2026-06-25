@@ -98,4 +98,119 @@
     } ]
   } ],
   "maxStartingWeight" : 0.1
+}, {
+  "crew" : [ {
+    "name" : "Engineering Crew",
+    "population" : 6,
+    "optimalDemand" : {
+      "FOOD" : 1.0,
+      "OXYGEN" : 1.1,
+      "WATER" : 1.8
+    },
+    "minimalDemand" : {
+      "FOOD" : 0.55,
+      "OXYGEN" : 0.75,
+      "WATER" : 0.9
+    }
+  }, {
+    "name" : "Science Crew",
+    "population" : 4,
+    "optimalDemand" : {
+      "FOOD" : 0.9,
+      "OXYGEN" : 1.0,
+      "WATER" : 1.6
+    },
+    "minimalDemand" : {
+      "FOOD" : 0.5,
+      "OXYGEN" : 0.7,
+      "WATER" : 0.85
+    }
+  } ],
+  "missionDurationSols" : 45,
+  "startingResources" : [ {
+    "resourceType" : "FOOD",
+    "quantity" : 520.0
+  }, {
+    "resourceType" : "OXYGEN",
+    "quantity" : 760.0
+  }, {
+    "resourceType" : "WATER",
+    "quantity" : 680.0
+  }, {
+    "resourceType" : "ENERGY",
+    "quantity" : 420.0
+  } ],
+  "modules" : [ {
+    "name" : "Solar Array",
+    "status" : "ACTIVE",
+    "category" : "ENERGY_MODULE",
+    "weight" : 1200.0,
+    "resourceConsumption" : [ ],
+    "resourceProduction" : [ {
+      "resourceType" : "ENERGY",
+      "quantity" : 45.0
+    } ]
+  }, {
+    "name" : "Greenhouse",
+    "status" : "ACTIVE",
+    "category" : "UTILITY_MODULE",
+    "weight" : 1800.0,
+    "resourceConsumption" : [ {
+      "resourceType" : "ENERGY",
+      "quantity" : 10.0
+    }, {
+      "resourceType" : "WATER",
+      "quantity" : 6.0
+    } ],
+    "resourceProduction" : [ {
+      "resourceType" : "FOOD",
+      "quantity" : 18.0
+    }, {
+      "resourceType" : "OXYGEN",
+      "quantity" : 5.0
+    } ]
+  }, {
+    "name" : "Oxygen Generator",
+    "status" : "ACTIVE",
+    "category" : "UTILITY_MODULE",
+    "weight" : 1100.0,
+    "resourceConsumption" : [ {
+      "resourceType" : "ENERGY",
+      "quantity" : 12.0
+    }, {
+      "resourceType" : "WATER",
+      "quantity" : 2.0
+    } ],
+    "resourceProduction" : [ {
+      "resourceType" : "OXYGEN",
+      "quantity" : 35.0
+    } ]
+  }, {
+    "name" : "Water Recycler",
+    "status" : "ACTIVE",
+    "category" : "UTILITY_MODULE",
+    "weight" : 1300.0,
+    "resourceConsumption" : [ {
+      "resourceType" : "ENERGY",
+      "quantity" : 8.0
+    } ],
+    "resourceProduction" : [ {
+      "resourceType" : "WATER",
+      "quantity" : 24.0
+    } ]
+  }, {
+    "name" : "Habitat Module",
+    "status" : "ACTIVE",
+    "category" : "UTILITY_MODULE",
+    "weight" : 2600.0,
+    "resourceConsumption" : [ {
+      "resourceType" : "ENERGY",
+      "quantity" : 15.0
+    }, {
+      "resourceType" : "OXYGEN",
+      "quantity" : 4.0
+    } ],
+    "resourceProduction" : [ ]
+  } ],
+  "maxStartingWeight" : 12500.0
 } ]

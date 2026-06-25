@@ -1,6 +1,7 @@
 package miasi.backend.domains.analysis.domain.modules;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
@@ -8,6 +9,7 @@ import miasi.backend.domains.analysis.domain.core.Resource;
 
 @Value
 @Builder
+@AllArgsConstructor
 public class Module {
 
   String id;
@@ -16,14 +18,17 @@ public class Module {
 
   int minCount;
 
-  @Builder.Default int maxCount = -1;
+  @Builder.Default
+  int maxCount = -1;
 
   List<Resource> production;
   List<Resource> consumption;
 
-  @With ModuleState status;
+  @With
+  ModuleState status;
 
-  @With float efficiency;
+  @With
+  float efficiency;
 
   public Module copy() {
     List<Resource> productionCopy =

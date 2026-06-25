@@ -1,1 +1,2294 @@
-[]
+[ {
+  "id" : "f08003cf-b51b-4ad7-98a9-300cc550bd86",
+  "payloadSessionId" : "afebd064-4168-4ba0-8a41-8c9a7d94507f",
+  "customizedModules" : [ ],
+  "customizedSupplies" : [ ],
+  "nominalVariant" : {
+    "type" : "IDEAL",
+    "timeline" : [ {
+      "sol" : 1,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -5.1,
+        "weight" : -2.55
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -5.1,
+        "weight" : -6.1200004
+      }, {
+        "type" : "WATER",
+        "amount" : -8.4,
+        "weight" : -9.24
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT", "MINIMAL_DEMAND_ACTIVATED" ]
+    }, {
+      "sol" : 2,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -10.2,
+        "weight" : -5.1
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -10.2,
+        "weight" : -12.240001
+      }, {
+        "type" : "WATER",
+        "amount" : -16.8,
+        "weight" : -18.48
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 3,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -15.299999,
+        "weight" : -7.6499996
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -15.299999,
+        "weight" : -18.36
+      }, {
+        "type" : "WATER",
+        "amount" : -25.199999,
+        "weight" : -27.72
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 4,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -20.4,
+        "weight" : -10.2
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -20.4,
+        "weight" : -24.480001
+      }, {
+        "type" : "WATER",
+        "amount" : -33.6,
+        "weight" : -36.96
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 5,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -25.5,
+        "weight" : -12.75
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -25.5,
+        "weight" : -30.6
+      }, {
+        "type" : "WATER",
+        "amount" : -42.0,
+        "weight" : -46.2
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 6,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -30.6,
+        "weight" : -15.3
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -30.6,
+        "weight" : -36.72
+      }, {
+        "type" : "WATER",
+        "amount" : -50.4,
+        "weight" : -55.440002
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 7,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -35.7,
+        "weight" : -17.85
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -35.7,
+        "weight" : -42.840004
+      }, {
+        "type" : "WATER",
+        "amount" : -58.800003,
+        "weight" : -64.68001
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 8,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -40.8,
+        "weight" : -20.4
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -40.8,
+        "weight" : -48.960003
+      }, {
+        "type" : "WATER",
+        "amount" : -67.200005,
+        "weight" : -73.920006
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 9,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -45.899998,
+        "weight" : -22.949999
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -45.899998,
+        "weight" : -55.079998
+      }, {
+        "type" : "WATER",
+        "amount" : -75.600006,
+        "weight" : -83.16001
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 10,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -50.999996,
+        "weight" : -25.499998
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -50.999996,
+        "weight" : -61.199997
+      }, {
+        "type" : "WATER",
+        "amount" : -84.00001,
+        "weight" : -92.40001
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 11,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -56.099995,
+        "weight" : -28.049997
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -56.099995,
+        "weight" : -67.32
+      }, {
+        "type" : "WATER",
+        "amount" : -92.40001,
+        "weight" : -101.640015
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 12,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -61.199993,
+        "weight" : -30.599997
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -61.199993,
+        "weight" : -73.439995
+      }, {
+        "type" : "WATER",
+        "amount" : -100.80001,
+        "weight" : -110.88001
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 13,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -66.299995,
+        "weight" : -33.149998
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -66.299995,
+        "weight" : -79.56
+      }, {
+        "type" : "WATER",
+        "amount" : -109.20001,
+        "weight" : -120.12002
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 14,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -71.399994,
+        "weight" : -35.699997
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -71.399994,
+        "weight" : -85.67999
+      }, {
+        "type" : "WATER",
+        "amount" : -117.60001,
+        "weight" : -129.36002
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 15,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -76.49999,
+        "weight" : -38.249996
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -76.49999,
+        "weight" : -91.799995
+      }, {
+        "type" : "WATER",
+        "amount" : -126.000015,
+        "weight" : -138.60002
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 16,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -81.59999,
+        "weight" : -40.799995
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -81.59999,
+        "weight" : -97.91999
+      }, {
+        "type" : "WATER",
+        "amount" : -134.40001,
+        "weight" : -147.84001
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 17,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -86.69999,
+        "weight" : -43.349995
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -86.69999,
+        "weight" : -104.03999
+      }, {
+        "type" : "WATER",
+        "amount" : -142.8,
+        "weight" : -157.08
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 18,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -91.79999,
+        "weight" : -45.899994
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -91.79999,
+        "weight" : -110.15999
+      }, {
+        "type" : "WATER",
+        "amount" : -151.2,
+        "weight" : -166.32
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 19,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -96.89999,
+        "weight" : -48.449993
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -96.89999,
+        "weight" : -116.27999
+      }, {
+        "type" : "WATER",
+        "amount" : -159.59999,
+        "weight" : -175.56
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 20,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -101.999985,
+        "weight" : -50.999992
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -101.999985,
+        "weight" : -122.39999
+      }, {
+        "type" : "WATER",
+        "amount" : -167.99998,
+        "weight" : -184.79999
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 21,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -107.09998,
+        "weight" : -53.54999
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -107.09998,
+        "weight" : -128.51999
+      }, {
+        "type" : "WATER",
+        "amount" : -176.39998,
+        "weight" : -194.03998
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 22,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -112.19998,
+        "weight" : -56.09999
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -112.19998,
+        "weight" : -134.63998
+      }, {
+        "type" : "WATER",
+        "amount" : -184.79997,
+        "weight" : -203.27997
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 23,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -117.29998,
+        "weight" : -58.64999
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -117.29998,
+        "weight" : -140.75998
+      }, {
+        "type" : "WATER",
+        "amount" : -193.19997,
+        "weight" : -212.51997
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 24,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -122.39998,
+        "weight" : -61.19999
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -122.39998,
+        "weight" : -146.87997
+      }, {
+        "type" : "WATER",
+        "amount" : -201.59996,
+        "weight" : -221.75996
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 25,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -127.49998,
+        "weight" : -63.74999
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -127.49998,
+        "weight" : -152.99998
+      }, {
+        "type" : "WATER",
+        "amount" : -209.99995,
+        "weight" : -230.99995
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 26,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -132.59998,
+        "weight" : -66.29999
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -132.59998,
+        "weight" : -159.11998
+      }, {
+        "type" : "WATER",
+        "amount" : -218.39995,
+        "weight" : -240.23994
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 27,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -137.69998,
+        "weight" : -68.84999
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -137.69998,
+        "weight" : -165.23999
+      }, {
+        "type" : "WATER",
+        "amount" : -226.79994,
+        "weight" : -249.47993
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 28,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -142.79999,
+        "weight" : -71.399994
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -142.79999,
+        "weight" : -171.35999
+      }, {
+        "type" : "WATER",
+        "amount" : -235.19994,
+        "weight" : -258.71994
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 29,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -147.9,
+        "weight" : -73.95
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -147.9,
+        "weight" : -177.48
+      }, {
+        "type" : "WATER",
+        "amount" : -243.59993,
+        "weight" : -267.95993
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 30,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -153.0,
+        "weight" : -76.5
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -153.0,
+        "weight" : -183.6
+      }, {
+        "type" : "WATER",
+        "amount" : -251.99992,
+        "weight" : -277.19992
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 31,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -158.1,
+        "weight" : -79.05
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -158.1,
+        "weight" : -189.72002
+      }, {
+        "type" : "WATER",
+        "amount" : -260.39993,
+        "weight" : -286.43994
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 32,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -163.20001,
+        "weight" : -81.600006
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -163.20001,
+        "weight" : -195.84003
+      }, {
+        "type" : "WATER",
+        "amount" : -268.79993,
+        "weight" : -295.67993
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 33,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -168.30002,
+        "weight" : -84.15001
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -168.30002,
+        "weight" : -201.96004
+      }, {
+        "type" : "WATER",
+        "amount" : -277.19992,
+        "weight" : -304.91992
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 34,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -173.40002,
+        "weight" : -86.70001
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -173.40002,
+        "weight" : -208.08003
+      }, {
+        "type" : "WATER",
+        "amount" : -285.5999,
+        "weight" : -314.1599
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 35,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -178.50003,
+        "weight" : -89.250015
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -178.50003,
+        "weight" : -214.20004
+      }, {
+        "type" : "WATER",
+        "amount" : -293.9999,
+        "weight" : -323.3999
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 36,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -183.60004,
+        "weight" : -91.80002
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -183.60004,
+        "weight" : -220.32005
+      }, {
+        "type" : "WATER",
+        "amount" : -302.3999,
+        "weight" : -332.6399
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 37,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -188.70004,
+        "weight" : -94.35002
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -188.70004,
+        "weight" : -226.44006
+      }, {
+        "type" : "WATER",
+        "amount" : -310.7999,
+        "weight" : -341.87988
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 38,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -193.80005,
+        "weight" : -96.900024
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -193.80005,
+        "weight" : -232.56007
+      }, {
+        "type" : "WATER",
+        "amount" : -319.1999,
+        "weight" : -351.11987
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 39,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -198.90005,
+        "weight" : -99.45003
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -198.90005,
+        "weight" : -238.68007
+      }, {
+        "type" : "WATER",
+        "amount" : -327.59988,
+        "weight" : -360.3599
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 40,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -204.00006,
+        "weight" : -102.00003
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -204.00006,
+        "weight" : -244.80008
+      }, {
+        "type" : "WATER",
+        "amount" : -335.99988,
+        "weight" : -369.59988
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 41,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -209.10007,
+        "weight" : -104.55003
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -209.10007,
+        "weight" : -250.92009
+      }, {
+        "type" : "WATER",
+        "amount" : -344.39987,
+        "weight" : -378.83987
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 42,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -214.20007,
+        "weight" : -107.10004
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -214.20007,
+        "weight" : -257.0401
+      }, {
+        "type" : "WATER",
+        "amount" : -352.79987,
+        "weight" : -388.07986
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 43,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -219.30008,
+        "weight" : -109.65004
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -219.30008,
+        "weight" : -263.1601
+      }, {
+        "type" : "WATER",
+        "amount" : -361.19986,
+        "weight" : -397.31985
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 44,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -224.40009,
+        "weight" : -112.20004
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -224.40009,
+        "weight" : -269.28012
+      }, {
+        "type" : "WATER",
+        "amount" : -369.59985,
+        "weight" : -406.55984
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 45,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -229.50009,
+        "weight" : -114.750046
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -229.50009,
+        "weight" : -275.40012
+      }, {
+        "type" : "WATER",
+        "amount" : -377.99985,
+        "weight" : -415.79984
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 46,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -234.6001,
+        "weight" : -117.30005
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -234.6001,
+        "weight" : -281.52014
+      }, {
+        "type" : "WATER",
+        "amount" : -386.39984,
+        "weight" : -425.03983
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 47,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -239.7001,
+        "weight" : -119.85005
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -239.7001,
+        "weight" : -287.64014
+      }, {
+        "type" : "WATER",
+        "amount" : -394.79984,
+        "weight" : -434.27982
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 48,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -244.80011,
+        "weight" : -122.400055
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -244.80011,
+        "weight" : -293.76013
+      }, {
+        "type" : "WATER",
+        "amount" : -403.19983,
+        "weight" : -443.51984
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 49,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -249.90012,
+        "weight" : -124.95006
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -249.90012,
+        "weight" : -299.88016
+      }, {
+        "type" : "WATER",
+        "amount" : -411.59982,
+        "weight" : -452.75983
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 50,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -255.00012,
+        "weight" : -127.50006
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -255.00012,
+        "weight" : -306.00015
+      }, {
+        "type" : "WATER",
+        "amount" : -419.99982,
+        "weight" : -461.99982
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 51,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -260.10013,
+        "weight" : -130.05006
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -260.10013,
+        "weight" : -312.12018
+      }, {
+        "type" : "WATER",
+        "amount" : -428.3998,
+        "weight" : -471.2398
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 52,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -265.20013,
+        "weight" : -132.60007
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -265.20013,
+        "weight" : -318.24017
+      }, {
+        "type" : "WATER",
+        "amount" : -436.7998,
+        "weight" : -480.4798
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 53,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -270.30014,
+        "weight" : -135.15007
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -270.30014,
+        "weight" : -324.36017
+      }, {
+        "type" : "WATER",
+        "amount" : -445.1998,
+        "weight" : -489.7198
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 54,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -275.40015,
+        "weight" : -137.70007
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -275.40015,
+        "weight" : -330.4802
+      }, {
+        "type" : "WATER",
+        "amount" : -453.5998,
+        "weight" : -498.95978
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 55,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -280.50015,
+        "weight" : -140.25008
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -280.50015,
+        "weight" : -336.6002
+      }, {
+        "type" : "WATER",
+        "amount" : -461.9998,
+        "weight" : -508.19977
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 56,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -285.60016,
+        "weight" : -142.80008
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -285.60016,
+        "weight" : -342.7202
+      }, {
+        "type" : "WATER",
+        "amount" : -470.39978,
+        "weight" : -517.43976
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 57,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -290.70016,
+        "weight" : -145.35008
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -290.70016,
+        "weight" : -348.8402
+      }, {
+        "type" : "WATER",
+        "amount" : -478.79977,
+        "weight" : -526.67975
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 58,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -295.80017,
+        "weight" : -147.90009
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -295.80017,
+        "weight" : -354.9602
+      }, {
+        "type" : "WATER",
+        "amount" : -487.19977,
+        "weight" : -535.91974
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 59,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -300.90018,
+        "weight" : -150.45009
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -300.90018,
+        "weight" : -361.08023
+      }, {
+        "type" : "WATER",
+        "amount" : -495.59976,
+        "weight" : -545.1597
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 60,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -306.00018,
+        "weight" : -153.00009
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -306.00018,
+        "weight" : -367.20023
+      }, {
+        "type" : "WATER",
+        "amount" : -503.99976,
+        "weight" : -554.3997
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 61,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -311.1002,
+        "weight" : -155.5501
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -311.1002,
+        "weight" : -373.32025
+      }, {
+        "type" : "WATER",
+        "amount" : -512.3998,
+        "weight" : -563.6398
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 62,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -316.2002,
+        "weight" : -158.1001
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -316.2002,
+        "weight" : -379.44025
+      }, {
+        "type" : "WATER",
+        "amount" : -520.7998,
+        "weight" : -572.8798
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 63,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -321.3002,
+        "weight" : -160.6501
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -321.3002,
+        "weight" : -385.56027
+      }, {
+        "type" : "WATER",
+        "amount" : -529.1998,
+        "weight" : -582.1198
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 64,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -326.4002,
+        "weight" : -163.2001
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -326.4002,
+        "weight" : -391.68027
+      }, {
+        "type" : "WATER",
+        "amount" : -537.59985,
+        "weight" : -591.35986
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 65,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -331.5002,
+        "weight" : -165.7501
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -331.5002,
+        "weight" : -397.80026
+      }, {
+        "type" : "WATER",
+        "amount" : -545.9999,
+        "weight" : -600.59985
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 66,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -336.60022,
+        "weight" : -168.30011
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -336.60022,
+        "weight" : -403.9203
+      }, {
+        "type" : "WATER",
+        "amount" : -554.3999,
+        "weight" : -609.8399
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    }, {
+      "sol" : 67,
+      "warehouse" : [ {
+        "type" : "FOOD",
+        "amount" : -341.70023,
+        "weight" : -170.85011
+      }, {
+        "type" : "OXYGEN",
+        "amount" : -341.70023,
+        "weight" : -410.04028
+      }, {
+        "type" : "WATER",
+        "amount" : -562.7999,
+        "weight" : -619.07996
+      } ],
+      "balance" : {
+        "produced" : [ ],
+        "consumed" : [ {
+          "type" : "FOOD",
+          "amount" : 5.1,
+          "weight" : 2.55
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 5.1,
+          "weight" : 6.1200004
+        }, {
+          "type" : "WATER",
+          "amount" : 8.4,
+          "weight" : 9.24
+        } ]
+      },
+      "mode" : "MINIMAL",
+      "modules" : [ ],
+      "observations" : [ "EVACUATION_ALERT" ]
+    } ],
+    "outcome" : {
+      "status" : "EVACUATION",
+      "deathSol" : 1,
+      "evacuationSol" : 1
+    }
+  },
+  "createdAt" : "2026-06-25T02:57:03.9990683"
+} ]
