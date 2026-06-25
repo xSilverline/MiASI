@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import miasi.backend.domains.analysis.domain.core.ResourceType;
 import miasi.backend.domains.analysis.domain.core.DailyBalance;
 import miasi.backend.domains.analysis.domain.core.Resource;
-import miasi.backend.domains.analysis.domain.core.ResourceType;
 import org.junit.jupiter.api.Test;
 
 class DailyBalanceTest {
