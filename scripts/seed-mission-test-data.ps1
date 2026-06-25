@@ -20,14 +20,22 @@ function Invoke-Api {
   }
 
   $json = $Body | ConvertTo-Json -Depth 30
-  return Invoke-RestMethod -Method $Method -Uri $uri -ContentType "application/json" -Body $json
+  try {
+    return Invoke-RestMethod -Method $Method -Uri $uri -ContentType "application/json" -Body $json
+  } catch {
+    Write-Host ""
+    Write-Host "Request failed: $Method $uri"
+    Write-Host "Payload:"
+    Write-Host $json
+    throw
+  }
 }
 
 $modules = @(
   @{
     name = "Solar Array"
     status = "ACTIVE"
-    category = "UTILITY_MODULE"
+    category = "ENERGY_MODULE"
     weight = 1200
     resourceConsumption = @()
     resourceProduction = @(
@@ -37,7 +45,7 @@ $modules = @(
   @{
     name = "Battery Bank"
     status = "ACTIVE"
-    category = "UTILITY_MODULE"
+    category = "ENERGY_MODULE"
     weight = 900
     resourceConsumption = @()
     resourceProduction = @(
@@ -86,7 +94,7 @@ $modules = @(
   @{
     name = "Habitat Module"
     status = "ACTIVE"
-    category = "LIVING_MODULE"
+    category = "UTILITY_MODULE"
     weight = 2600
     resourceConsumption = @(
       @{ resourceType = "ENERGY"; quantity = 15 },
