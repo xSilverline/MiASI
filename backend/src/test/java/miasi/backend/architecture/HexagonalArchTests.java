@@ -72,6 +72,24 @@ class HexagonalArchTests {
       classes().that().resideInAnyPackage("..ports..", "..port.out..").should().beInterfaces();
 
   @ArchTest
+  static final ArchRule analysis_input_use_cases_should_be_interfaces =
+      classes()
+          .that()
+          .resideInAnyPackage("..domains.analysis.application.port.in..")
+          .and()
+          .haveSimpleNameEndingWith("UseCase")
+          .should()
+          .beInterfaces();
+
+  @ArchTest
+  static final ArchRule analysis_output_ports_should_be_interfaces =
+      classes()
+          .that()
+          .resideInAnyPackage("..domains.analysis.application.port.out..")
+          .should()
+          .beInterfaces();
+
+  @ArchTest
   static final ArchRule output_port_implementations_are_in_infrastructure =
       classes()
           .that()
