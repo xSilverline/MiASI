@@ -1,13 +1,11 @@
 package miasi.backend.domains.authorization;
 
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class Authorization {
   private final IUserRepository repository;
   private final ConcurrentHashMap<String, Identity> cache = new ConcurrentHashMap<>();
@@ -17,7 +15,6 @@ public class Authorization {
     this.repository = repository;
     repository.findAll().forEach(i -> cache.put(i.getLogin(), i));
   }
-
 
   public synchronized String login(String login, String password) throws Exception {
     // session validation
@@ -43,7 +40,6 @@ public class Authorization {
     return activeSession.getSessionToken();
   }
 
-
   public synchronized void logout(String token) throws Exception {
     if (activeSession != null && activeSession.getSessionToken().equals(token)) {
       activeSession = null;
@@ -55,6 +51,4 @@ public class Authorization {
   public boolean isAuthenticated(String token) {
     return activeSession != null && activeSession.getSessionToken().equals(token);
   }
-
-
 }

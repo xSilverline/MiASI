@@ -1,6 +1,7 @@
 package miasi.backend.domains.analysis.domain.modules;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
@@ -8,6 +9,7 @@ import miasi.backend.domains.analysis.domain.core.Resource;
 
 @Value
 @Builder
+@AllArgsConstructor
 public class Module {
 
   String id;
@@ -29,11 +31,13 @@ public class Module {
   float efficiency;
 
   public Module copy() {
-    List<Resource> productionCopy = this.production != null ?
-        this.production.stream().map(Resource::copy).toList() : List.of();
+    List<Resource> productionCopy =
+        this.production != null ? this.production.stream().map(Resource::copy).toList() : List.of();
 
-    List<Resource> consumptionCopy = this.consumption != null ?
-        this.consumption.stream().map(Resource::copy).toList() : List.of();
+    List<Resource> consumptionCopy =
+        this.consumption != null
+            ? this.consumption.stream().map(Resource::copy).toList()
+            : List.of();
 
     return new Module(
         this.id,
@@ -44,7 +48,6 @@ public class Module {
         productionCopy,
         consumptionCopy,
         this.status,
-        this.efficiency
-    );
+        this.efficiency);
   }
 }

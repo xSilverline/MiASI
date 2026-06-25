@@ -20,8 +20,8 @@ public class PayloadWeightOptimizer {
   private final PowerGridPlanner powerGridPlanner;
   private final SimulationOutcomeEvaluator evaluator;
 
-  public OptimalConfiguration optimizeConfiguration(MissionManifest manifest,
-      List<Module> catalog) {
+  public OptimalConfiguration optimizeConfiguration(
+      MissionManifest manifest, List<Module> catalog) {
 
     List<Module> activeModules = initializeMandatoryModules(catalog);
 
@@ -69,17 +69,16 @@ public class PayloadWeightOptimizer {
     }
 
     boolean isLimitExceeded = isWeightLimitExceeded(bestTotalWeight, manifest);
-    return new OptimalConfiguration(activeModules, bestSol0Supplies, bestTotalWeight,
-        isLimitExceeded);
+    return new OptimalConfiguration(
+        activeModules, bestSol0Supplies, bestTotalWeight, isLimitExceeded);
   }
 
-
   private List<Resource> simulateAndFindDeficit(List<Module> modules, MissionManifest manifest) {
-    List<Resource> emptyWarehouse = List.of(
-        new Resource(ResourceType.OXYGEN, 0),
-        new Resource(ResourceType.WATER, 0),
-        new Resource(ResourceType.FOOD, 0)
-    );
+    List<Resource> emptyWarehouse =
+        List.of(
+            new Resource(ResourceType.OXYGEN, 0),
+            new Resource(ResourceType.WATER, 0),
+            new Resource(ResourceType.FOOD, 0));
 
     List<DailyState> timeline = timelineSimulator.simulate(manifest, modules, emptyWarehouse);
     return evaluator.calculateMinimumSurvivalSupplies(timeline);
@@ -96,9 +95,7 @@ public class PayloadWeightOptimizer {
   }
 
   private long countModules(List<Module> currentModules, Module target) {
-    return currentModules.stream()
-        .filter(m -> m.getId().equals(target.getId()))
-        .count();
+    return currentModules.stream().filter(m -> m.getId().equals(target.getId())).count();
   }
 
   private boolean isWeightLimitExceeded(float totalWeight, MissionManifest manifest) {

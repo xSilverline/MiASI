@@ -5,8 +5,7 @@ import java.util.List;
 public record RunNominalSimulationRequest(
     String payloadSessionId,
     List<ModuleDto> customizedModules,
-    List<SupplyDto> customizedSupplies
-) {
+    List<SupplyDto> customizedSupplies) {
 
   public record ModuleDto(
       String name,
@@ -14,23 +13,9 @@ public record RunNominalSimulationRequest(
       String category,
       float weight,
       List<ResourceDto> resourceConsumption,
-      List<ResourceDto> resourceProduction
-  ) {
+      List<ResourceDto> resourceProduction) {}
 
-  }
+  public record SupplyDto(String type, float amount, float weight) {}
 
-  public record SupplyDto(
-      String type,
-      float amount,
-      float weight
-  ) {
-
-  }
-
-  public record ResourceDto(
-      String resourceType,
-      float quantity
-  ) {
-
-  }
+  public record ResourceDto(String resourceType, float quantity) {}
 }

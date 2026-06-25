@@ -28,23 +28,19 @@ public class PayloadAppService implements IOptimizePayloadUseCase {
   public PayloadOptimizationSession optimize(OptimizePayloadCommand command) {
 
     MissionManifest manifest = dataProvider.getMissionManifest(command.missionPlanId());
-    List<Module> catalog = dataProvider.getModuleCatalog();
+    List<Module> catalog = dataProvider.getMissionModules(command.missionPlanId());
 
     OptimalConfiguration optimalConfig = optimizer.optimizeConfiguration(manifest, catalog);
 
-    PayloadOptimizationSession session = new PayloadOptimizationSession(
-        UUID.randomUUID().toString(),
-        manifest,
-        optimalConfig,
-        LocalDateTime.now()
-    );
+    PayloadOptimizationSession session =
+        new PayloadOptimizationSession(
+            UUID.randomUUID().toString(), manifest, optimalConfig, LocalDateTime.now());
 
     sessionRepository.save(session);
 
     // EDA
     eventPublisher.publishPayloadOptimizationCompleted(
-        new PayloadOptimizationCompletedEvent(session)
-    );
+        new PayloadOptimizationCompletedEvent(session));
 
     return session;
   }

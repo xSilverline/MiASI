@@ -8,5 +8,5 @@ public interface IMissionDataProviderPort {
 
   MissionManifest getMissionManifest(int missionPlanId);
 
-  List<Module> getModuleCatalog();
+  List<Module> getMissionModules(int missionPlanId);
 }

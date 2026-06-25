@@ -1,28 +1,114 @@
-[
-  {
-    "name": "TestModule",
-    "status": "ACTIVE",
-    "category": "UTILITY_MODULE",
-    "weight": 2137.0,
-    "resourceConsumption": [
-      {
-        "resourceType": "ENERGY",
-        "quantity": 1.0
-      },
-      {
-        "resourceType": "WATER",
-        "quantity": 1.0
-      }
-    ],
-    "resourceProduction": [
-      {
-        "resourceType": "FOOD",
-        "quantity": 2.5
-      },
-      {
-        "resourceType": "OXYGEN",
-        "quantity": 15.0
-      }
-    ]
-  }
-]
+[ {
+  "name" : "TestModule",
+  "status" : "ACTIVE",
+  "category" : "UTILITY_MODULE",
+  "weight" : 2137.0,
+  "resourceConsumption" : [ {
+    "resourceType" : "ENERGY",
+    "quantity" : 1.0
+  }, {
+    "resourceType" : "WATER",
+    "quantity" : 1.0
+  } ],
+  "resourceProduction" : [ {
+    "resourceType" : "FOOD",
+    "quantity" : 2.5
+  }, {
+    "resourceType" : "OXYGEN",
+    "quantity" : 15.0
+  } ]
+}, {
+  "name" : "Solar Array",
+  "status" : "ACTIVE",
+  "category" : "ENERGY_MODULE",
+  "weight" : 1200.0,
+  "resourceConsumption" : [ ],
+  "resourceProduction" : [ {
+    "resourceType" : "ENERGY",
+    "quantity" : 45.0
+  } ]
+}, {
+  "name" : "Battery Bank",
+  "status" : "ACTIVE",
+  "category" : "ENERGY_MODULE",
+  "weight" : 900.0,
+  "resourceConsumption" : [ ],
+  "resourceProduction" : [ {
+    "resourceType" : "ENERGY",
+    "quantity" : 8.0
+  } ]
+}, {
+  "name" : "Greenhouse",
+  "status" : "ACTIVE",
+  "category" : "UTILITY_MODULE",
+  "weight" : 1800.0,
+  "resourceConsumption" : [ {
+    "resourceType" : "ENERGY",
+    "quantity" : 10.0
+  }, {
+    "resourceType" : "WATER",
+    "quantity" : 6.0
+  } ],
+  "resourceProduction" : [ {
+    "resourceType" : "FOOD",
+    "quantity" : 18.0
+  }, {
+    "resourceType" : "OXYGEN",
+    "quantity" : 5.0
+  } ]
+}, {
+  "name" : "Oxygen Generator",
+  "status" : "ACTIVE",
+  "category" : "UTILITY_MODULE",
+  "weight" : 1100.0,
+  "resourceConsumption" : [ {
+    "resourceType" : "ENERGY",
+    "quantity" : 12.0
+  }, {
+    "resourceType" : "WATER",
+    "quantity" : 2.0
+  } ],
+  "resourceProduction" : [ {
+    "resourceType" : "OXYGEN",
+    "quantity" : 35.0
+  } ]
+}, {
+  "name" : "Water Recycler",
+  "status" : "ACTIVE",
+  "category" : "UTILITY_MODULE",
+  "weight" : 1300.0,
+  "resourceConsumption" : [ {
+    "resourceType" : "ENERGY",
+    "quantity" : 8.0
+  } ],
+  "resourceProduction" : [ {
+    "resourceType" : "WATER",
+    "quantity" : 24.0
+  } ]
+}, {
+  "name" : "Habitat Module",
+  "status" : "ACTIVE",
+  "category" : "UTILITY_MODULE",
+  "weight" : 2600.0,
+  "resourceConsumption" : [ {
+    "resourceType" : "ENERGY",
+    "quantity" : 15.0
+  }, {
+    "resourceType" : "OXYGEN",
+    "quantity" : 4.0
+  } ],
+  "resourceProduction" : [ ]
+}, {
+  "name" : "Research Lab",
+  "status" : "ACTIVE",
+  "category" : "UTILITY_MODULE",
+  "weight" : 1600.0,
+  "resourceConsumption" : [ {
+    "resourceType" : "ENERGY",
+    "quantity" : 14.0
+  }, {
+    "resourceType" : "WATER",
+    "quantity" : 1.0
+  } ],
+  "resourceProduction" : [ ]
+} ]

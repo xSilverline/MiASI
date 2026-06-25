@@ -1,0 +1,56 @@
+[ {
+  "description" : "Cargo lander delivers oxygen tanks.",
+  "effects" : [ {
+    "target" : "OXYGEN",
+    "value" : 80.0,
+    "unit" : "L",
+    "description" : "Extra oxygen supply."
+  } ],
+  "id" : "81c0989c-bbed-4075-b98a-382237b43aa6",
+  "sol" : 5,
+  "type" : "SUPPLY_DELIVERY"
+}, {
+  "description" : "Cargo lander delivers food supplies.",
+  "effects" : [ {
+    "target" : "FOOD",
+    "value" : 30.0,
+    "unit" : "KG",
+    "description" : "Extra food supply."
+  } ],
+  "id" : "abf35e01-9f5d-46de-9709-1f46baa2034d",
+  "sol" : 10,
+  "type" : "SUPPLY_DELIVERY"
+}, {
+  "description" : "Dust storm hits solar panels.",
+  "effects" : [ {
+    "target" : "ENERGY",
+    "value" : -15.0,
+    "unit" : "PERCENT",
+    "description" : "Lower energy production."
+  } ],
+  "id" : "ace25103-02db-4edc-b7d3-7706bb82931d",
+  "sol" : 15,
+  "type" : "THREAT"
+}, {
+  "description" : "Water storage leak detected.",
+  "effects" : [ {
+    "target" : "WATER",
+    "value" : -20.0,
+    "unit" : "L",
+    "description" : "Lost water."
+  } ],
+  "id" : "615babe7-055b-4331-bcaa-c8a34873c998",
+  "sol" : 18,
+  "type" : "THREAT"
+}, {
+  "description" : "Habitat pressure is unstable.",
+  "effects" : [ {
+    "target" : "habitat",
+    "value" : -1.0,
+    "unit" : "STATE",
+    "description" : "Module state changed."
+  } ],
+  "id" : "02facaeb-20ae-41d2-a93e-67245962e226",
+  "sol" : 22,
+  "type" : "MODULE_STATE_CHANGE"
+} ]

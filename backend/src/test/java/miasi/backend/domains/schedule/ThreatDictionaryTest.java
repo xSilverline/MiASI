@@ -1,14 +1,13 @@
 package miasi.backend.domains.schedule;
 
-import miasi.backend.domains.schedule.enums.DifficultyLevel;
-import miasi.backend.domains.schedule.enums.ThreatType;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import miasi.backend.domains.schedule.enums.DifficultyLevel;
+import miasi.backend.domains.schedule.enums.ThreatType;
+import org.junit.jupiter.api.Test;
 
 class ThreatDictionaryTest {
 

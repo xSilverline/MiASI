@@ -28,7 +28,7 @@
     <url/>
   </scm>
   <properties>
-    <java.version>23</java.version>
+    <java.version>21</java.version>
   </properties>
   <build>
     <plugins>
@@ -78,7 +78,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.2.5</version>
         <configuration>
-          <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+          <argLine>@{argLine} -XX:+EnableDynamicAgentLoading</argLine>
         </configuration>
       </plugin>
     </plugins>
@@ -88,6 +88,10 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springdoc</groupId>
@@ -103,6 +107,12 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
       <version>5.10.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit-junit5</artifactId>
+      <version>1.4.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -129,19 +139,8 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-controls</artifactId>
-      <version>22-ea+11</version>
-    </dependency>
-    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.tngtech.archunit</groupId>
-      <artifactId>archunit-junit5</artifactId>
-      <version>1.4.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

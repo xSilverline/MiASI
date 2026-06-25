@@ -14,15 +14,11 @@ import org.springframework.stereotype.Component;
 public class AnalysisEventPublisherAdapter implements IAnalysisEventPublisherPort {
 
   @Override
-  public void publishPayloadOptimizationCompleted(PayloadOptimizationCompletedEvent event) {
-  }
+  public void publishPayloadOptimizationCompleted(PayloadOptimizationCompletedEvent event) {}
 
   @Override
-  public void publishNominalSimulationCompleted(NominalSimulationCompletedEvent event) {
-  }
+  public void publishNominalSimulationCompleted(NominalSimulationCompletedEvent event) {}
 
   @Override
-  public void publishScenariosAnalysisCompleted(ScenariosAnalysisCompletedEvent event) {
-
-  }
+  public void publishScenariosAnalysisCompleted(ScenariosAnalysisCompletedEvent event) {}
 }

@@ -12,7 +12,7 @@ import miasi.backend.domains.analysis.domain.core.VariantType;
 @AllArgsConstructor
 public class SimulationVariant {
 
-  VariantType type;                 // IDEAL lub REAL
-  List<DailyState> timeline;        // Wygenerowana oś czasu (Sol po Solu)
-  SimulationOutcome outcome;        // Pudełko zawierające status, deathSol i evacuationSol
+  VariantType type; // IDEAL lub REAL
+  List<DailyState> timeline; // Wygenerowana oś czasu (Sol po Solu)
+  SimulationOutcome outcome; // Pudełko zawierające status, deathSol i evacuationSol
 }

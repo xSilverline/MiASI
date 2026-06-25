@@ -17,8 +17,8 @@ public class CrewGroup {
   ConsumptionProfile optimalNeeds;
 
   public List<Resource> getDailyDemand(ConsumptionMode mode) {
-    return mode == ConsumptionMode.OPTIMAL ?
-        optimalNeeds.getDailyConsumption() :
-        minimalNeeds.getDailyConsumption();
+    return mode == ConsumptionMode.OPTIMAL
+        ? optimalNeeds.getDailyConsumption()
+        : minimalNeeds.getDailyConsumption();
   }
 }

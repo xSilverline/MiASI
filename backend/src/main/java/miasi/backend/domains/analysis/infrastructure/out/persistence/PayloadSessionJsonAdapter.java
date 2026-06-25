@@ -11,14 +11,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class PayloadSessionJsonAdapter implements IPayloadSessionRepositoryPort {
 
-  private final JsonFileStorage<PayloadOptimizationSession> database = new JsonFileStorage<>(
-      PayloadOptimizationSession.class);
+  private final JsonFileStorage<PayloadOptimizationSession> database =
+      new JsonFileStorage<>(PayloadOptimizationSession.class);
   private final String filePath;
   private List<PayloadOptimizationSession> sessions = new ArrayList<>();
 
   public PayloadSessionJsonAdapter(
-      @Value("${database.filename.analysis.payload}") String filePath
-  ) {
+      @Value("${database.filename.analysis.payload}") String filePath) {
     this.filePath = filePath;
     List<PayloadOptimizationSession> loaded = database.loadListFromFile(filePath);
     if (loaded != null) {

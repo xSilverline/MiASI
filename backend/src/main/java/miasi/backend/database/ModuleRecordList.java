@@ -1,11 +1,10 @@
 package miasi.backend.database;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)

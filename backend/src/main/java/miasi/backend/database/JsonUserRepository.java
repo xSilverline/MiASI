@@ -1,13 +1,12 @@
 package miasi.backend.database;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import miasi.backend.domains.authorization.IUserRepository;
 import miasi.backend.domains.authorization.Identity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 @Repository
 public class JsonUserRepository implements IUserRepository {
@@ -29,8 +28,7 @@ public class JsonUserRepository implements IUserRepository {
   public Collection<Identity> findAll() {
 
     List<Identity> identities = database.loadListFromFile(filePath);
-    if (identities == null)
-      return new ArrayList<>();
+    if (identities == null) return new ArrayList<>();
 
     return identities;
   }

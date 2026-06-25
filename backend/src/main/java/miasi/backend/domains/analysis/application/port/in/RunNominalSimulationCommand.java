@@ -5,7 +5,7 @@ import miasi.backend.domains.analysis.domain.core.Resource;
 import miasi.backend.domains.analysis.domain.modules.Module;
 
 public record RunNominalSimulationCommand(
-    String payloadSessionId,           // ID wyliczonej Fazy 1 (z jakiego punktu startujemy)
-    List<Module> customizedModules,    // To, co użytkownik zmienił
-    List<Resource> customizedSupplies  // To, co użytkownik zmienił
-) {}
+    String payloadSessionId, // ID wyliczonej Fazy 1 (z jakiego punktu startujemy)
+    List<Module> customizedModules, // To, co użytkownik zmienił
+    List<Resource> customizedSupplies // To, co użytkownik zmienił
+    ) {}

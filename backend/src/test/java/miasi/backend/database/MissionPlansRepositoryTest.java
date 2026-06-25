@@ -1,5 +1,12 @@
 package miasi.backend.database;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import miasi.backend.domains.configuration.missionPlan.MissionPlan;
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
@@ -12,22 +19,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 @ActiveProfiles("test")
 class MissionPlansRepositoryTest {
   @Value("${database.filename.missions}")
   String path;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
   private MissionPlansRepository repository;
 
@@ -96,8 +94,7 @@ class MissionPlansRepositoryTest {
     JSONAssert.assertEquals(
         objectMapper.writeValueAsString(plan),
         objectMapper.writeValueAsString(newRepo.findById(1)),
-        true
-    );
+        true);
   }
 
   @Test

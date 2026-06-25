@@ -21,5 +21,5 @@ public class DailyState {
   DailyBalance balance;
   ConsumptionMode mode;
   List<Module> modules;
-  Set<ObservationType> observations;  // !!!
+  Set<ObservationType> observations; // !!!
 }

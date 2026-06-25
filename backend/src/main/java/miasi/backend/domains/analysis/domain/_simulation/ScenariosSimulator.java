@@ -31,8 +31,8 @@ public class ScenariosSimulator {
     List<DailyState> realTimeline = timelineSimulator.simulate(threatManifest, modules, supplies);
 
     SimulationOutcome realOutcome = outcomeEvaluator.evaluate(realTimeline, threatManifest);
-    SimulationVariant realVariant = new SimulationVariant(VariantType.REAL, realTimeline,
-        realOutcome);
+    SimulationVariant realVariant =
+        new SimulationVariant(VariantType.REAL, realTimeline, realOutcome);
 
     return new ScenariosAnalysisSession(
         UUID.randomUUID().toString(),
@@ -41,7 +41,6 @@ public class ScenariosSimulator {
         threats,
         nominalSession.getNominalVariant(),
         realVariant,
-        LocalDateTime.now()
-    );
+        LocalDateTime.now());
   }
 }

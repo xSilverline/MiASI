@@ -8,7 +8,6 @@ import miasi.backend.domains.analysis.domain.core.Resource;
 import miasi.backend.domains.analysis.domain.core.ResourceType;
 import miasi.backend.domains.analysis.domain.core.Status;
 
-
 public class SimulationOutcomeEvaluator {
 
   public SimulationOutcome evaluate(List<DailyState> timeline, MissionManifest manifest) {
@@ -20,8 +19,8 @@ public class SimulationOutcomeEvaluator {
         deathSol = state.getSol();
       }
 
-      if (sosCalledSol == null && state.getObservations()
-          .contains(ObservationType.EVACUATION_ALERT)) {
+      if (sosCalledSol == null
+          && state.getObservations().contains(ObservationType.EVACUATION_ALERT)) {
         sosCalledSol = state.getSol();
       }
     }
@@ -40,7 +39,6 @@ public class SimulationOutcomeEvaluator {
     return new SimulationOutcome(status, deathSol, evacuationSol);
   }
 
-
   public List<Resource> calculateMinimumSurvivalSupplies(List<DailyState> timeline) {
     float minOxygen = 0, minWater = 0, minFood = 0;
 
@@ -53,16 +51,17 @@ public class SimulationOutcomeEvaluator {
     return List.of(
         new Resource(ResourceType.OXYGEN, Math.abs(minOxygen)),
         new Resource(ResourceType.WATER, Math.abs(minWater)),
-        new Resource(ResourceType.FOOD, Math.abs(minFood))
-    );
+        new Resource(ResourceType.FOOD, Math.abs(minFood)));
   }
 
   private boolean hasAnyResourceDeficit(List<Resource> warehouse) {
-    return warehouse.stream().anyMatch(r ->
-        (r.getType() == ResourceType.OXYGEN ||
-            r.getType() == ResourceType.WATER ||
-            r.getType() == ResourceType.FOOD) && r.getAmount() < 0
-    );
+    return warehouse.stream()
+        .anyMatch(
+            r ->
+                (r.getType() == ResourceType.OXYGEN
+                        || r.getType() == ResourceType.WATER
+                        || r.getType() == ResourceType.FOOD)
+                    && r.getAmount() < 0);
   }
 
   private float getResourceAmount(List<Resource> warehouse, ResourceType type) {

@@ -28,9 +28,8 @@ public class TimelineSimulator {
   private final PowerGridSimulator powerGridSimulator;
   private final SurvivalPredictor survivalPredictor;
 
-
-  public List<DailyState> simulate(MissionManifest manifest, List<Module> activeModules,
-      List<Resource> startingResources) {
+  public List<DailyState> simulate(
+      MissionManifest manifest, List<Module> activeModules, List<Resource> startingResources) {
     List<Resource> warehouse = copyResources(startingResources);
     List<Module> currentModules = copyModules(activeModules);
     List<DailyState> timeline = new ArrayList<>();
@@ -39,8 +38,8 @@ public class TimelineSimulator {
 
     ConsumptionMode previousMode = ConsumptionMode.OPTIMAL;
     for (int sol = 1; sol <= totalDays; sol++) {
-      DailyState dailyState = simulateSingleDay(sol, totalDays, warehouse, currentModules, manifest,
-          previousMode);
+      DailyState dailyState =
+          simulateSingleDay(sol, totalDays, warehouse, currentModules, manifest, previousMode);
       timeline.add(dailyState);
       previousMode = dailyState.getMode();
     }
@@ -48,35 +47,51 @@ public class TimelineSimulator {
     return timeline;
   }
 
-  private DailyState simulateSingleDay(int sol, int totalDays, List<Resource> warehouse,
-      List<Module> currentModules, MissionManifest manifest, ConsumptionMode previousMode) {
+  private DailyState simulateSingleDay(
+      int sol,
+      int totalDays,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest,
+      ConsumptionMode previousMode) {
     Set<ObservationType> observations = new java.util.HashSet<>();
     processExternalEvents(sol, warehouse, currentModules, manifest, observations);
     processPowerGrid(warehouse, currentModules, observations);
-    ConsumptionMode currentMode = evaluateSurvivalAndMode(sol, totalDays, warehouse, currentModules,
-        manifest, previousMode, observations);
+    ConsumptionMode currentMode =
+        evaluateSurvivalAndMode(
+            sol, totalDays, warehouse, currentModules, manifest, previousMode, observations);
     DailyBalance todayBalance = calculateDailyBalance(currentModules, manifest, currentMode);
     updateWarehouse(warehouse, todayBalance);
 
-    return new DailyState(sol, copyResources(warehouse), todayBalance, currentMode,
-        copyModules(currentModules), observations);
+    return new DailyState(
+        sol,
+        copyResources(warehouse),
+        todayBalance,
+        currentMode,
+        copyModules(currentModules),
+        observations);
   }
 
-  private void processExternalEvents(int sol, List<Resource> warehouse, List<Module> currentModules,
-      MissionManifest manifest, Set<ObservationType> observations) {
+  private void processExternalEvents(
+      int sol,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest,
+      Set<ObservationType> observations) {
     deliveryProcessor.process(sol, manifest.getDeliveries(), currentModules, warehouse);
     threatProcessor.process(sol, manifest.getThreats(), currentModules, warehouse);
 
-    boolean hasDelivery = manifest.getDeliveries() != null &&
-        manifest.getDeliveries().stream().anyMatch(d -> d.getSol() == sol);
+    boolean hasDelivery =
+        manifest.getDeliveries() != null
+            && manifest.getDeliveries().stream().anyMatch(d -> d.getSol() == sol);
 
     if (hasDelivery) {
       observations.add(ObservationType.DELIVERY_RECEIVED);
     }
   }
 
-  private void processPowerGrid(List<Resource> warehouse, List<Module> currentModules,
-      Set<ObservationType> observations) {
+  private void processPowerGrid(
+      List<Resource> warehouse, List<Module> currentModules, Set<ObservationType> observations) {
     float availableEnergy = powerGridSimulator.getEnergyAmount(warehouse);
 
     if (powerGridSimulator.process(availableEnergy, currentModules)) {
@@ -84,14 +99,20 @@ public class TimelineSimulator {
     }
   }
 
-  private ConsumptionMode evaluateSurvivalAndMode(int sol, int totalDays, List<Resource> warehouse,
-      List<Module> currentModules, MissionManifest manifest, ConsumptionMode previousMode,
+  private ConsumptionMode evaluateSurvivalAndMode(
+      int sol,
+      int totalDays,
+      List<Resource> warehouse,
+      List<Module> currentModules,
+      MissionManifest manifest,
+      ConsumptionMode previousMode,
       Set<ObservationType> observations) {
-    ConsumptionMode currentMode = survivalPredictor.evaluateCrewConsumptionMode(sol, totalDays,
-        warehouse, currentModules, manifest);
+    ConsumptionMode currentMode =
+        survivalPredictor.evaluateCrewConsumptionMode(
+            sol, totalDays, warehouse, currentModules, manifest);
 
-    if (survivalPredictor.checkIfEvacuationIsNeeded(sol, totalDays, warehouse, currentModules,
-        manifest)) {
+    if (survivalPredictor.checkIfEvacuationIsNeeded(
+        sol, totalDays, warehouse, currentModules, manifest)) {
       observations.add(ObservationType.EVACUATION_ALERT);
     }
 
@@ -104,12 +125,13 @@ public class TimelineSimulator {
     return currentMode;
   }
 
-  private DailyBalance calculateDailyBalance(List<Module> currentModules, MissionManifest manifest,
-      ConsumptionMode currentMode) {
+  private DailyBalance calculateDailyBalance(
+      List<Module> currentModules, MissionManifest manifest, ConsumptionMode currentMode) {
     DailyBalance balance = new DailyBalance();
 
     productionCalculator.calculateModulesProduction(currentModules).forEach(balance::addProduction);
-    demandCalculator.calculateCrewDemand(manifest.getCrew(), currentMode)
+    demandCalculator
+        .calculateCrewDemand(manifest.getCrew(), currentMode)
         .forEach(balance::addConsumption);
     demandCalculator.calculateModulesDemand(currentModules).forEach(balance::addConsumption);
 
@@ -121,7 +143,6 @@ public class TimelineSimulator {
     warehouse.clear();
     warehouse.addAll(updated);
   }
-
 
   private List<Resource> copyResources(List<Resource> source) {
     if (source == null) {

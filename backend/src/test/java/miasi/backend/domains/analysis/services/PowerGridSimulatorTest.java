@@ -32,10 +32,7 @@ class PowerGridSimulatorTest {
     when(demandCalculator.calculateModulesDemand(any()))
         .thenReturn(List.of(new Resource(ResourceType.ENERGY, 50f)));
 
-    Module realModule = Module.builder()
-        .name("Wiertnica")
-        .status(ModuleState.ACTIVE)
-        .build();
+    Module realModule = Module.builder().name("Wiertnica").status(ModuleState.ACTIVE).build();
 
     List<Module> currentModules = new ArrayList<>(List.of(realModule));
 
@@ -45,7 +42,9 @@ class PowerGridSimulatorTest {
     // Then
     assertTrue(blackoutOccurred, "Powinien wystąpić blackout (zwrócić true)");
 
-    assertEquals(ModuleState.INACTIVE, currentModules.get(0).getStatus(),
+    assertEquals(
+        ModuleState.INACTIVE,
+        currentModules.get(0).getStatus(),
         "Moduł powinien zostać wyłączony z powodu braku energii");
   }
 
@@ -61,10 +60,8 @@ class PowerGridSimulatorTest {
     when(demandCalculator.calculateModulesDemand(any()))
         .thenReturn(List.of(new Resource(ResourceType.ENERGY, 50f)));
 
-    Module realModule = Module.builder()
-        .name("Farma Hydroponiczna")
-        .status(ModuleState.ACTIVE)
-        .build();
+    Module realModule =
+        Module.builder().name("Farma Hydroponiczna").status(ModuleState.ACTIVE).build();
 
     List<Module> currentModules = new ArrayList<>(List.of(realModule));
 
@@ -73,8 +70,8 @@ class PowerGridSimulatorTest {
 
     // Then
     assertFalse(blackoutOccurred, "Blackout nie powinien wystąpić (zwrócić false)");
-    assertEquals(ModuleState.ACTIVE, currentModules.get(0).getStatus(),
-        "Moduł powinien pozostać aktywny");
+    assertEquals(
+        ModuleState.ACTIVE, currentModules.get(0).getStatus(), "Moduł powinien pozostać aktywny");
   }
 
   @Test
@@ -94,10 +91,8 @@ class PowerGridSimulatorTest {
     // Given
     PowerGridSimulator processor = new PowerGridSimulator(mock(), mock());
 
-    List<Resource> resources = List.of(
-        new Resource(ResourceType.FOOD, 10),
-        new Resource(ResourceType.ENERGY, 25)
-    );
+    List<Resource> resources =
+        List.of(new Resource(ResourceType.FOOD, 10), new Resource(ResourceType.ENERGY, 25));
 
     // When
     float result = processor.getEnergyAmount(resources);

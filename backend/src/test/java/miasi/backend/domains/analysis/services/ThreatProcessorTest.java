@@ -76,8 +76,8 @@ class ThreatProcessorTest {
     Threat threat = mock(Threat.class);
 
     // Używamy Buildera i PRAWDZIWEGO obiektu!
-    Module module = Module.builder().name("DRILL").efficiency(0.8f).status(ModuleState.ACTIVE)
-        .build();
+    Module module =
+        Module.builder().name("DRILL").efficiency(0.8f).status(ModuleState.ACTIVE).build();
 
     when(threat.getSol()).thenReturn(1);
     when(threat.getDurationSols()).thenReturn(5);
@@ -99,8 +99,8 @@ class ThreatProcessorTest {
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
 
-    Module module = Module.builder().name("MODULE").efficiency(1f).status(ModuleState.ACTIVE)
-        .build();
+    Module module =
+        Module.builder().name("MODULE").efficiency(1f).status(ModuleState.ACTIVE).build();
 
     when(threat.getSol()).thenReturn(1);
     when(threat.getDurationSols()).thenReturn(5);
@@ -134,8 +134,8 @@ class ThreatProcessorTest {
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
 
-    Module module = Module.builder().name("ENGINE").efficiency(1.0f).status(ModuleState.ACTIVE)
-        .build();
+    Module module =
+        Module.builder().name("ENGINE").efficiency(1.0f).status(ModuleState.ACTIVE).build();
 
     when(threat.getSol()).thenReturn(1);
     when(threat.getDurationSols()).thenReturn(3);
@@ -176,8 +176,8 @@ class ThreatProcessorTest {
     ThreatProcessor processor = new ThreatProcessor();
     Threat threat = mock(Threat.class);
 
-    Module module = Module.builder().name("ENGINE").efficiency(1.0f).status(ModuleState.ACTIVE)
-        .build();
+    Module module =
+        Module.builder().name("ENGINE").efficiency(1.0f).status(ModuleState.ACTIVE).build();
 
     when(threat.getSol()).thenReturn(10);
     when(threat.getDurationSols()).thenReturn(2);
