@@ -25,6 +25,7 @@ interface CustomXAxisTickProps {
 }
 interface UsageChartProps {
   data: ChartDataPoint[];
+  missionDuration: number;
 }
 
 interface CustomTooltipProps {
@@ -125,7 +126,10 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
   return null;
 };
 
-export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
+export const UsageChart: React.FC<UsageChartProps> = ({
+  data,
+  missionDuration,
+}) => {
   if (!data || data.length === 0) {
     return (
       <div className="flex h-full items-center justify-center text-slate-500 uppercase text-xs tracking-widest">
@@ -133,6 +137,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
       </div>
     );
   }
+  const maxSol = Math.ceil(missionDuration * 1.05);
   return (
     <div className="bg-mars-itemBackground p-6 rounded-xl shadow-md w-full flex flex-col flex-1 min-h-75">
       <div className="flex justify-between items-center mb-6 shrink-0">
@@ -165,7 +170,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
             <XAxis
               dataKey="sol"
               type="number"
-              domain={[0, TOTAL_SIMULATION_DAYS]}
+              domain={[0, maxSol]}
               ticks={xMajorTicks}
               stroke="#94a3b8"
               axisLine={false}
@@ -225,7 +230,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
               strokeWidth={3}
             />
             <ReferenceLine
-              x={MISSION_DURATION}
+              x={missionDuration}
               stroke="#ff0000"
               opacity={0.5}
               strokeWidth={3}
@@ -233,7 +238,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
 
             <Line
               type="monotone"
-              dataKey="woda"
+              dataKey="waterStore"
               stroke="#22d3ee"
               strokeWidth={2}
               dot={false}
@@ -241,7 +246,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
             />
             <Line
               type="monotone"
-              dataKey="tlen"
+              dataKey="oxygenStore"
               stroke="#a855f7"
               strokeWidth={2}
               dot={false}
@@ -249,7 +254,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
             />
             <Line
               type="monotone"
-              dataKey="zywnosc"
+              dataKey="foodStore"
               stroke="#16a34a"
               strokeWidth={2}
               dot={false}
@@ -257,7 +262,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({ data }) => {
             />
             <Line
               type="monotone"
-              dataKey="energia"
+              dataKey="energyStore"
               stroke="#eab308"
               strokeWidth={2}
               dot={false}

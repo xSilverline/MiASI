@@ -1,26 +1,27 @@
-﻿export type TargetType = "module" | "resource";
-export type ActionType = "efficiency" | "plus" | "minus";
+﻿export type EventType = "SUPPLY_DELIVERY" | "THREAT" | "MODULE_STATE_CHANGE";
 
-export interface EventImpact {
-  id: string;
-  targetId: string;
-  targetName: string;
-  targetType: TargetType;
-  actionType: ActionType;
+export interface EventEffect {
+  target: string;
   value: number;
+  unit: string;
+  description?: string;
 }
 
 export interface EventData {
   id: string;
-  name: string;
-  type: string;
-  duration: number;
-  impacts: EventImpact[];
+  name?: string;
+  type: EventType;
+  description?: string;
+  sol?: number;
+  duration?: number;
+  effects: EventEffect[];
 }
 
 export interface ScheduledEvent {
-  id: string; // Unikalne ID instancji w harmonogramie
-  eventId: string; // ID zdarzenia z bazy (np. 'ev-1')
+  id: string;
+  eventId: string;
   startDay: number;
   duration: number;
 }
+
+

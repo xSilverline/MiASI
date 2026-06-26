@@ -7,7 +7,6 @@ export const useMissionData = () => {
   const [config, setConfig] = useState<MissionDashboardConfig | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Zmienne stanowe do śledzenia statusu API i sesji
   const [isDataModified, setIsDataModified] = useState<boolean>(false);
   const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
   const [isRecalculating, setIsRecalculating] = useState<boolean>(false);
@@ -21,7 +20,7 @@ export const useMissionData = () => {
     try {
       const data = await missionRepository.getConfig();
       setConfig(data);
-      return data; // Zwracamy pobrane dane (lub null), żeby App.tsx mogło podjąć decyzję o routingu
+      return data;
     } catch (error) {
       console.error("Błąd pobierania konfiguracji", error);
       return null;
@@ -34,29 +33,66 @@ export const useMissionData = () => {
     const updatedConfig = config
       ? { ...config, ...newData }
       : (newData as MissionDashboardConfig);
-
     setConfig(updatedConfig);
     setIsDataModified(true);
-    setPayloadSessionId(null);
 
     try {
-      await missionRepository.saveConfig(newData);
+      await missionRepository.saveConfig(updatedConfig);
+
+      const freshConfig = await missionRepository.getConfig();
+      if (freshConfig) {
+        setConfig(freshConfig);
+      }
     } catch (error) {
       console.error("Błąd zapisu", error);
     }
   };
 
   const optimize = async () => {
+    if (!config) return;
     setIsOptimizing(true);
     try {
-      const { payloadSessionId, updatedConfig } =
+      // 1. Pobieramy zoptymalizowany plan z API
+      const { payloadSessionId: newPayloadId, updatedConfig } =
         await missionRepository.optimize();
-      setPayloadSessionId(payloadSessionId);
-      setConfig((prev) => (prev ? { ...prev, ...updatedConfig } : null));
+      setPayloadSessionId(newPayloadId);
+
+      // 2. Bezpieczne łączenie (Merge) - zachowujemy wszystko to, czego
+      // optymalizacja mogła nie zwrócić (np. eventsList)
+      const mergedConfig = {
+        ...config,
+        ...updatedConfig,
+        // Zapewniamy, że tablice są zawsze tablicami, nawet jeśli API zwróci undefined
+        modulesList: updatedConfig.modulesList || config.modulesList,
+        startingResources:
+          updatedConfig.startingResources || config.startingResources,
+      };
+
+      // 3. Zapisujemy zmergowany stan lokalnie
+      setConfig(mergedConfig);
+
+      // 4. TWARDY ZAPIS do bazy (niezbędne, aby kolejne wywołania API wiedziały o zmianach)
+      await missionRepository.saveConfig(mergedConfig);
+
+      // 5. Ostateczna synchronizacja (Pobranie "Source of Truth" z bazy)
+      const freshConfig = await missionRepository.getConfig();
+      if (freshConfig) {
+        setConfig(freshConfig);
+      }
+
+      // 6. Rekalkulacja wykresów na już zapisanych danych
+      setIsRecalculating(true);
+      const { nominalSessionId: newNominalId, chartData: newChartData } =
+        await missionRepository.recalculate(newPayloadId);
+
+      setNominalSessionId(newNominalId);
+      setChartData(newChartData);
+      setIsDataModified(false);
     } catch (error) {
-      console.error("Błąd optymalizacji", error);
+      console.error("Błąd podczas optymalizacji i synchronizacji:", error);
     } finally {
       setIsOptimizing(false);
+      setIsRecalculating(false);
     }
   };
 
@@ -85,6 +121,7 @@ export const useMissionData = () => {
     isOptimizing,
     isRecalculating,
     payloadSessionId,
+    nominalSessionId,
     chartData,
     updateConfig,
     optimize,

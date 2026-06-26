@@ -126,12 +126,12 @@ export const DayScheduleModal: React.FC<DayScheduleModalProps> = ({
                   <div className="flex items-center gap-4 min-w-0">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider shrink-0 ${
-                        item.eventDetails.type === "pogodowe"
+                        item.eventDetails.type === "THREAT"
                           ? "bg-red-600 text-white"
                           : "bg-green-500 text-white"
                       }`}
                     >
-                      {item.eventDetails.type === "pogodowe"
+                      {item.eventDetails.type === "THREAT"
                         ? "Zagrożenie"
                         : "Sukces"}
                     </span>

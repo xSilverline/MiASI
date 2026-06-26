@@ -12,52 +12,47 @@ import { HeaderCard } from "./components/HeaderCard.tsx";
 import { DetailCard, type DetailItem } from "./components/DetailCard.tsx";
 import { UsageChart } from "./components/UsageChart.tsx";
 import { formatNumber } from "./utils/formatters.ts";
-import {
-  ENERGY_PRODUCTION,
-  ENERGY_USAGE,
-  ENERGY_DIFFERENCE,
-} from "../infrastructure/mock-data/config.ts";
 import { ScheduleView } from "./views/Schedule/ScheduleView.tsx";
-
-export type ViewState = "login" | "dashboard" | "configCreator" | string;
 import { LoginView } from "./views/LoginView.tsx";
 import {
   ConfigCreatorView,
   type StandaloneViewType,
 } from "./views/ConfigCreator/ConfigCreatorView.tsx";
-
 import type { ModuleData } from "../core/domain/entities/module.ts";
 import type { EventData } from "../core/domain/entities/event.ts";
-
+import type { GeneralConfigData } from "./views/ConfigCreator/ResourceConfigView.tsx";
 import { useMissionData } from "./hooks/useMissionData.ts";
-
 import {
   CrewModal,
   ResourcesModal,
   ModulesModal,
 } from "./components/DashboardModals.tsx";
-import type { ResourceConsumption } from "../core/domain/value-objects/ResourceConsuption.ts";
 import type {
   MissionDashboardConfig,
   ModuleWithCount,
 } from "../core/domain/entities/MissionConfig.ts";
+import { SimulationView } from "./views/Simulation/SimulationView.tsx";
+
+export type ViewState = "login" | "dashboard" | "configCreator" | string;
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>("login");
   const [isManualWizard, setIsManualWizard] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
+
   const {
     config,
     isLoading,
     isDataModified,
     isRecalculating,
-    updateConfig,
-    recalculate,
-    optimize,
     isOptimizing,
     payloadSessionId,
     chartData,
+    updateConfig,
+    recalculate,
+    optimize,
     loadConfig,
+    nominalSessionId,
   } = useMissionData();
 
   const [isCrewModalOpen, setIsCrewModalOpen] = useState(false);
@@ -68,46 +63,41 @@ const App: React.FC = () => {
     const initApp = async () => {
       const token = localStorage.getItem("sessionToken");
       if (token) {
-        // Jeśli jest token, próbujemy od razu pobrać konfigurację
         const data = await loadConfig();
-        // Weryfikacja: jest config -> Dashboard, nie ma -> Kreator
         setCurrentView(data ? "dashboard" : "configCreator");
       } else {
         setCurrentView("login");
       }
       setIsInitializing(false);
     };
-
     void initApp();
   }, [loadConfig]);
 
   const handleLogin = async () => {
     setIsManualWizard(false);
-    // Weryfikacja: Pobieramy dane i decydujemy gdzie posłać usera
     const data = await loadConfig();
     setCurrentView(data ? "dashboard" : "configCreator");
   };
 
   const handleConfigFinish = (data?: {
+    general?: GeneralConfigData;
     modules?: ModuleData[];
     events?: EventData[];
-    consumption?: ResourceConsumption;
   }) => {
     if (data) {
       let hasChanges = false;
       const updates: Partial<MissionDashboardConfig> = {};
 
-      // Jeśli config nie istnieje, tworzymy go i dodajemy domyślne parametry
-      if (!config) {
-        updates.crew = { men: 2, women: 2 };
-        updates.resources = { oxygen: 50000, water: 30000, food: 3100 };
-        updates.missionDuration = 700;
+      if (data.general) {
+        updates.missionDuration = data.general.missionDuration;
+        updates.maxStartingWeight = data.general.maxStartingWeight;
+        updates.crew = data.general.crew;
+        updates.startingResources = data.general.startingResources;
         hasChanges = true;
       }
 
       if (data.modules) {
         updates.modulesList = data.modules.map((newMod) => {
-          // Bezpieczne szukanie w configu (który może być nullem)
           const existing = config?.modulesList?.find((p) => p.id === newMod.id);
           return {
             ...newMod,
@@ -122,25 +112,12 @@ const App: React.FC = () => {
         hasChanges = true;
       }
 
-      if (data.consumption) {
-        updates.consumptionRates = data.consumption;
-        hasChanges = true;
-      }
-
       if (hasChanges) {
         void updateConfig(updates);
       }
     }
-
-    // Niezależnie od wszystkiego wymuszamy przejście do Dashboardu
     setCurrentView("dashboard");
   };
-
-  React.useEffect(() => {
-    if (!isLoading && !config && currentView === "dashboard") {
-      setCurrentView("configCreator");
-    }
-  }, [isLoading, config, currentView]);
 
   if (isInitializing || isLoading) {
     return (
@@ -155,14 +132,14 @@ const App: React.FC = () => {
     );
   }
 
+  if (currentView === "login") return <LoginView onLogin={handleLogin} />;
+
   const getStandaloneView = (): StandaloneViewType => {
     if (currentView === "resources") return "resources";
     if (currentView === "modules") return "modules";
     if (currentView === "events") return "events";
     return null;
   };
-
-  if (currentView === "login") return <LoginView onLogin={handleLogin} />;
 
   if (
     ["configCreator", "resources", "modules", "events"].includes(currentView)
@@ -172,39 +149,42 @@ const App: React.FC = () => {
         standaloneView={getStandaloneView()}
         showStartWarning={isManualWizard}
         onFinish={handleConfigFinish}
-        initialModules={config?.modulesList || []}
-        initialEvents={config?.eventsList || []}
-        initialConsumption={config?.consumptionRates}
+        initialConfig={config}
       />
     );
   }
 
-  // 3. Zabezpieczenie: Wszystko poniżej TEJ linii (Dashboard, Harmonogram) wymaga configu.
   if (!config) return null;
 
-  // --- ODTWORZONA LOGIKA WYLICZEŃ DLA STAREGO TYPU (MissionDashboardConfig) ---
-  const totalCrew = config.crew.men + config.crew.women;
-
+  // Przeliczanie metryk w locie na podstawie nowej, elastycznej struktury
+  const totalCrew = config.crew.reduce(
+    (acc, profile) => acc + (profile.population || 0),
+    0,
+  );
   const getPersonsWord = (count: number) => {
     if (count === 1) return "OSOBA";
     if (count >= 2 && count <= 4) return "OSOBY";
     return "OSÓB";
   };
 
+  const getResQty = (type: string) =>
+    config.startingResources.find((r) => r.resourceType === type)?.quantity ||
+    0;
+
   const resourceData: DetailItem[] = [
     {
       label: "TLEN",
-      value: formatNumber(config.resources.oxygen),
+      value: formatNumber(getResQty("OXYGEN")),
       valueSuffix: "L",
     },
     {
       label: "WODA",
-      value: formatNumber(config.resources.water),
+      value: formatNumber(getResQty("WATER")),
       valueSuffix: "L",
     },
     {
       label: "ŻYWNOŚĆ",
-      value: formatNumber(config.resources.food),
+      value: formatNumber(getResQty("FOOD")),
       valueSuffix: "PORCJI",
     },
   ];
@@ -215,17 +195,9 @@ const App: React.FC = () => {
   }));
 
   const energyData: DetailItem[] = [
-    {
-      label: "PRODUKCJA",
-      value: formatNumber(ENERGY_PRODUCTION),
-      valueSuffix: "kW",
-    },
-    { label: "ZUŻYCIE", value: formatNumber(ENERGY_USAGE), valueSuffix: "kW" },
-    {
-      label: "BILANS",
-      value: formatNumber(ENERGY_DIFFERENCE),
-      valueSuffix: "kW",
-    },
+    { label: "PRODUKCJA", value: formatNumber(150), valueSuffix: "kW" }, // Zostawione jako sztywny mock, póki co
+    { label: "ZUŻYCIE", value: formatNumber(110), valueSuffix: "kW" },
+    { label: "BILANS", value: formatNumber(40), valueSuffix: "kW" },
   ];
 
   return (
@@ -234,9 +206,13 @@ const App: React.FC = () => {
         currentView={currentView}
         onNavigate={(v) => {
           if (v === "configCreator") setIsManualWizard(true);
+          else setIsManualWizard(false);
           setCurrentView(v);
         }}
-        onLogout={() => setCurrentView("login")}
+        onLogout={() => {
+          localStorage.removeItem("sessionToken");
+          setCurrentView("login");
+        }}
       />
 
       <main className="grow p-10 flex flex-col h-full min-w-0 gap-8 box-border">
@@ -266,7 +242,7 @@ const App: React.FC = () => {
                       strokeWidth={1.5}
                     />
                     <h3 className="text-sm md:text-base font-bold tracking-widest text-white uppercase mb-3">
-                      Wymagana analiza i Optymalizacja
+                      Wymagana Analiza i Optymalizacja
                     </h3>
                     <p className="text-xs md:text-sm text-slate-400 mb-8 max-w-lg leading-relaxed">
                       Wprowadzono zmiany w konfiguracji. System musi najpierw
@@ -275,7 +251,6 @@ const App: React.FC = () => {
                     </p>
 
                     <div className="flex flex-wrap items-center justify-center gap-4">
-                      {/* PRZYCISK AUTO OPTYMALIZACJI */}
                       <button
                         onClick={() => void optimize()}
                         disabled={isOptimizing || isRecalculating}
@@ -289,7 +264,6 @@ const App: React.FC = () => {
                         Auto Optymalizacja
                       </button>
 
-                      {/* PRZYCISK REKALKULACJI */}
                       <button
                         onClick={() => void recalculate()}
                         disabled={
@@ -299,7 +273,7 @@ const App: React.FC = () => {
                       >
                         {isRecalculating ? (
                           <>
-                            <RefreshCw size={18} className="animate-spin" />
+                            <RefreshCw size={18} className="animate-spin" />{" "}
                             Trwa Obliczanie...
                           </>
                         ) : (
@@ -310,7 +284,10 @@ const App: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <UsageChart data={chartData} />
+                <UsageChart
+                  data={chartData}
+                  missionDuration={config.missionDuration}
+                />
               )}
             </div>
 
@@ -333,6 +310,20 @@ const App: React.FC = () => {
             missionDuration={config.missionDuration}
             availableEvents={config.eventsList}
           />
+        ) : currentView === "simAuto" ? (
+          <SimulationView
+            mode="automatic"
+            missionDuration={config.missionDuration}
+            nominalSessionId={nominalSessionId}
+            availableEvents={config.eventsList}
+          />
+        ) : currentView === "simManual" ? (
+          <SimulationView
+            mode="manual"
+            missionDuration={config.missionDuration}
+            nominalSessionId={nominalSessionId}
+            availableEvents={config.eventsList}
+          />
         ) : (
           <div className="flex items-center justify-center h-full">
             <h2 className="text-2xl text-slate-400 uppercase tracking-widest">
@@ -346,19 +337,15 @@ const App: React.FC = () => {
         <CrewModal
           data={config.crew}
           onClose={() => setIsCrewModalOpen(false)}
-          onSave={(d) => {
-            void updateConfig({ crew: d });
-          }}
+          onSave={(d) => void updateConfig({ crew: d })}
         />
       )}
 
       {isResourcesModalOpen && (
         <ResourcesModal
-          data={config.resources}
+          data={config.startingResources}
           onClose={() => setIsResourcesModalOpen(false)}
-          onSave={(d) => {
-            void updateConfig({ resources: d });
-          }}
+          onSave={(d) => void updateConfig({ startingResources: d })}
         />
       )}
 
@@ -366,9 +353,7 @@ const App: React.FC = () => {
         <ModulesModal
           data={config.modulesList}
           onClose={() => setIsModulesModalOpen(false)}
-          onSave={(d) => {
-            void updateConfig({ modulesList: d });
-          }}
+          onSave={(d) => void updateConfig({ modulesList: d })}
         />
       )}
     </div>

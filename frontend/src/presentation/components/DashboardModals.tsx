@@ -1,10 +1,11 @@
 ﻿import React, { useState } from "react";
 import { Check, X } from "lucide-react";
+import type { SexProfile } from "../../core/domain/value-objects/ResourceConsuption.ts";
 import type {
-  CrewData,
-  ResourcesData,
-  ModuleWithCount,
-} from "../../infrastructure/adapters/MissionAdapter.ts";
+  ResourceQuantity,
+  ResourceType,
+} from "../../core/domain/entities/module.ts";
+import type { ModuleWithCount } from "../../core/domain/entities/MissionConfig.ts";
 
 const handleBlockNonIntegers = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (["e", "E", "+", "-", ".", ","].includes(e.key)) e.preventDefault();
@@ -15,11 +16,23 @@ export const CrewModal = ({
   onClose,
   onSave,
 }: {
-  data: CrewData;
+  data: SexProfile[];
   onClose: () => void;
-  onSave: (d: CrewData) => void;
+  onSave: (d: SexProfile[]) => void;
 }) => {
-  const [edit, setEdit] = useState(data);
+  // Głęboka kopia, aby nie mutować głównego stanu przed zapisem
+  const [edit, setEdit] = useState<SexProfile[]>(
+    JSON.parse(JSON.stringify(data)),
+  );
+
+  const updatePopulation = (name: string, value: number) => {
+    setEdit((prev) =>
+      prev.map((p) => (p.name === name ? { ...p, population: value } : p)),
+    );
+  };
+
+  const getPop = (name: string) =>
+    edit.find((p) => p.name === name)?.population || 0;
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-mars-background/80 backdrop-blur-sm p-6">
@@ -36,10 +49,10 @@ export const CrewModal = ({
               type="number"
               min="0"
               step="1"
-              value={edit.men}
+              value={getPop("Male")}
               onKeyDown={handleBlockNonIntegers}
               onChange={(e) =>
-                setEdit({ ...edit, men: parseInt(e.target.value, 10) || 0 })
+                updatePopulation("Male", parseInt(e.target.value, 10) || 0)
               }
               className="w-full bg-mars-line text-white px-4 py-2.5 rounded-xl text-center text-sm focus:outline-none focus:ring-1 focus:ring-mars-orange/40"
             />
@@ -52,10 +65,10 @@ export const CrewModal = ({
               type="number"
               min="0"
               step="1"
-              value={edit.women}
+              value={getPop("Female")}
               onKeyDown={handleBlockNonIntegers}
               onChange={(e) =>
-                setEdit({ ...edit, women: parseInt(e.target.value, 10) || 0 })
+                updatePopulation("Female", parseInt(e.target.value, 10) || 0)
               }
               className="w-full bg-mars-line text-white px-4 py-2.5 rounded-xl text-center text-sm focus:outline-none focus:ring-1 focus:ring-mars-orange/40"
             />
@@ -88,11 +101,28 @@ export const ResourcesModal = ({
   onClose,
   onSave,
 }: {
-  data: ResourcesData;
+  data: ResourceQuantity[];
   onClose: () => void;
-  onSave: (d: ResourcesData) => void;
+  onSave: (d: ResourceQuantity[]) => void;
 }) => {
-  const [edit, setEdit] = useState(data);
+  const [edit, setEdit] = useState<ResourceQuantity[]>(
+    JSON.parse(JSON.stringify(data)),
+  );
+
+  const updateQuantity = (type: ResourceType, value: number) => {
+    setEdit((prev) => {
+      const exists = prev.find((p) => p.resourceType === type);
+      if (exists) {
+        return prev.map((p) =>
+          p.resourceType === type ? { ...p, quantity: value } : p,
+        );
+      }
+      return [...prev, { resourceType: type, quantity: value }];
+    });
+  };
+
+  const getQty = (type: ResourceType) =>
+    edit.find((r) => r.resourceType === type)?.quantity || 0;
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-mars-background/80 backdrop-blur-sm p-6">
@@ -101,11 +131,13 @@ export const ResourcesModal = ({
           Zasoby Początkowe
         </h3>
         <div className="flex flex-col w-full gap-5 mb-10">
-          {Object.entries({
-            oxygen: "Tlen (L)",
-            water: "Woda (L)",
-            food: "Żywność (Porcje)",
-          }).map(([key, label]) => (
+          {(
+            Object.entries({
+              OXYGEN: "Tlen (L)",
+              WATER: "Woda (L)",
+              FOOD: "Żywność (Porcje)",
+            }) as [ResourceType, string][]
+          ).map(([key, label]) => (
             <div
               key={key}
               className="grid grid-cols-[100px_1fr] items-center gap-4"
@@ -117,10 +149,10 @@ export const ResourcesModal = ({
                 type="number"
                 min="0"
                 step="1"
-                value={edit[key as keyof ResourcesData]}
+                value={getQty(key)}
                 onKeyDown={handleBlockNonIntegers}
                 onChange={(e) =>
-                  setEdit({ ...edit, [key]: parseInt(e.target.value, 10) || 0 })
+                  updateQuantity(key, parseInt(e.target.value, 10) || 0)
                 }
                 className="w-full bg-mars-line text-white px-4 py-2.5 rounded-xl text-center text-sm focus:outline-none focus:ring-1 focus:ring-mars-orange/40"
               />
@@ -158,7 +190,9 @@ export const ModulesModal = ({
   onClose: () => void;
   onSave: (d: ModuleWithCount[]) => void;
 }) => {
-  const [edit, setEdit] = useState(data);
+  const [edit, setEdit] = useState<ModuleWithCount[]>(
+    JSON.parse(JSON.stringify(data)),
+  );
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-mars-background/80 backdrop-blur-sm p-6">

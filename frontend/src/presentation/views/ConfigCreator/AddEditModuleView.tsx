@@ -1,15 +1,18 @@
 ﻿import React, { useState } from "react";
 import { Trash2, Check, ChevronDown, AlertCircle } from "lucide-react";
 import type {
-  ResourceKey,
   ModuleData,
+  ResourceType,
+  ModuleStatus,
+  ModuleCategory,
+  ResourceQuantity,
 } from "../../../core/domain/entities/module.ts";
 
 interface AddModuleStepProps {
   mode?: "add" | "edit";
   initialData?: ModuleData;
   onCancel: () => void;
-  onSave: (data: Partial<ModuleData>) => void;
+  onSave: (data: ModuleData) => void;
 }
 
 export const AddModuleStep: React.FC<AddModuleStepProps> = ({
@@ -19,37 +22,40 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
   onSave,
 }) => {
   const [name, setName] = useState(initialData?.name || "");
-  const [type, setType] = useState(initialData?.type || "");
-  const [errors, setErrors] = useState({ name: false, type: false });
+  const [category, setCategory] = useState<ModuleCategory | "">(
+    initialData?.category || "",
+  );
+  const [errors, setErrors] = useState({ name: false, category: false });
+  const [status, setStatus] = useState<ModuleStatus>(
+    initialData?.status || "ACTIVE",
+  );
+  const [weight, setWeight] = useState(
+    initialData?.weight ? String(initialData.weight) : "0",
+  );
 
   const [resources, setResources] = useState<
-    Record<ResourceKey, { prod: string; cons: string }>
+    Record<ResourceType, { prod: string; cons: string }>
   >(() => {
-    if (initialData) {
-      return {
-        woda: {
-          prod: String(initialData.resources.woda.prod),
-          cons: String(initialData.resources.woda.cons),
-        },
-        tlen: {
-          prod: String(initialData.resources.tlen.prod),
-          cons: String(initialData.resources.tlen.cons),
-        },
-        zywnosc: {
-          prod: String(initialData.resources.zywnosc.prod),
-          cons: String(initialData.resources.zywnosc.cons),
-        },
-        energia: {
-          prod: String(initialData.resources.energia.prod),
-          cons: String(initialData.resources.energia.cons),
-        },
-      };
-    }
+    const getRes = (arr: ResourceQuantity[] | undefined, type: ResourceType) =>
+      arr?.find((r) => r.resourceType === type)?.quantity || 0;
+
     return {
-      woda: { prod: "0", cons: "0" },
-      tlen: { prod: "0", cons: "0" },
-      zywnosc: { prod: "0", cons: "0" },
-      energia: { prod: "0", cons: "0" },
+      WATER: {
+        prod: String(getRes(initialData?.resourceProduction, "WATER")),
+        cons: String(getRes(initialData?.resourceConsumption, "WATER")),
+      },
+      OXYGEN: {
+        prod: String(getRes(initialData?.resourceProduction, "OXYGEN")),
+        cons: String(getRes(initialData?.resourceConsumption, "OXYGEN")),
+      },
+      FOOD: {
+        prod: String(getRes(initialData?.resourceProduction, "FOOD")),
+        cons: String(getRes(initialData?.resourceConsumption, "FOOD")),
+      },
+      ENERGY: {
+        prod: String(getRes(initialData?.resourceProduction, "ENERGY")),
+        cons: String(getRes(initialData?.resourceConsumption, "ENERGY")),
+      },
     };
   });
 
@@ -60,7 +66,7 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
   };
 
   const handleResourceChange = (
-    res: ResourceKey,
+    res: ResourceType,
     field: "prod" | "cons",
     val: string,
   ) => {
@@ -72,47 +78,43 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
 
   const handleSave = () => {
     const isNameEmpty = !name.trim();
-    const isTypeEmpty = !type;
+    const isCategoryEmpty = !category;
 
-    if (isNameEmpty || isTypeEmpty) {
-      setErrors({ name: isNameEmpty, type: isTypeEmpty });
+    if (isNameEmpty || isCategoryEmpty) {
+      setErrors({ name: isNameEmpty, category: isCategoryEmpty });
       return;
     }
 
     const parseRes = (val: string) => parseFloat(val.replace(",", ".")) || 0;
 
-    const parsedResources = {
-      woda: {
-        prod: parseRes(resources.woda.prod),
-        cons: parseRes(resources.woda.cons),
-      },
-      tlen: {
-        prod: parseRes(resources.tlen.prod),
-        cons: parseRes(resources.tlen.cons),
-      },
-      zywnosc: {
-        prod: parseRes(resources.zywnosc.prod),
-        cons: parseRes(resources.zywnosc.cons),
-      },
-      energia: {
-        prod: parseRes(resources.energia.prod),
-        cons: parseRes(resources.energia.cons),
-      },
-    };
+    const resourceProduction: ResourceQuantity[] = [];
+    const resourceConsumption: ResourceQuantity[] = [];
+
+    (Object.keys(resources) as ResourceType[]).forEach((type) => {
+      const prodVal = parseRes(resources[type].prod);
+      const consVal = parseRes(resources[type].cons);
+      if (prodVal > 0)
+        resourceProduction.push({ resourceType: type, quantity: prodVal });
+      if (consVal > 0)
+        resourceConsumption.push({ resourceType: type, quantity: consVal });
+    });
 
     onSave({
-      id: initialData?.id,
+      id: initialData?.id || crypto.randomUUID(),
       name: name.trim(),
-      type,
-      resources: parsedResources,
+      category: category as ModuleCategory,
+      status,
+      weight: parseFloat(weight.replace(",", ".")) || 0,
+      resourceProduction,
+      resourceConsumption,
     });
   };
 
-  const resourceTypes: { id: ResourceKey; label: string }[] = [
-    { id: "woda", label: "Woda" },
-    { id: "tlen", label: "Tlen" },
-    { id: "zywnosc", label: "Żywność" },
-    { id: "energia", label: "Energia" },
+  const resourceTypes: { id: ResourceType; label: string }[] = [
+    { id: "WATER", label: "Woda" },
+    { id: "OXYGEN", label: "Tlen" },
+    { id: "FOOD", label: "Żywność" },
+    { id: "ENERGY", label: "Energia" },
   ];
 
   return (
@@ -143,54 +145,84 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
               }`}
             />
             {errors.name && (
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 pointer-events-none">
-                <AlertCircle size={18} strokeWidth={2.5} />
-              </div>
+              <AlertCircle
+                size={18}
+                strokeWidth={2.5}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 pointer-events-none"
+              />
             )}
           </div>
         </div>
 
         <div className="grid grid-cols-[80px_1fr] items-center gap-6 relative">
           <label className="text-[10px] md:text-xs tracking-widest uppercase text-slate-200 text-right">
-            Typ
+            Kategoria
           </label>
           <div className="relative w-full">
             <select
-              value={type}
+              value={category}
               onChange={(e) => {
-                setType(e.target.value);
-                if (errors.type)
-                  setErrors((prev) => ({ ...prev, type: false }));
+                setCategory(e.target.value as ModuleCategory);
+                if (errors.category)
+                  setErrors((prev) => ({ ...prev, category: false }));
               }}
               className={`w-full bg-mars-line text-white px-4 py-3 rounded-xl text-center text-sm tracking-wide focus:outline-none transition-all font-medium shadow-inner appearance-none cursor-pointer ${
-                errors.type
+                errors.category
                   ? "ring-1 ring-red-500 border border-red-500"
                   : "focus:ring-1 focus:ring-mars-orange/40"
               }`}
             >
               <option value="" disabled>
-                Wybierz typ...
+                Wybierz kategorię...
               </option>
-              <option value="mieszkalny">Mieszkalny</option>
-              <option value="produkcyjny">Produkcyjny</option>
-              <option value="energetyczny">Energetyczny</option>
-              <option value="magazynowy">Magazynowy</option>
-              <option value="uzytkowy">Użytkowy</option>
+              <option value="UTILITY_MODULE">Użytkowy (Utility)</option>
+              <option value="ENERGY_MODULE">Energetyczny (Energy)</option>
             </select>
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex items-center gap-2">
-              {errors.type && (
-                <AlertCircle
-                  size={18}
-                  strokeWidth={2.5}
-                  className="text-red-500"
-                />
-              )}
-              <ChevronDown
-                size={18}
-                strokeWidth={3}
-                className="text-mars-orange"
-              />
-            </div>
+            <ChevronDown
+              size={18}
+              strokeWidth={3}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-mars-orange pointer-events-none"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-[80px_1fr] items-center gap-6 relative">
+          <label className="text-[10px] md:text-xs tracking-widest uppercase text-slate-200 text-right">
+            Status
+          </label>
+          <div className="relative w-full">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as ModuleStatus)}
+              className="w-full bg-mars-line text-white px-4 py-3 rounded-xl text-center text-sm tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 transition-all font-medium shadow-inner appearance-none cursor-pointer"
+            >
+              <option value="ACTIVE">AKTYWNY</option>
+              <option value="PARTIALLY_DAMAGED">CZĘŚCIOWO USZKODZONY</option>
+              <option value="DESTROYED">ZNISZCZONY</option>
+              <option value="INACTIVE">NIEAKTYWNY</option>
+            </select>
+            <ChevronDown
+              size={18}
+              strokeWidth={3}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-mars-orange pointer-events-none"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-[80px_1fr] items-center gap-6">
+          <label className="text-[10px] md:text-xs tracking-widest uppercase text-slate-200 text-right">
+            Waga (kg)
+          </label>
+          <div className="relative w-full">
+            <input
+              type="number"
+              min="0"
+              step="0.1"
+              value={weight}
+              onKeyDown={handleBlockInvalidFloats}
+              onChange={(e) => setWeight(e.target.value)}
+              className="w-full bg-mars-line text-white px-4 py-3 rounded-xl text-center text-sm tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 transition-all font-medium shadow-inner"
+            />
           </div>
         </div>
       </div>
@@ -201,7 +233,6 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
           <div>Produkcja</div>
           <div>Zużycie</div>
         </div>
-
         {resourceTypes.map((res) => (
           <div
             key={res.id}
@@ -219,7 +250,7 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
               onChange={(e) =>
                 handleResourceChange(res.id, "prod", e.target.value)
               }
-              className="w-full bg-mars-line text-white px-2 py-2.5 rounded-xl text-center text-sm tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 transition-all font-medium shadow-inner"
+              className="w-full bg-mars-line text-white px-2 py-2.5 rounded-xl text-center text-sm tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 transition-all shadow-inner"
             />
             <input
               type="number"
@@ -230,7 +261,7 @@ export const AddModuleStep: React.FC<AddModuleStepProps> = ({
               onChange={(e) =>
                 handleResourceChange(res.id, "cons", e.target.value)
               }
-              className="w-full bg-mars-line text-white px-2 py-2.5 rounded-xl text-center text-sm tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 transition-all font-medium shadow-inner"
+              className="w-full bg-mars-line text-white px-2 py-2.5 rounded-xl text-center text-sm tracking-wide focus:outline-none focus:ring-1 focus:ring-mars-orange/40 transition-all shadow-inner"
             />
           </div>
         ))}

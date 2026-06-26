@@ -3,38 +3,35 @@ import { AlertTriangle, Save } from "lucide-react";
 import earthBg from "../../assets/earth.png";
 import marsBg from "../../assets/mars.png";
 
-import { ResourceConfigStep } from "./ResourceConfigView.tsx";
+import {
+  ResourceConfigStep,
+  type GeneralConfigData,
+} from "./ResourceConfigView.tsx";
 import { ModulesConfigStep } from "./ModulesConfigView.tsx";
 import { AddModuleStep } from "./AddEditModuleView.tsx";
 import { EventsConfigStep } from "./EventsConfigView.tsx";
 import { AddEventStep } from "./AddEditEventView.tsx";
 
 import type { ModuleData } from "../../../core/domain/entities/module.ts";
-
 import type { EventData } from "../../../core/domain/entities/event.ts";
-
-import type { ResourceConsumption } from "../../../core/domain/value-objects/ResourceConsuption.ts";
+import type { MissionDashboardConfig } from "../../../core/domain/entities/MissionConfig.ts";
 
 export type StandaloneViewType = "resources" | "modules" | "events" | null;
 
 interface ConfigCreatorViewProps {
   standaloneView?: StandaloneViewType;
-  initialModules?: ModuleData[];
-  initialEvents?: EventData[];
-  initialConsumption?: ResourceConsumption;
+  initialConfig?: MissionDashboardConfig | null;
   showStartWarning?: boolean;
   onFinish: (data?: {
+    general?: GeneralConfigData;
     modules?: ModuleData[];
     events?: EventData[];
-    consumption?: ResourceConsumption;
   }) => void;
 }
 
 export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
   standaloneView = null,
-  initialModules,
-  initialEvents,
-  initialConsumption,
+  initialConfig,
   showStartWarning = false,
   onFinish,
 }) => {
@@ -52,18 +49,31 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
     useState<boolean>(showStartWarning);
   const [isFinishModalOpen, setIsFinishModalOpen] = useState<boolean>(false);
 
-  const [modules, setModules] = useState<ModuleData[]>(initialModules || []);
+  const [modules, setModules] = useState<ModuleData[]>(
+    initialConfig?.modulesList || [],
+  );
   const [editingModuleId, setEditingModuleId] = useState<string | null>(null);
 
-  const [events, setEvents] = useState<EventData[]>(initialEvents || []);
+  const [events, setEvents] = useState<EventData[]>(
+    initialConfig?.eventsList || [],
+  );
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
-  const [consumption, setConsumption] = useState<
-    ResourceConsumption | undefined
-  >(initialConsumption);
+  const [generalConfig, setGeneralConfig] = useState<
+    GeneralConfigData | undefined
+  >(
+    initialConfig
+      ? {
+          missionDuration: initialConfig.missionDuration,
+          maxStartingWeight: initialConfig.maxStartingWeight,
+          crew: initialConfig.crew,
+          startingResources: initialConfig.startingResources,
+        }
+      : undefined,
+  );
 
   const handleFinalSave = () => {
-    onFinish({ modules, events, consumption });
+    onFinish({ general: generalConfig, modules, events });
   };
 
   const handleCancel = () => onFinish();
@@ -86,9 +96,13 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
   };
 
   const handleAddModule = (newModule: Omit<ModuleData, "id">) => {
-    setModules([...modules, { ...newModule, id: crypto.randomUUID() }]);
+    setModules([
+      ...modules,
+      { ...newModule, id: crypto.randomUUID() } as ModuleData,
+    ]);
     setStep(2);
   };
+
   const handleEditModule = (updatedModule: ModuleData) => {
     setModules(
       modules.map((m) => (m.id === updatedModule.id ? updatedModule : m)),
@@ -103,6 +117,7 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
     ]);
     setStep(5);
   };
+
   const handleEditEvent = (updatedEvent: EventData) => {
     setEvents(events.map((e) => (e.id === updatedEvent.id ? updatedEvent : e)));
     setStep(5);
@@ -145,9 +160,9 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
 
         {step === 1 && (
           <ResourceConfigStep
-            initialData={consumption}
+            initialData={generalConfig}
             onNext={(data) => {
-              setConsumption(data);
+              setGeneralConfig(data);
               if (isStandalone) setIsFinishModalOpen(true);
               else setStep(2);
             }}
@@ -179,16 +194,19 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
         {step === 3 && (
           <AddModuleStep
             mode="add"
+            key="new-module"
             onCancel={() => setStep(2)}
-            onSave={(data) => handleAddModule(data as Omit<ModuleData, "id">)}
+            onSave={handleAddModule as any}
           />
         )}
+
         {step === 4 && moduleToEdit && (
           <AddModuleStep
             mode="edit"
+            key={moduleToEdit.id}
             initialData={moduleToEdit}
             onCancel={() => setStep(2)}
-            onSave={(data) => handleEditModule(data as ModuleData)}
+            onSave={handleEditModule}
           />
         )}
 
@@ -211,18 +229,21 @@ export const ConfigCreatorView: React.FC<ConfigCreatorViewProps> = ({
         {step === 6 && (
           <AddEventStep
             mode="add"
+            key="new-event"
             modules={modules}
             onCancel={() => setStep(5)}
-            onSave={(data) => handleAddEvent(data as Omit<EventData, "id">)}
+            onSave={handleAddEvent as any}
           />
         )}
+
         {step === 7 && eventToEdit && (
           <AddEventStep
             mode="edit"
+            key={eventToEdit.id}
             modules={modules}
             initialData={eventToEdit}
             onCancel={() => setStep(5)}
-            onSave={(data) => handleEditEvent(data as EventData)}
+            onSave={handleEditEvent}
           />
         )}
       </div>

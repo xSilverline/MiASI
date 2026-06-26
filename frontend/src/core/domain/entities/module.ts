@@ -1,17 +1,22 @@
-﻿// src/types/module.ts
+﻿export type ResourceType = "FOOD" | "OXYGEN" | "WATER" | "ENERGY";
+export type ModuleStatus =
+  | "ACTIVE"
+  | "PARTIALLY_DAMAGED"
+  | "DESTROYED"
+  | "INACTIVE";
+export type ModuleCategory = "UTILITY_MODULE" | "ENERGY_MODULE";
 
-export type ResourceKey = "woda" | "tlen" | "zywnosc" | "energia";
-
-export interface ResourceValues {
-  prod: number;
-  cons: number;
+export interface ResourceQuantity {
+  resourceType: ResourceType;
+  quantity: number;
 }
 
 export interface ModuleData {
   id: string;
   name: string;
-  type: string;
-  resources: Record<ResourceKey, ResourceValues>;
+  status: ModuleStatus;
+  category: ModuleCategory;
+  weight: number;
+  resourceProduction: ResourceQuantity[];
+  resourceConsumption: ResourceQuantity[];
 }
-
-

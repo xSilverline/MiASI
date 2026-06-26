@@ -1,10 +1,8 @@
-﻿export interface ConsumptionValues {
-  opt: number;
-  min: number;
-}
-export interface ResourceConsumption {
-  maleFood: ConsumptionValues;
-  femaleFood: ConsumptionValues;
-  oxygen: ConsumptionValues;
-  water: ConsumptionValues;
+﻿import type { ResourceType } from "../entities/module.ts";
+
+export interface SexProfile {
+  name: string;
+  population: number;
+  optimalDemand: Partial<Record<ResourceType, number>>;
+  minimalDemand: Partial<Record<ResourceType, number>>;
 }

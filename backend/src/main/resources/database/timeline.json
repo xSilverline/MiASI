@@ -53,4 +53,37 @@
   "id" : "02facaeb-20ae-41d2-a93e-67245962e226",
   "sol" : 22,
   "type" : "MODULE_STATE_CHANGE"
+}, {
+  "description" : "Cargo lander delivers food supplies.",
+  "effects" : [ {
+    "target" : "FOOD",
+    "value" : 30.0,
+    "unit" : "KG",
+    "description" : "Extra food supply."
+  } ],
+  "id" : "fa5fe253-82ed-4e9e-9830-2faa3471dd5a",
+  "sol" : 12,
+  "type" : "SUPPLY_DELIVERY"
+}, {
+  "description" : "Cargo lander delivers oxygen tanks.",
+  "effects" : [ {
+    "target" : "OXYGEN",
+    "value" : 80.0,
+    "unit" : "L",
+    "description" : "Extra oxygen supply."
+  } ],
+  "id" : "09946bd9-3653-4d27-964b-c581c170158d",
+  "sol" : 15,
+  "type" : "SUPPLY_DELIVERY"
+}, {
+  "description" : "Dust storm event available as a mission schedule preset.",
+  "effects" : [ {
+    "target" : "ENERGY",
+    "value" : -10.0,
+    "unit" : "PERCENT",
+    "description" : "Reduced solar energy production during the storm."
+  } ],
+  "id" : "44073c8d-c7ea-4853-9b59-ccb3a9c1f543",
+  "sol" : 4,
+  "type" : "THREAT"
 } ]

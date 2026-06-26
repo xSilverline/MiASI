@@ -59,7 +59,7 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                       key={se.id}
                       title={se.eventDetails.name}
                       className={`truncate text-[10px] px-2 py-0.5 rounded-full font-semibold border ${
-                        se.eventDetails.type === "pogodowe"
+                        se.eventDetails.type === "THREAT"
                           ? "bg-red-600/20 text-red-500 border-red-600/50"
                           : "bg-green-600/20 text-green-500 border-green-600/50"
                       }`}

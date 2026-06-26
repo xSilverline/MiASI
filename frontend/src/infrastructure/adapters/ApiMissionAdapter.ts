@@ -1,4 +1,5 @@
-﻿import type {
+﻿// ======= ZMIANA ========
+import type {
   ChartDataPoint,
   IMissionRepository,
 } from "../../core/application/ports/IMissionRepository";
@@ -6,10 +7,76 @@ import type {
   MissionDashboardConfig,
   ModuleWithCount,
 } from "../../core/domain/entities/MissionConfig";
-import type {
-  ResourceKey,
-  ResourceValues,
-} from "../../core/domain/entities/module";
+
+interface ApiResource {
+  type?: string;
+  amount?: number;
+  resourceType?: string;
+  quantity?: number;
+}
+interface ApiEventDefinition {
+  id: string;
+  name?: string;
+  type: "SUPPLY_DELIVERY" | "THREAT" | "MODULE_STATE_CHANGE";
+  description?: string;
+  effects?: {
+    target: string;
+    value: number;
+    unit: string;
+    description?: string;
+  }[];
+}
+
+interface ApiCrewProfile {
+  name: string;
+  population: number;
+  optimalDemand?: Record<string, number>;
+  minimalDemand?: Record<string, number>;
+}
+
+interface ApiModule {
+  name: string;
+  status?: string;
+  category?: string;
+  weight?: number;
+  resourceProduction?: ApiResource[];
+  resourceConsumption?: ApiResource[];
+}
+
+interface ApiMissionPlan {
+  missionDurationSols?: number;
+  maxStartingWeight?: number;
+  crew?: ApiCrewProfile[];
+  startingResources?: ApiResource[];
+  modules?: ApiModule[];
+  optimalModules?: ApiModule[];
+}
+
+interface ApiDailyState {
+  sol: number;
+  warehouse?: ApiResource[];
+  balance?: {
+    produced?: ApiResource[];
+    consumed?: ApiResource[];
+  };
+}
+
+interface ApiSimulateNominalResponse {
+  sessionId: string;
+  nominalVariant?: {
+    timeline?: ApiDailyState[];
+  };
+}
+
+interface ApiOptimizeResponse {
+  sessionId: string;
+  configuration: ApiMissionPlan;
+}
+
+interface ApiMessageResponse {
+  message: string;
+}
+// ---------------------------------------------------
 
 export class ApiMissionAdapter implements IMissionRepository {
   private readonly API_URL = "http://localhost:8080/api";
@@ -21,74 +88,114 @@ export class ApiMissionAdapter implements IMissionRepository {
       Authorization: token ? `Bearer ${token}` : "",
     };
   }
-
   private async getMissionPlanId(): Promise<number> {
     const res = await fetch(`${this.API_URL}/conf/plans-count`, {
-      headers: this.getHeaders(), // ZMIANA: Dodajemy nagłówki
+      headers: this.getHeaders(),
     });
     if (!res.ok) throw new Error("Nie udało się pobrać liczby planów");
-    const data = await res.json();
+    const data = (await res.json()) as ApiMessageResponse;
     const count = parseInt(String(data.message), 10) || 0;
-    return count > 0 ? count - 1 : 0;
+    return count > 0 ? count - 1 : -1; // Zwracamy -1, jeśli baza jest pusta
   }
 
-  private mapApiToUIConfig(apiPlan: any): Partial<MissionDashboardConfig> {
+  private mapApiToUIConfig(
+    apiPlan: ApiMissionPlan,
+  ): Partial<MissionDashboardConfig> {
     const resources = { oxygen: 0, water: 0, food: 0 };
-    apiPlan.startingResources?.forEach((r: any) => {
-      if (r.resourceType === "OXYGEN") resources.oxygen = r.quantity;
-      if (r.resourceType === "WATER") resources.water = r.quantity;
-      if (r.resourceType === "FOOD") resources.food = r.quantity;
+    apiPlan.startingResources?.forEach((r) => {
+      const type = (r.resourceType || r.type || "").toUpperCase();
+      const val = r.quantity ?? r.amount ?? 0;
+
+      if (type === "OXYGEN") resources.oxygen = val;
+      else if (type === "WATER") resources.water = val;
+      else if (type === "FOOD") resources.food = val;
     });
 
-    const modulesMap = new Map<string, any>();
-    (apiPlan.modules || apiPlan.optimalModules || []).forEach((m: any) => {
-      const key = m.name;
-      if (modulesMap.has(key)) {
-        modulesMap.get(key)!.count++;
+    const modulesMap = new Map<string, Omit<ModuleWithCount, "id">>();
+    const modulesList = apiPlan.modules || apiPlan.optimalModules || [];
+
+    modulesList.forEach((m) => {
+      if (modulesMap.has(m.name)) {
+        modulesMap.get(m.name)!.count++;
       } else {
-        const resConfig: Record<ResourceKey, ResourceValues> = {
-          woda: { prod: 0, cons: 0 },
-          tlen: { prod: 0, cons: 0 },
-          zywnosc: { prod: 0, cons: 0 },
-          energia: { prod: 0, cons: 0 },
-        };
-        m.type?.resourceProduction?.forEach((rp: any) => {
-          if (rp.resourceType === "WATER") resConfig.woda.prod = rp.quantity;
-          if (rp.resourceType === "OXYGEN") resConfig.tlen.prod = rp.quantity;
-          if (rp.resourceType === "FOOD") resConfig.zywnosc.prod = rp.quantity;
-          if (rp.resourceType === "ENERGY")
-            resConfig.energia.prod = rp.quantity;
-        });
-        m.type?.resourceConsumption?.forEach((rc: any) => {
-          if (rc.resourceType === "WATER") resConfig.woda.cons = rc.quantity;
-          if (rc.resourceType === "OXYGEN") resConfig.tlen.cons = rc.quantity;
-          if (rc.resourceType === "FOOD") resConfig.zywnosc.cons = rc.quantity;
-          if (rc.resourceType === "ENERGY")
-            resConfig.energia.cons = rc.quantity;
-        });
-        modulesMap.set(key, {
+        modulesMap.set(m.name, {
           name: m.name,
-          type: m.type?.name || "NIEZNANY",
-          resources: resConfig,
+          category: (m.category as any) || "UTILITY_MODULE",
+          status: (m.status as any) || "ACTIVE",
+          weight: m.weight ?? 0,
+          resourceProduction: (m.resourceProduction || []).map((rp) => ({
+            resourceType: (rp.resourceType || rp.type) as any,
+            quantity: rp.quantity ?? rp.amount ?? 0,
+          })),
+          resourceConsumption: (m.resourceConsumption || []).map((rc) => ({
+            resourceType: (rc.resourceType || rc.type) as any,
+            quantity: rc.quantity ?? rc.amount ?? 0,
+          })),
           count: 1,
         });
       }
     });
 
     return {
-      resources,
+      startingResources: [
+        { resourceType: "OXYGEN", quantity: resources.oxygen },
+        { resourceType: "WATER", quantity: resources.water },
+        { resourceType: "FOOD", quantity: resources.food },
+      ],
       modulesList: Array.from(modulesMap.values()).map((item, index) => ({
         id: `mod-${index}`,
         ...item,
       })),
     };
   }
+  // 3. Podmień ciało metody saveConfig
+  async saveConfig(data: Partial<MissionDashboardConfig>): Promise<void> {
+    const fullData = data as MissionDashboardConfig;
+    const missionId = await this.getMissionPlanId();
 
-  private mapTimelineToChart(timeline: any[]): ChartDataPoint[] {
+    // Tworzymy payload - teraz to praktycznie czyste przepisanie danych!
+    const planDto = {
+      missionDurationSols: fullData.missionDuration || 700,
+      maxStartingWeight: fullData.maxStartingWeight || 150000,
+      crew: fullData.crew,
+      startingResources: fullData.startingResources,
+      modules: fullData.modulesList.flatMap((m) =>
+        Array.from({ length: m.count > 0 ? m.count : 1 }).map(() => ({
+          name: m.name,
+          status: m.status,
+          category: m.category,
+          weight: m.weight,
+          resourceProduction: m.resourceProduction,
+          resourceConsumption: m.resourceConsumption,
+        })),
+      ),
+    };
+
+    const url =
+      missionId >= 0
+        ? `${this.API_URL}/conf/plan?override=${missionId}`
+        : `${this.API_URL}/conf/plan`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: this.getHeaders(),
+      body: JSON.stringify(planDto),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Błąd zapisu do API: ${res.status}`);
+    }
+  }
+
+  private mapTimelineToChart(timeline: ApiDailyState[]): ChartDataPoint[] {
     return timeline.map((day) => {
-      // Bezpieczne wyszukiwanie zasobu w tablicy
-      const getRes = (arr: any[], type: string) =>
-        arr?.find((r: any) => r.type === type)?.amount || 0;
+      // Pancerne pobieranie zasobu niezależnie od wersji API
+      const getRes = (arr: ApiResource[] | undefined, targetType: string) => {
+        const found = arr?.find(
+          (r) => r.type === targetType || r.resourceType === targetType,
+        );
+        if (!found) return 0;
+        return found.amount !== undefined ? found.amount : found.quantity || 0;
+      };
 
       return {
         sol: day.sol,
@@ -108,7 +215,6 @@ export class ApiMissionAdapter implements IMissionRepository {
     });
   }
 
-  // Zaktualizowana metoda recalculate:
   async recalculate(
     payloadSessionId: string,
   ): Promise<{ nominalSessionId: string; chartData: ChartDataPoint[] }> {
@@ -117,13 +223,13 @@ export class ApiMissionAdapter implements IMissionRepository {
       headers: this.getHeaders(),
       body: JSON.stringify({
         payloadSessionId,
-        customizedModules: [], // W przyszłości podepniemy tu listę modyfikacji z UI
+        customizedModules: [],
         customizedSupplies: [],
       }),
     });
 
     if (!res.ok) throw new Error("Błąd symulacji nominalnej");
-    const data = await res.json();
+    const data = (await res.json()) as ApiSimulateNominalResponse;
     const chartData = this.mapTimelineToChart(
       data.nominalVariant?.timeline || [],
     );
@@ -142,54 +248,129 @@ export class ApiMissionAdapter implements IMissionRepository {
       headers: this.getHeaders(),
     });
     if (!res.ok) throw new Error("Błąd pobierania planu");
-    const plan = await res.json();
+    const plan = (await res.json()) as ApiMissionPlan;
 
-    const crew = { men: 0, women: 0 };
-    const consumptionRates = {
-      maleFood: { opt: 0, min: 0 },
-      femaleFood: { opt: 0, min: 0 },
-      oxygen: { opt: 0, min: 0 },
-      water: { opt: 0, min: 0 },
-    };
-
-    plan.crew?.forEach((p: any) => {
-      const isMale =
-        p.name.toLowerCase().includes("male") ||
-        p.name.toLowerCase().includes("męż");
-      if (isMale) {
-        crew.men = p.population;
-        consumptionRates.maleFood.opt = p.optimalDemand?.["FOOD"] || 0;
-        consumptionRates.maleFood.min = p.minimalDemand?.["FOOD"] || 0;
-      } else {
-        crew.women = p.population;
-        consumptionRates.femaleFood.opt = p.optimalDemand?.["FOOD"] || 0;
-        consumptionRates.femaleFood.min = p.minimalDemand?.["FOOD"] || 0;
-      }
-      if (p.optimalDemand?.["OXYGEN"])
-        consumptionRates.oxygen.opt = p.optimalDemand["OXYGEN"];
-      if (p.minimalDemand?.["OXYGEN"])
-        consumptionRates.oxygen.min = p.minimalDemand["OXYGEN"];
-      if (p.optimalDemand?.["WATER"])
-        consumptionRates.water.opt = p.optimalDemand["WATER"];
-      if (p.minimalDemand?.["WATER"])
-        consumptionRates.water.min = p.minimalDemand["WATER"];
-    });
+    // Przekazanie gotowych załóg z API z drobnym fallbackiem
+    const crew = (plan.crew || []).map((c) => ({
+      name: c.name,
+      population: c.population || 0,
+      optimalDemand: c.optimalDemand || {},
+      minimalDemand: c.minimalDemand || {},
+    }));
 
     const mapped = this.mapApiToUIConfig(plan);
 
+    const eventsRes = await fetch(`${this.API_URL}/event-catalog`, {
+      headers: this.getHeaders(),
+    });
+
+    const eventsCatalog = eventsRes.ok
+      ? ((await eventsRes.json()) as ApiEventDefinition[])
+      : [];
+
     return {
       crew,
-      consumptionRates,
-      resources: mapped.resources!,
-      modulesList: mapped.modulesList!,
-      eventsList: [],
+      startingResources: mapped.startingResources || [],
+      modulesList: mapped.modulesList || [],
+      eventsList: eventsCatalog.map((event) => ({
+        id: event.id,
+        name: event.name,
+        type: event.type,
+        description: event.description,
+        effects: event.effects || [],
+      })),
       missionDuration: plan.missionDurationSols || 700,
+      maxStartingWeight: plan.maxStartingWeight || 150000,
     };
   }
 
-  async saveConfig(data: Partial<MissionDashboardConfig>): Promise<void> {
-    return Promise.resolve();
-  }
+  // async saveConfig(data: Partial<MissionDashboardConfig>): Promise<void> {
+  //   // Rzutujemy bezpiecznie na pełen typ dla ułatwienia odczytu (w logice upewniliśmy się, że jest pełny)
+  //   const fullData = data as MissionDashboardConfig;
+  //
+  //   const missionId = await this.getMissionPlanId();
+  //
+  //   const planDto = {
+  //     missionDurationSols: fullData.missionDuration,
+  //     maxStartingWeight: fullData.maxStartingWeight || 150000,
+  //     crew: [
+  //       {
+  //         name: "Male",
+  //         population: fullData.crew.men,
+  //         optimalDemand: {
+  //           FOOD: fullData.consumptionRates.maleFood.opt,
+  //           WATER: fullData.consumptionRates.water.opt,
+  //           OXYGEN: fullData.consumptionRates.oxygen.opt,
+  //         },
+  //         minimalDemand: {
+  //           FOOD: fullData.consumptionRates.maleFood.min,
+  //           WATER: fullData.consumptionRates.water.min,
+  //           OXYGEN: fullData.consumptionRates.oxygen.min,
+  //         },
+  //       },
+  //       {
+  //         name: "Female",
+  //         population: fullData.crew.women,
+  //         optimalDemand: {
+  //           FOOD: fullData.consumptionRates.femaleFood.opt,
+  //           WATER: fullData.consumptionRates.water.opt,
+  //           OXYGEN: fullData.consumptionRates.oxygen.opt,
+  //         },
+  //         minimalDemand: {
+  //           FOOD: fullData.consumptionRates.femaleFood.min,
+  //           WATER: fullData.consumptionRates.water.min,
+  //           OXYGEN: fullData.consumptionRates.oxygen.min,
+  //         },
+  //       },
+  //     ],
+  //     startingResources: [
+  //       { resourceType: "OXYGEN", quantity: fullData.resources.oxygen },
+  //       { resourceType: "WATER", quantity: fullData.resources.water },
+  //       { resourceType: "FOOD", quantity: fullData.resources.food },
+  //     ],
+  //     modules: fullData.modulesList.flatMap((m) => {
+  //       // Tłumaczenie potencjalnych starych/błędnych typów z UI na ścisły Enum API
+  //       let safeCategory = "UTILITY_MODULE";
+  //       if (m.type === "ENERGY_MODULE" || m.type === "energetyczny") {
+  //         safeCategory = "ENERGY_MODULE";
+  //       }
+  //
+  //       return Array.from({ length: m.count > 0 ? m.count : 1 }).map(() => ({
+  //         name: m.name,
+  //         status: m.status || "ACTIVE",
+  //         category: safeCategory, // ZMIANA: Wysyłamy wyłącznie przefiltrowany Enum
+  //         weight: m.weight || 0,
+  //         resourceProduction: [
+  //           { resourceType: "WATER", quantity: m.resources.woda.prod },
+  //           { resourceType: "OXYGEN", quantity: m.resources.tlen.prod },
+  //           { resourceType: "FOOD", quantity: m.resources.zywnosc.prod },
+  //           { resourceType: "ENERGY", quantity: m.resources.energia.prod },
+  //         ],
+  //         resourceConsumption: [
+  //           { resourceType: "WATER", quantity: m.resources.woda.cons },
+  //           { resourceType: "OXYGEN", quantity: m.resources.tlen.cons },
+  //           { resourceType: "FOOD", quantity: m.resources.zywnosc.cons },
+  //           { resourceType: "ENERGY", quantity: m.resources.energia.cons },
+  //         ],
+  //       }));
+  //     }),
+  //   };
+  //
+  //   const url =
+  //     missionId >= 0
+  //       ? `${this.API_URL}/conf/plan?override=${missionId}`
+  //       : `${this.API_URL}/conf/plan`;
+  //
+  //   const res = await fetch(url, {
+  //     method: "POST",
+  //     headers: this.getHeaders(),
+  //     body: JSON.stringify(planDto),
+  //   });
+  //
+  //   if (!res.ok) {
+  //     throw new Error(`Błąd podczas zapisu do API: ${res.status}`);
+  //   }
+  // }
 
   async optimize(): Promise<{
     payloadSessionId: string;
@@ -204,7 +385,7 @@ export class ApiMissionAdapter implements IMissionRepository {
     });
 
     if (!res.ok) throw new Error("Błąd auto-optymalizacji");
-    const data = await res.json();
+    const data = (await res.json()) as ApiOptimizeResponse;
 
     return {
       payloadSessionId: data.sessionId,
@@ -212,3 +393,4 @@ export class ApiMissionAdapter implements IMissionRepository {
     };
   }
 }
+// ========= KONIEC SEKCJI========
