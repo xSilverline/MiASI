@@ -25,7 +25,8 @@ export const useMissionData = () => {
   const [config, setConfig] = useState<MissionDashboardConfig | null>(null);
   const [optimizedConfig, setOptimizedConfig] =
     useState<Partial<MissionDashboardConfig> | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [isDataModified, setIsDataModified] = useState<boolean>(false);
   const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
@@ -39,7 +40,11 @@ export const useMissionData = () => {
   const loadConfig = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await missionRepository.getConfig();
+      const data = await withTimeout(
+        missionRepository.getConfig(),
+        20000,
+        "Przekroczono limit czasu synchronizacji konfiguracji z serwerem.",
+      );
       setConfig(data);
       setOptimizedConfig(null);
       setPayloadSessionId(null);
@@ -71,7 +76,11 @@ export const useMissionData = () => {
     try {
       await missionRepository.saveConfig(updatedConfig);
 
-      const freshConfig = await missionRepository.getConfig();
+      const freshConfig = await withTimeout(
+        missionRepository.getConfig(),
+        20000,
+        "Konfiguracja została zapisana, ale ponowne pobranie danych przekroczyło limit czasu.",
+      );
       if (freshConfig) {
         setConfig(freshConfig);
       }
@@ -80,6 +89,18 @@ export const useMissionData = () => {
       setAnalysisError("Nie udało się zapisać konfiguracji na serwerze.");
     }
   };
+  const resetMissionData = useCallback(() => {
+    setConfig(null);
+    setOptimizedConfig(null);
+    setIsLoading(false);
+    setIsDataModified(false);
+    setIsOptimizing(false);
+    setIsRecalculating(false);
+    setAnalysisError(null);
+    setPayloadSessionId(null);
+    setNominalSessionId(null);
+    setChartData([]);
+  }, []);
 
   const runNominal = async (payloadId: string) => {
     setIsRecalculating(true);
@@ -164,5 +185,6 @@ export const useMissionData = () => {
     optimize,
     recalculate,
     loadConfig,
+    resetMissionData,
   };
 };

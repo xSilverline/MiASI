@@ -55,6 +55,7 @@ const App: React.FC = () => {
     recalculate,
     optimize,
     loadConfig,
+    resetMissionData,
   } = useMissionData();
 
   const [isCrewModalOpen, setIsCrewModalOpen] = useState(false);
@@ -124,7 +125,7 @@ const App: React.FC = () => {
     setCurrentView("dashboard");
   };
 
-  if (isInitializing || isLoading) {
+  if (isInitializing || (currentView !== "login" && isLoading)) {
     return (
       <div className="h-screen w-screen bg-mars-background flex flex-col items-center justify-center text-mars-orange">
         <Loader2 size={48} className="animate-spin mb-4" />
@@ -177,7 +178,6 @@ const App: React.FC = () => {
       }
     : config;
 
-  // Przeliczanie metryk w locie na podstawie nowej, elastycznej struktury
   const totalCrew = dashboardConfig.crew.reduce(
     (acc, profile) => acc + (profile.population || 0),
     0,
@@ -265,6 +265,11 @@ const App: React.FC = () => {
         }}
         onLogout={() => {
           localStorage.removeItem("sessionToken");
+          resetMissionData();
+          setIsManualWizard(false);
+          setIsCrewModalOpen(false);
+          setIsResourcesModalOpen(false);
+          setIsModulesModalOpen(false);
           setCurrentView("login");
         }}
       />

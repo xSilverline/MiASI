@@ -92,22 +92,39 @@ export class ApiMissionAdapter implements IMissionRepository {
     };
   }
 
-  private async request<T>(url: string, init?: RequestInit): Promise<T> {
-    const res = await fetch(url, {
-      ...init,
-      headers: {
-        ...this.getHeaders(),
-        ...(init?.headers || {}),
-      },
-    });
+  private async request<T>(
+    url: string,
+    init?: RequestInit,
+    timeoutMs = 15000,
+  ): Promise<T> {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
 
-    if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      throw new Error(`API error ${res.status}: ${body || res.statusText}`);
+    try {
+      const res = await fetch(url, {
+        ...init,
+        signal: controller.signal,
+        headers: {
+          ...this.getHeaders(),
+          ...(init?.headers || {}),
+        },
+      });
+
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(`API error ${res.status}: ${body || res.statusText}`);
+      }
+
+      if (res.status === 204) return undefined as T;
+      return (await res.json()) as T;
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        throw new Error(`Przekroczono limit czasu zapytania: ${url}`);
+      }
+      throw error;
+    } finally {
+      window.clearTimeout(timeoutId);
     }
-
-    if (res.status === 204) return undefined as T;
-    return (await res.json()) as T;
   }
 
   private mapEventCatalogToUI(events: ApiEventDefinition[]) {
@@ -176,13 +193,11 @@ export class ApiMissionAdapter implements IMissionRepository {
     );
   }
   private async getMissionPlanId(): Promise<number> {
-    const res = await fetch(`${this.API_URL}/conf/plans-count`, {
-      headers: this.getHeaders(),
-    });
-    if (!res.ok) throw new Error("Nie udało się pobrać liczby planów");
-    const data = (await res.json()) as ApiMessageResponse;
+    const data = await this.request<ApiMessageResponse>(
+      `${this.API_URL}/conf/plans-count`,
+    );
     const count = parseInt(String(data.message), 10) || 0;
-    return count > 0 ? count - 1 : -1; // Zwracamy -1, jeśli baza jest pusta
+    return count > 0 ? count - 1 : -1;
   }
 
   private toStableModuleId(name: string): string {
@@ -275,17 +290,14 @@ export class ApiMissionAdapter implements IMissionRepository {
       missionId >= 0
         ? `${this.API_URL}/conf/plan?override=${missionId}`
         : `${this.API_URL}/conf/plan`;
-    const res = await fetch(url, {
+    await this.request<ApiMessageResponse>(url, {
       method: "POST",
-      headers: this.getHeaders(),
       body: JSON.stringify(planDto),
     });
 
-    if (!res.ok) {
-      throw new Error(`Błąd zapisu do API: ${res.status}`);
-    }
-
-    await this.upsertEventCatalog(fullData.eventsList);
+    await this.upsertEventCatalog(fullData.eventsList).catch((error) => {
+      console.error("Błąd synchronizacji katalogu zdarzeń", error);
+    });
   }
 
   private mapTimelineToChart(timeline: ApiDailyState[]): ChartDataPoint[] {
@@ -323,18 +335,18 @@ export class ApiMissionAdapter implements IMissionRepository {
   async recalculate(
     payloadSessionId: string,
   ): Promise<{ nominalSessionId: string; chartData: ChartDataPoint[] }> {
-    const res = await fetch(`${this.API_URL}/analysis/simulate/nominal`, {
-      method: "POST",
-      headers: this.getHeaders(),
-      body: JSON.stringify({
-        payloadSessionId,
-        customizedModules: [],
-        customizedSupplies: [],
-      }),
-    });
-
-    if (!res.ok) throw new Error("Błąd symulacji nominalnej");
-    const data = (await res.json()) as ApiSimulateNominalResponse;
+    const data = await this.request<ApiSimulateNominalResponse>(
+      `${this.API_URL}/analysis/simulate/nominal`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          payloadSessionId,
+          customizedModules: [],
+          customizedSupplies: [],
+        }),
+      },
+      60000,
+    );
     const chartData = this.mapTimelineToChart(
       data.nominalVariant?.timeline || [],
     );
@@ -349,11 +361,9 @@ export class ApiMissionAdapter implements IMissionRepository {
     const missionId = await this.getMissionPlanId();
     if (missionId === -1) return null;
 
-    const res = await fetch(`${this.API_URL}/conf/${missionId}/plan`, {
-      headers: this.getHeaders(),
-    });
-    if (!res.ok) throw new Error("Błąd pobierania planu");
-    const plan = (await res.json()) as ApiMissionPlan;
+    const plan = await this.request<ApiMissionPlan>(
+      `${this.API_URL}/conf/${missionId}/plan`,
+    );
 
     // Przekazanie gotowych załóg z API z drobnym fallbackiem
     const crew = (plan.crew || []).map((c) => ({
@@ -470,14 +480,14 @@ export class ApiMissionAdapter implements IMissionRepository {
   }> {
     const missionPlanId = await this.getMissionPlanId();
 
-    const res = await fetch(`${this.API_URL}/analysis/payload/optimize`, {
-      method: "POST",
-      headers: this.getHeaders(),
-      body: JSON.stringify({ missionPlanId }),
-    });
-
-    if (!res.ok) throw new Error("Błąd auto-optymalizacji");
-    const data = (await res.json()) as ApiOptimizeResponse;
+    const data = await this.request<ApiOptimizeResponse>(
+      `${this.API_URL}/analysis/payload/optimize`,
+      {
+        method: "POST",
+        body: JSON.stringify({ missionPlanId: missionPlanId.toString() }),
+      },
+      60000,
+    );
 
     return {
       payloadSessionId: data.sessionId,
