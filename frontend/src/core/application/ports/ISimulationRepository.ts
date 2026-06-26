@@ -1,10 +1,5 @@
 export type SimulationStatus = "SUCCESS" | "FAILURE" | "EVACUATION";
-export type ScenarioDifficulty =
-  | "LEVEL_I"
-  | "LEVEL_II"
-  | "LEVEL_III"
-  | "LEVEL_IV"
-  | "LEVEL_V";
+export type ScenarioDifficulty = "LEVEL_I" | "LEVEL_II" | "LEVEL_III" | "LEVEL_IV" | "LEVEL_V";
 export type ScenarioMode = "MANUAL" | "AUTOMATIC";
 
 export interface SimulationResourcePoint {

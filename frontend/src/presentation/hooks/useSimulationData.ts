@@ -29,9 +29,7 @@ export const useSimulationData = () => {
       setDraftId(draft.draftId);
       setProposedEventsCount(draft.proposedEventsCount);
 
-      const schedule = await simulationRepository.approveScenarioDraft(
-        draft.draftId,
-      );
+      const schedule = await simulationRepository.approveScenarioDraft(draft.draftId);
       setScheduleId(schedule.scheduleId);
 
       const simulation = await simulationRepository.runScenarioSimulation({

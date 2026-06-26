@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Check, Trash2, X } from "lucide-react";
 import type {
   EventData,
@@ -35,13 +35,14 @@ export const DayScheduleModal: React.FC<DayScheduleModalProps> = ({
   const handleSave = () => {
     if (!selectedEventId || duration < 1) return;
 
-    const eventToSave = {
-      eventId: selectedEventId,
-      startDay: day,
-      duration: duration,
-    };
-
-    onSave(eventToSave, editingId || undefined);
+    onSave(
+      {
+        eventId: selectedEventId,
+        startDay: day,
+        duration,
+      },
+      editingId || undefined,
+    );
 
     setSelectedEventId("");
     setDuration(1);
@@ -75,11 +76,13 @@ export const DayScheduleModal: React.FC<DayScheduleModalProps> = ({
                 className="w-full bg-mars-itemBackground border border-mars-line rounded-md p-3 text-white focus:outline-none focus:border-mars-orange appearance-none"
               >
                 <option value="" disabled>
-                  Wybierz zdarzenie...
+                  {availableEvents.length > 0
+                    ? "Wybierz zdarzenie..."
+                    : "Brak zdarzeń w katalogu"}
                 </option>
-                {availableEvents.map((ev) => (
-                  <option key={ev.id} value={ev.id}>
-                    {ev.name}
+                {availableEvents.map((event) => (
+                  <option key={event.id} value={event.id}>
+                    {event.name || event.description || event.type}
                   </option>
                 ))}
               </select>
@@ -98,17 +101,15 @@ export const DayScheduleModal: React.FC<DayScheduleModalProps> = ({
               />
             </div>
 
-            {/* Przycisk akceptacji - stała wielkość, bez zagnieżdżania */}
             <button
               onClick={handleSave}
-              disabled={!selectedEventId}
+              disabled={!selectedEventId || availableEvents.length === 0}
               className="p-3 shrink-0 flex items-center justify-center aspect-square bg-mars-itemBackground border border-mars-line rounded-md text-green-500 hover:border-green-500 hover:bg-green-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-[1px]"
             >
               <Check size={24} />
             </button>
           </div>
 
-          {/* Lista zdarzeń */}
           <div className="bg-mars-itemBackground rounded-lg p-6 min-h-50 max-h-50 overflow-y-auto custom-scrollbar flex flex-col gap-3 pr-4">
             {dayEvents.length === 0 ? (
               <p className="text-center text-slate-500 my-auto text-sm uppercase tracking-wider">
@@ -131,9 +132,7 @@ export const DayScheduleModal: React.FC<DayScheduleModalProps> = ({
                           : "bg-green-500 text-white"
                       }`}
                     >
-                      {item.eventDetails.type === "THREAT"
-                        ? "Zagrożenie"
-                        : "Sukces"}
+                      {item.eventDetails.type === "THREAT" ? "Zagrożenie" : "Sukces"}
                     </span>
                     <span className="text-sm text-slate-200 truncate">
                       {item.eventDetails.name}
@@ -147,7 +146,7 @@ export const DayScheduleModal: React.FC<DayScheduleModalProps> = ({
 
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // Zapobiega wywołaniu handleEditClick
+                      e.stopPropagation();
                       onDelete(item.id);
                     }}
                     className="text-red-500 hover:text-red-400 p-2 shrink-0 ml-2"

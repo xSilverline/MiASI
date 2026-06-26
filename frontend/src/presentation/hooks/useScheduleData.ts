@@ -1,17 +1,24 @@
-﻿import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { ScheduledEvent } from "../../core/domain/entities/event";
 import { scheduleRepository } from "../../infrastructure/dependencyInjection/container";
 
 export const useScheduleData = () => {
   const [scheduledEvents, setScheduledEvents] = useState<ScheduledEvent[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const silentRefetch = useCallback(async () => {
     try {
       const data = await scheduleRepository.getEvents();
       setScheduledEvents(data);
-    } catch (error) {
-      console.error("Błąd pobierania harmonogramu:", error);
+      setError(null);
+    } catch (err) {
+      console.error("Błąd pobierania harmonogramu:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Nie udało się pobrać harmonogramu.",
+      );
     }
   }, []);
 
@@ -19,17 +26,24 @@ export const useScheduleData = () => {
     let isMounted = true;
 
     const loadInitialData = async () => {
+      setIsLoading(true);
       try {
         const data = await scheduleRepository.getEvents();
         if (isMounted) {
           setScheduledEvents(data);
+          setError(null);
         }
-      } catch (error) {
-        console.error("Błąd pobierania harmonogramu:", error);
-      } finally {
+      } catch (err) {
+        console.error("Błąd pobierania harmonogramu:", err);
         if (isMounted) {
-          setIsLoading(false);
+          setError(
+            err instanceof Error
+              ? err.message
+              : "Nie udało się pobrać harmonogramu.",
+          );
         }
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
     };
 
@@ -44,11 +58,12 @@ export const useScheduleData = () => {
     eventData: Omit<ScheduledEvent, "id">,
     editId?: string,
   ) => {
+    const optimisticId =
+      editId || `sched-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
     const eventToSave: ScheduledEvent = {
       ...eventData,
-      id:
-        editId ||
-        `sched-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      id: optimisticId,
     };
 
     setScheduledEvents((prev) =>
@@ -58,22 +73,31 @@ export const useScheduleData = () => {
     );
 
     try {
+      if (editId) {
+        // Timeline API has add/delete, but no update endpoint. For editing we
+        // replace the scheduled occurrence and then refetch the authoritative id.
+        await scheduleRepository.deleteEvent(editId);
+      }
+
       await scheduleRepository.saveEvent(eventToSave);
-    } catch (error) {
-      console.error("Błąd zapisu zdarzenia:", error);
+      await silentRefetch();
+    } catch (err) {
+      console.error("Błąd zapisu zdarzenia:", err);
       await silentRefetch();
     }
   };
 
   const deleteEvent = async (id: string) => {
     setScheduledEvents((prev) => prev.filter((ev) => ev.id !== id));
+
     try {
       await scheduleRepository.deleteEvent(id);
-    } catch (error) {
-      console.error("Błąd usuwania zdarzenia:", error);
+      await silentRefetch();
+    } catch (err) {
+      console.error("Błąd usuwania zdarzenia:", err);
       await silentRefetch();
     }
   };
 
-  return { scheduledEvents, isLoading, saveEvent, deleteEvent };
+  return { scheduledEvents, isLoading, error, saveEvent, deleteEvent, refetch: silentRefetch };
 };

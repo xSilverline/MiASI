@@ -1,24 +1,27 @@
-﻿import type { IScheduleRepository } from "../../core/application/ports/IScheduleRepository";
-import type { ScheduledEvent } from "../../core/domain/entities/event";
-
-interface ApiEventEffect {
-  target: string;
-  value: number;
-  unit: string;
-  description?: string;
-}
+import type { IScheduleRepository } from "../../core/application/ports/IScheduleRepository";
+import type {
+  EventEffect,
+  EventType,
+  ScheduledEvent,
+} from "../../core/domain/entities/event";
 
 interface ApiScheduledEvent {
-  id: string;
-  type?: string;
+  id?: string;
+  eventId?: string;
+  eventDefinitionId?: string;
+  name?: string;
+  type?: EventType;
   sol?: number;
+  startDay?: number;
+  duration?: number;
+  durationSols?: number;
   description?: string;
-  effects?: ApiEventEffect[];
+  effects?: EventEffect[];
 }
 
 interface ApiTimelineSolResponse {
   sol: number;
-  events: ApiScheduledEvent[];
+  events?: ApiScheduledEvent[];
 }
 
 export class ApiScheduleAdapter implements IScheduleRepository {
@@ -47,23 +50,44 @@ export class ApiScheduleAdapter implements IScheduleRepository {
       throw new Error(`API error ${res.status}: ${body || res.statusText}`);
     }
 
-    if (res.status === 204) {
-      return undefined as T;
-    }
+    if (res.status === 204) return undefined as T;
 
-    return (await res.json()) as T;
+    const text = await res.text();
+    if (!text) return undefined as T;
+
+    return JSON.parse(text) as T;
+  }
+
+  private mapApiEventToScheduledEvent(
+    event: ApiScheduledEvent,
+    fallbackSol: number,
+  ): ScheduledEvent {
+    const id =
+      event.id ||
+      event.eventId ||
+      event.eventDefinitionId ||
+      crypto.randomUUID();
+    const eventId = event.eventDefinitionId || event.eventId || event.id || id;
+
+    return {
+      id,
+      eventId,
+      startDay: event.sol ?? event.startDay ?? fallbackSol,
+      duration: event.duration ?? event.durationSols ?? 1,
+      name: event.name,
+      type: event.type,
+      description: event.description,
+      effects: event.effects || [],
+    };
   }
 
   private mapTimelineToScheduledEvents(
     timeline: ApiTimelineSolResponse[],
   ): ScheduledEvent[] {
     return timeline.flatMap((day) =>
-      (day.events || []).map((event) => ({
-        id: event.id,
-        eventId: event.id,
-        startDay: event.sol ?? day.sol,
-        duration: 1,
-      })),
+      (day.events || []).map((event) =>
+        this.mapApiEventToScheduledEvent(event, day.sol),
+      ),
     );
   }
 
@@ -72,7 +96,9 @@ export class ApiScheduleAdapter implements IScheduleRepository {
       `${this.API_URL}/timeline`,
     );
 
-    return this.mapTimelineToScheduledEvents(timeline);
+    return this.mapTimelineToScheduledEvents(
+      Array.isArray(timeline) ? timeline : [],
+    );
   }
 
   async saveEvent(event: ScheduledEvent): Promise<void> {

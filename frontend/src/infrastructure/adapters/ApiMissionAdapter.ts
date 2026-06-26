@@ -1,4 +1,4 @@
-﻿// ======= ZMIANA ========
+// ======= ZMIANA ========
 import type {
   ChartDataPoint,
   IMissionRepository,
@@ -13,18 +13,6 @@ interface ApiResource {
   amount?: number;
   resourceType?: string;
   quantity?: number;
-}
-interface ApiEventDefinition {
-  id: string;
-  name?: string;
-  type: "SUPPLY_DELIVERY" | "THREAT" | "MODULE_STATE_CHANGE";
-  description?: string;
-  effects?: {
-    target: string;
-    value: number;
-    unit: string;
-    description?: string;
-  }[];
 }
 
 interface ApiCrewProfile {
@@ -50,6 +38,21 @@ interface ApiMissionPlan {
   startingResources?: ApiResource[];
   modules?: ApiModule[];
   optimalModules?: ApiModule[];
+}
+
+interface ApiEventDefinition {
+  id?: string;
+  name?: string;
+  type?: "SUPPLY_DELIVERY" | "THREAT" | "MODULE_STATE_CHANGE";
+  description?: string;
+  affectedElement?: string;
+  consequence?: string;
+  effects?: {
+    target: string;
+    value: number;
+    unit: string;
+    description?: string;
+  }[];
 }
 
 interface ApiDailyState {
@@ -88,6 +91,90 @@ export class ApiMissionAdapter implements IMissionRepository {
       Authorization: token ? `Bearer ${token}` : "",
     };
   }
+
+  private async request<T>(url: string, init?: RequestInit): Promise<T> {
+    const res = await fetch(url, {
+      ...init,
+      headers: {
+        ...this.getHeaders(),
+        ...(init?.headers || {}),
+      },
+    });
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      throw new Error(`API error ${res.status}: ${body || res.statusText}`);
+    }
+
+    if (res.status === 204) return undefined as T;
+    return (await res.json()) as T;
+  }
+
+  private mapEventCatalogToUI(events: ApiEventDefinition[]) {
+    return events
+      .filter((event) => event.id && event.type)
+      .map((event) => ({
+        id: event.id!,
+        name: event.name || event.description || event.id!,
+        type: event.type!,
+        description: event.description,
+        effects: event.effects || [],
+      }));
+  }
+
+  private mapUIEventToCatalog(event: MissionDashboardConfig["eventsList"][number]) {
+    return {
+      id: event.id,
+      name: event.name || event.id,
+      type: event.type,
+      description: event.description || event.name || event.id,
+      affectedElement: event.effects?.[0]?.target || "",
+      consequence: event.effects?.[0]?.description || "",
+      effects: event.effects || [],
+    } satisfies ApiEventDefinition;
+  }
+
+  private async getEventCatalog() {
+    try {
+      const events = await this.request<ApiEventDefinition[]>(
+        `${this.API_URL}/event-catalog`,
+      );
+      return this.mapEventCatalogToUI(events);
+    } catch (error) {
+      console.error("Błąd pobierania katalogu zdarzeń", error);
+      return [];
+    }
+  }
+
+  private async upsertEventCatalog(events: MissionDashboardConfig["eventsList"] | undefined) {
+    if (!events || events.length === 0) return;
+
+    const existing = await this.request<ApiEventDefinition[]>(
+      `${this.API_URL}/event-catalog`,
+    ).catch(() => []);
+    const existingIds = new Set(existing.map((event) => event.id).filter(Boolean));
+
+    await Promise.all(
+      events.map((event) => {
+        const payload = this.mapUIEventToCatalog(event);
+
+        if (existingIds.has(event.id)) {
+          return this.request<ApiEventDefinition>(
+            `${this.API_URL}/event-catalog/${encodeURIComponent(event.id)}`,
+            {
+              method: "PUT",
+              body: JSON.stringify(payload),
+            },
+          );
+        }
+
+        return this.request<ApiEventDefinition>(`${this.API_URL}/event-catalog`, {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      }),
+    );
+  }
   private async getMissionPlanId(): Promise<number> {
     const res = await fetch(`${this.API_URL}/conf/plans-count`, {
       headers: this.getHeaders(),
@@ -98,10 +185,18 @@ export class ApiMissionAdapter implements IMissionRepository {
     return count > 0 ? count - 1 : -1; // Zwracamy -1, jeśli baza jest pusta
   }
 
+  private toStableModuleId(name: string): string {
+    return `mod-${name
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")}`;
+  }
+
   private mapApiToUIConfig(
     apiPlan: ApiMissionPlan,
   ): Partial<MissionDashboardConfig> {
-    const resources = { oxygen: 0, water: 0, food: 0 };
+    const resources = { oxygen: 0, water: 0, food: 0, energy: 0 };
     apiPlan.startingResources?.forEach((r) => {
       const type = (r.resourceType || r.type || "").toUpperCase();
       const val = r.quantity ?? r.amount ?? 0;
@@ -109,17 +204,21 @@ export class ApiMissionAdapter implements IMissionRepository {
       if (type === "OXYGEN") resources.oxygen = val;
       else if (type === "WATER") resources.water = val;
       else if (type === "FOOD") resources.food = val;
+      else if (type === "ENERGY") resources.energy = val;
     });
 
     const modulesMap = new Map<string, Omit<ModuleWithCount, "id">>();
-    const modulesList = apiPlan.modules || apiPlan.optimalModules || [];
+    const modulesList = apiPlan.optimalModules || apiPlan.modules || [];
 
     modulesList.forEach((m) => {
-      if (modulesMap.has(m.name)) {
-        modulesMap.get(m.name)!.count++;
+      const moduleName = m.name?.trim();
+      if (!moduleName) return;
+
+      if (modulesMap.has(moduleName)) {
+        modulesMap.get(moduleName)!.count++;
       } else {
-        modulesMap.set(m.name, {
-          name: m.name,
+        modulesMap.set(moduleName, {
+          name: moduleName,
           category: (m.category as any) || "UTILITY_MODULE",
           status: (m.status as any) || "ACTIVE",
           weight: m.weight ?? 0,
@@ -141,9 +240,10 @@ export class ApiMissionAdapter implements IMissionRepository {
         { resourceType: "OXYGEN", quantity: resources.oxygen },
         { resourceType: "WATER", quantity: resources.water },
         { resourceType: "FOOD", quantity: resources.food },
+        { resourceType: "ENERGY", quantity: resources.energy },
       ],
-      modulesList: Array.from(modulesMap.values()).map((item, index) => ({
-        id: `mod-${index}`,
+      modulesList: Array.from(modulesMap.values()).map((item) => ({
+        id: this.toStableModuleId(item.name),
         ...item,
       })),
     };
@@ -184,35 +284,40 @@ export class ApiMissionAdapter implements IMissionRepository {
     if (!res.ok) {
       throw new Error(`Błąd zapisu do API: ${res.status}`);
     }
+
+    await this.upsertEventCatalog(fullData.eventsList);
   }
 
   private mapTimelineToChart(timeline: ApiDailyState[]): ChartDataPoint[] {
-    return timeline.map((day) => {
-      // Pancerne pobieranie zasobu niezależnie od wersji API
-      const getRes = (arr: ApiResource[] | undefined, targetType: string) => {
-        const found = arr?.find(
-          (r) => r.type === targetType || r.resourceType === targetType,
-        );
-        if (!found) return 0;
-        return found.amount !== undefined ? found.amount : found.quantity || 0;
-      };
+    const getRes = (arr: ApiResource[] | undefined, targetType: string) => {
+      const found = arr?.find((r) => {
+        const type = (r.type || r.resourceType || "").toUpperCase();
+        return type === targetType;
+      });
 
-      return {
-        sol: day.sol,
-        energyStore: getRes(day.warehouse, "ENERGY"),
-        energyProd: getRes(day.balance?.produced, "ENERGY"),
-        energyCons: getRes(day.balance?.consumed, "ENERGY"),
-        waterStore: getRes(day.warehouse, "WATER"),
-        waterProd: getRes(day.balance?.produced, "WATER"),
-        waterCons: getRes(day.balance?.consumed, "WATER"),
-        oxygenStore: getRes(day.warehouse, "OXYGEN"),
-        oxygenProd: getRes(day.balance?.produced, "OXYGEN"),
-        oxygenCons: getRes(day.balance?.consumed, "OXYGEN"),
-        foodStore: getRes(day.warehouse, "FOOD"),
-        foodProd: getRes(day.balance?.produced, "FOOD"),
-        foodCons: getRes(day.balance?.consumed, "FOOD"),
-      };
-    });
+      if (!found) return 0;
+      return found.amount !== undefined ? found.amount : found.quantity || 0;
+    };
+
+    /**
+     * Dashboard chart uses absolute warehouse values returned by the API.
+     * Scaling and safe-threshold visualization are handled in UsageChart.
+     */
+    return timeline.map((day) => ({
+      sol: day.sol,
+      energyStore: getRes(day.warehouse, "ENERGY"),
+      energyProd: getRes(day.balance?.produced, "ENERGY"),
+      energyCons: getRes(day.balance?.consumed, "ENERGY"),
+      waterStore: getRes(day.warehouse, "WATER"),
+      waterProd: getRes(day.balance?.produced, "WATER"),
+      waterCons: getRes(day.balance?.consumed, "WATER"),
+      oxygenStore: getRes(day.warehouse, "OXYGEN"),
+      oxygenProd: getRes(day.balance?.produced, "OXYGEN"),
+      oxygenCons: getRes(day.balance?.consumed, "OXYGEN"),
+      foodStore: getRes(day.warehouse, "FOOD"),
+      foodProd: getRes(day.balance?.produced, "FOOD"),
+      foodCons: getRes(day.balance?.consumed, "FOOD"),
+    }));
   }
 
   async recalculate(
@@ -259,26 +364,13 @@ export class ApiMissionAdapter implements IMissionRepository {
     }));
 
     const mapped = this.mapApiToUIConfig(plan);
-
-    const eventsRes = await fetch(`${this.API_URL}/event-catalog`, {
-      headers: this.getHeaders(),
-    });
-
-    const eventsCatalog = eventsRes.ok
-      ? ((await eventsRes.json()) as ApiEventDefinition[])
-      : [];
+    const eventsList = await this.getEventCatalog();
 
     return {
       crew,
       startingResources: mapped.startingResources || [],
       modulesList: mapped.modulesList || [],
-      eventsList: eventsCatalog.map((event) => ({
-        id: event.id,
-        name: event.name,
-        type: event.type,
-        description: event.description,
-        effects: event.effects || [],
-      })),
+      eventsList,
       missionDuration: plan.missionDurationSols || 700,
       maxStartingWeight: plan.maxStartingWeight || 150000,
     };
@@ -381,7 +473,7 @@ export class ApiMissionAdapter implements IMissionRepository {
     const res = await fetch(`${this.API_URL}/analysis/payload/optimize`, {
       method: "POST",
       headers: this.getHeaders(),
-      body: JSON.stringify({ missionPlanId: missionPlanId.toString() }),
+      body: JSON.stringify({ missionPlanId }),
     });
 
     if (!res.ok) throw new Error("Błąd auto-optymalizacji");

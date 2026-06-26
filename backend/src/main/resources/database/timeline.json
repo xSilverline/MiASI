@@ -86,4 +86,31 @@
   "id" : "44073c8d-c7ea-4853-9b59-ccb3a9c1f543",
   "sol" : 4,
   "type" : "THREAT"
+}, {
+  "description" : "Supply delivery event available as a mission schedule preset.",
+  "effects" : [ {
+    "target" : "WATER",
+    "value" : 1000.0,
+    "unit" : "KG",
+    "description" : "Water delivered to mission storage."
+  }, {
+    "target" : "FOOD",
+    "value" : 2000.0,
+    "unit" : "KG",
+    "description" : "Food delivered to mission storage."
+  } ],
+  "id" : "30ddef33-93bb-488f-8f3e-4ffd1c6e3893",
+  "sol" : 25,
+  "type" : "SUPPLY_DELIVERY"
+}, {
+  "description" : "Dust storm hits solar panels.",
+  "effects" : [ {
+    "target" : "ENERGY",
+    "value" : -15.0,
+    "unit" : "PERCENT",
+    "description" : "Lower energy production."
+  } ],
+  "id" : "33ce7855-3b54-4cdc-b3f7-1ff71f8b5808",
+  "sol" : 3,
+  "type" : "THREAT"
 } ]

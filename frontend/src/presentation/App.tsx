@@ -13,6 +13,7 @@ import { DetailCard, type DetailItem } from "./components/DetailCard.tsx";
 import { UsageChart } from "./components/UsageChart.tsx";
 import { formatNumber } from "./utils/formatters.ts";
 import { ScheduleView } from "./views/Schedule/ScheduleView.tsx";
+import { SimulationView } from "./views/Simulation/SimulationView.tsx";
 import { LoginView } from "./views/LoginView.tsx";
 import {
   ConfigCreatorView,
@@ -31,7 +32,6 @@ import type {
   MissionDashboardConfig,
   ModuleWithCount,
 } from "../core/domain/entities/MissionConfig.ts";
-import { SimulationView } from "./views/Simulation/SimulationView.tsx";
 
 export type ViewState = "login" | "dashboard" | "configCreator" | string;
 
@@ -42,17 +42,19 @@ const App: React.FC = () => {
 
   const {
     config,
+    optimizedConfig,
     isLoading,
     isDataModified,
     isRecalculating,
     isOptimizing,
+    analysisError,
     payloadSessionId,
+    nominalSessionId,
     chartData,
     updateConfig,
     recalculate,
     optimize,
     loadConfig,
-    nominalSessionId,
   } = useMissionData();
 
   const [isCrewModalOpen, setIsCrewModalOpen] = useState(false);
@@ -98,10 +100,13 @@ const App: React.FC = () => {
 
       if (data.modules) {
         updates.modulesList = data.modules.map((newMod) => {
-          const existing = config?.modulesList?.find((p) => p.id === newMod.id);
+          const existing = config?.modulesList?.find(
+            (p) => p.id === newMod.id || p.name === newMod.name,
+          );
+
           return {
             ...newMod,
-            count: existing ? existing.count : 0,
+            count: existing ? existing.count : 1,
           } as ModuleWithCount;
         });
         hasChanges = true;
@@ -156,8 +161,24 @@ const App: React.FC = () => {
 
   if (!config) return null;
 
+  const dashboardConfig: MissionDashboardConfig = optimizedConfig
+    ? {
+        ...config,
+        ...optimizedConfig,
+        startingResources:
+          optimizedConfig.startingResources || config.startingResources,
+        modulesList: optimizedConfig.modulesList || config.modulesList,
+        crew: optimizedConfig.crew || config.crew,
+        eventsList: optimizedConfig.eventsList || config.eventsList,
+        missionDuration:
+          optimizedConfig.missionDuration || config.missionDuration,
+        maxStartingWeight:
+          optimizedConfig.maxStartingWeight || config.maxStartingWeight,
+      }
+    : config;
+
   // Przeliczanie metryk w locie na podstawie nowej, elastycznej struktury
-  const totalCrew = config.crew.reduce(
+  const totalCrew = dashboardConfig.crew.reduce(
     (acc, profile) => acc + (profile.population || 0),
     0,
   );
@@ -168,8 +189,8 @@ const App: React.FC = () => {
   };
 
   const getResQty = (type: string) =>
-    config.startingResources.find((r) => r.resourceType === type)?.quantity ||
-    0;
+    dashboardConfig.startingResources.find((r) => r.resourceType === type)
+      ?.quantity || 0;
 
   const resourceData: DetailItem[] = [
     {
@@ -189,15 +210,48 @@ const App: React.FC = () => {
     },
   ];
 
-  const moduleData: DetailItem[] = config.modulesList.map((m) => ({
+  const moduleData: DetailItem[] = dashboardConfig.modulesList.map((m) => ({
     label: m.name.toUpperCase(),
     value: m.count.toString(),
   }));
 
+  const getEnergyQuantity = (
+    collection: { resourceType: string; quantity: number }[] | undefined,
+  ) =>
+    collection?.find((resource) => resource.resourceType === "ENERGY")
+      ?.quantity || 0;
+
+  const energyProduction = dashboardConfig.modulesList.reduce(
+    (sum, module) =>
+      sum + getEnergyQuantity(module.resourceProduction) * (module.count || 0),
+    0,
+  );
+
+  const energyConsumption = dashboardConfig.modulesList.reduce(
+    (sum, module) =>
+      sum + getEnergyQuantity(module.resourceConsumption) * (module.count || 0),
+    0,
+  );
+
+  const energyBalance = energyProduction - energyConsumption;
+
   const energyData: DetailItem[] = [
-    { label: "PRODUKCJA", value: formatNumber(150), valueSuffix: "kW" }, // Zostawione jako sztywny mock, póki co
-    { label: "ZUŻYCIE", value: formatNumber(110), valueSuffix: "kW" },
-    { label: "BILANS", value: formatNumber(40), valueSuffix: "kW" },
+    {
+      label: "PRODUKCJA",
+      value: formatNumber(energyProduction),
+      valueSuffix: "kW",
+    },
+    {
+      label: "ZUŻYCIE",
+      value: formatNumber(energyConsumption),
+      valueSuffix: "kW",
+    },
+    {
+      label: "BILANS",
+      value: formatNumber(energyBalance),
+      valueSuffix: "kW",
+      color: energyBalance >= 0 ? "text-green-500" : "text-red-500",
+    },
   ];
 
   return (
@@ -228,7 +282,7 @@ const App: React.FC = () => {
               <HeaderCard
                 icon={Clock}
                 title="CZAS TRWANIA MISJI"
-                value={`${config.missionDuration} SOL`}
+                value={`${dashboardConfig.missionDuration} SOL`}
               />
             </div>
 
@@ -283,10 +337,71 @@ const App: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              ) : isRecalculating ? (
+                <div className="flex-1 flex flex-col justify-center items-center bg-mars-itemBackground rounded-3xl p-10 shadow-md border border-mars-orange/20 min-h-[300px]">
+                  <Loader2
+                    size={44}
+                    className="animate-spin text-mars-orange mb-4"
+                  />
+                  <h3 className="text-sm md:text-base font-bold tracking-widest text-white uppercase mb-3">
+                    Trwa symulacja nominalna
+                  </h3>
+                  <p className="text-xs md:text-sm text-slate-400 max-w-lg text-center leading-relaxed">
+                    Auto-optymalizacja zakończona. System przelicza przebieg
+                    misji i przygotowuje dane wykresu.
+                  </p>
+                </div>
+              ) : analysisError ? (
+                <div className="flex-1 flex flex-col justify-center items-center bg-mars-itemBackground rounded-3xl p-10 shadow-md border border-red-500/20 min-h-[300px]">
+                  <AlertTriangle
+                    size={48}
+                    className="text-red-500 mb-4"
+                    strokeWidth={1.5}
+                  />
+                  <h3 className="text-sm md:text-base font-bold tracking-widest text-white uppercase mb-3">
+                    Nie udało się przeliczyć wykresu
+                  </h3>
+                  <p className="text-xs md:text-sm text-slate-400 mb-8 max-w-lg text-center leading-relaxed">
+                    {analysisError}
+                  </p>
+                  <button
+                    onClick={() => void recalculate()}
+                    disabled={
+                      !payloadSessionId || isRecalculating || isOptimizing
+                    }
+                    className="flex items-center gap-3 py-3.5 px-8 rounded-xl text-xs tracking-widest font-bold uppercase bg-mars-orange/10 text-mars-orange border border-mars-orange/30 hover:bg-mars-orange/20 hover:border-mars-orange transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Ponów rekalkulację
+                  </button>
+                </div>
+              ) : chartData.length === 0 ? (
+                <div className="flex-1 flex flex-col justify-center items-center bg-mars-itemBackground rounded-3xl p-10 shadow-md border border-mars-orange/20 min-h-[300px]">
+                  <AlertTriangle
+                    size={48}
+                    className="text-mars-orange mb-4"
+                    strokeWidth={1.5}
+                  />
+                  <h3 className="text-sm md:text-base font-bold tracking-widest text-white uppercase mb-3">
+                    Brak danych wykresu
+                  </h3>
+                  <p className="text-xs md:text-sm text-slate-400 mb-8 max-w-lg text-center leading-relaxed">
+                    Payload został utworzony, ale symulacja nominalna nie
+                    zwróciła danych timeline.
+                  </p>
+                  <button
+                    onClick={() => void recalculate()}
+                    disabled={
+                      !payloadSessionId || isRecalculating || isOptimizing
+                    }
+                    className="flex items-center gap-3 py-3.5 px-8 rounded-xl text-xs tracking-widest font-bold uppercase bg-mars-orange/10 text-mars-orange border border-mars-orange/30 hover:bg-mars-orange/20 hover:border-mars-orange transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Rekalkuluj wykres
+                  </button>
+                </div>
               ) : (
                 <UsageChart
                   data={chartData}
-                  missionDuration={config.missionDuration}
+                  missionDuration={dashboardConfig.missionDuration}
                 />
               )}
             </div>
@@ -307,20 +422,20 @@ const App: React.FC = () => {
           </>
         ) : currentView === "schedule" ? (
           <ScheduleView
-            missionDuration={config.missionDuration}
+            missionDuration={dashboardConfig.missionDuration}
             availableEvents={config.eventsList}
           />
         ) : currentView === "simAuto" ? (
           <SimulationView
             mode="automatic"
-            missionDuration={config.missionDuration}
+            missionDuration={dashboardConfig.missionDuration}
             nominalSessionId={nominalSessionId}
             availableEvents={config.eventsList}
           />
         ) : currentView === "simManual" ? (
           <SimulationView
             mode="manual"
-            missionDuration={config.missionDuration}
+            missionDuration={dashboardConfig.missionDuration}
             nominalSessionId={nominalSessionId}
             availableEvents={config.eventsList}
           />
@@ -333,6 +448,7 @@ const App: React.FC = () => {
         )}
       </main>
 
+      {/* UWAGA: Komponenty Modali będą teraz wymagały przepisania, bo dostają czyste arraye prosto z API! */}
       {isCrewModalOpen && (
         <CrewModal
           data={config.crew}
