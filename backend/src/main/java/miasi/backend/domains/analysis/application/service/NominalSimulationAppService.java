@@ -17,7 +17,9 @@ import miasi.backend.domains.analysis.domain._simulation.SimulationOutcomeEvalua
 import miasi.backend.domains.analysis.domain._simulation.SimulationVariant;
 import miasi.backend.domains.analysis.domain._simulation.TimelineSimulator;
 import miasi.backend.domains.analysis.domain.core.DailyState;
+import miasi.backend.domains.analysis.domain.core.Resource;
 import miasi.backend.domains.analysis.domain.core.VariantType;
+import miasi.backend.domains.analysis.domain.modules.Module;
 
 @RequiredArgsConstructor
 public class NominalSimulationAppService implements IRunNominalSimulationUseCase {
@@ -39,25 +41,37 @@ public class NominalSimulationAppService implements IRunNominalSimulationUseCase
           "Payload optimization session not found: " + command.payloadSessionId());
     }
 
+    // Jeśli użytkownik przysłał modyfikacje, używamy ich. W przeciwnym razie bierzemy zoptymalizowane.
+    List<Module> modulesToUse =
+        (command.customizedModules() != null && !command.customizedModules().isEmpty())
+            ? command.customizedModules()
+            : baseSession.getConfiguration().getOptimalModules();
+
+    List<Resource> suppliesToUse =
+        (command.customizedSupplies() != null && !command.customizedSupplies().isEmpty())
+            ? command.customizedSupplies()
+            : baseSession.getConfiguration().getStartingResources();
+
+    // Uruchamiamy symulację z poprawnymi danymi
     List<DailyState> timeline =
         timelineSimulator.simulate(
             baseSession.getInputManifest(),
-            command.customizedModules(),
-            command.customizedSupplies());
+            modulesToUse,
+            suppliesToUse);
 
     var outcome = outcomeEvaluator.evaluate(timeline, baseSession.getInputManifest());
     SimulationVariant nominalVariant = new SimulationVariant(VariantType.IDEAL, timeline, outcome);
 
+    // Zapisujemy wybrane/zbudowane moduły i zapasy, a nie tylko te z komendy
     NominalSimulationSession session =
         new NominalSimulationSession(
             UUID.randomUUID().toString(),
             command.payloadSessionId(),
-            command.customizedModules(),
-            command.customizedSupplies(),
+            modulesToUse,
+            suppliesToUse,
             nominalVariant,
             LocalDateTime.now());
 
-    // EDA
     eventPublisher.publishNominalSimulationCompleted(new NominalSimulationCompletedEvent(session));
 
     sessionRepository.saveNominal(session);

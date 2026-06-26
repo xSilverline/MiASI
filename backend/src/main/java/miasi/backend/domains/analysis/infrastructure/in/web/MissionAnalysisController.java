@@ -35,7 +35,7 @@ public class MissionAnalysisController {
   private final IRunNominalSimulationUseCase runNominalSimulationUseCase;
   private final IRunScenariosSimulationUseCase runScenariosSimulationUseCase;
 
-  @PostMapping("/payload/optimize")
+  @PostMapping({"/optimize", "/payload/optimize"})
   public ResponseEntity<PayloadOptimizationResponse> optimizePayload(
       @RequestBody PayloadOptimizationRequest request) {
 
@@ -45,7 +45,7 @@ public class MissionAnalysisController {
     return ResponseEntity.ok(PayloadOptimizationResponse.fromDomain(session));
   }
 
-  @PostMapping("/simulate/nominal")
+  @PostMapping({"/nominal", "/simulate/nominal"})
   public ResponseEntity<NominalSimulationResponse> simulateNominal(
       @RequestBody RunNominalSimulationRequest request) {
 
@@ -92,7 +92,7 @@ public class MissionAnalysisController {
     return ResponseEntity.ok(NominalSimulationResponse.fromDomain(session));
   }
 
-  @PostMapping("/simulate/scenarios")
+  @PostMapping({"/scenarios", "/simulate/scenarios"})
   public ResponseEntity<ScenariosSimulationResponse> simulateScenarios(
       @RequestBody RunScenariosSimulationRequest request) {
 

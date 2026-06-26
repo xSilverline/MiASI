@@ -6,12 +6,14 @@ import miasi.backend.domains.analysis.domain._simulation.SimulationVariant;
 import miasi.backend.domains.analysis.domain.schedule.Threat;
 
 public record ScenariosSimulationResponse(
+    String status,
     String sessionId,
     List<Threat> appliedThreats,
     SimulationVariant idealVariant,
     SimulationVariant realVariant) {
   public static ScenariosSimulationResponse fromDomain(ScenariosAnalysisSession session) {
     return new ScenariosSimulationResponse(
+        "success",
         session.getId(),
         session.getAppliedThreats(),
         session.getIdealVariant(),
