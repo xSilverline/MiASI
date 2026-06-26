@@ -77,20 +77,11 @@
   },
   "configuration" : {
     "optimalModules" : [ {
-      "consumption" : [ {
-        "type" : "ENERGY",
-        "amount" : 1.0,
-        "weight" : 0.0
-      }, {
-        "type" : "WATER",
-        "amount" : 1.0,
-        "weight" : 1.1
-      } ],
-      "efficiency" : 1.0,
       "id" : "default-laboratory",
-      "maxCount" : 1,
-      "minCount" : 1,
       "name" : "default_laboratory",
+      "weight" : 2137.0,
+      "minCount" : 1,
+      "maxCount" : 1,
       "production" : [ {
         "type" : "FOOD",
         "amount" : 2.5,
@@ -100,8 +91,17 @@
         "amount" : 15.0,
         "weight" : 18.0
       } ],
+      "consumption" : [ {
+        "type" : "ENERGY",
+        "amount" : 1.0,
+        "weight" : 0.0
+      }, {
+        "type" : "WATER",
+        "amount" : 1.0,
+        "weight" : 1.1
+      } ],
       "status" : "ACTIVE",
-      "weight" : 2137.0
+      "efficiency" : 1.0
     } ],
     "startingResources" : [ {
       "type" : "OXYGEN",
@@ -120,4 +120,126 @@
     "isWeightLimitExceeded" : false
   },
   "createdAt" : "2026-06-25T02:54:52.0247085"
+}, {
+  "id" : "1254ca09-b7a6-4a06-92c5-3678b841a75d",
+  "inputManifest" : {
+    "id" : 0,
+    "durationSols" : 67,
+    "rescueSols" : 0,
+    "maxWeightSolZero" : 0.0,
+    "crew" : [ {
+      "name" : "Women's Crew",
+      "count" : 3,
+      "minimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 0.2,
+          "weight" : 0.1
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 0.2,
+          "weight" : 0.24000001
+        }, {
+          "type" : "WATER",
+          "amount" : 0.3,
+          "weight" : 0.33
+        } ]
+      },
+      "optimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 0.8,
+          "weight" : 0.4
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 0.8,
+          "weight" : 0.96000004
+        }, {
+          "type" : "WATER",
+          "amount" : 0.8,
+          "weight" : 0.88000005
+        } ]
+      }
+    }, {
+      "name" : "Men's Crew",
+      "count" : 15,
+      "minimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 0.3,
+          "weight" : 0.15
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 0.3,
+          "weight" : 0.36
+        }, {
+          "type" : "WATER",
+          "amount" : 0.5,
+          "weight" : 0.55
+        } ]
+      },
+      "optimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 1.0,
+          "weight" : 0.5
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 1.0,
+          "weight" : 1.2
+        }, {
+          "type" : "WATER",
+          "amount" : 1.0,
+          "weight" : 1.1
+        } ]
+      }
+    } ],
+    "deliveries" : [ ],
+    "threats" : [ ]
+  },
+  "configuration" : {
+    "optimalModules" : [ {
+      "id" : "default-laboratory",
+      "name" : "default_laboratory",
+      "weight" : 2137.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ {
+        "type" : "FOOD",
+        "amount" : 2.5,
+        "weight" : 1.25
+      }, {
+        "type" : "OXYGEN",
+        "amount" : 15.0,
+        "weight" : 18.0
+      } ],
+      "consumption" : [ {
+        "type" : "ENERGY",
+        "amount" : 1.0,
+        "weight" : 0.0
+      }, {
+        "type" : "WATER",
+        "amount" : 1.0,
+        "weight" : 1.1
+      } ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    } ],
+    "startingResources" : [ {
+      "type" : "OXYGEN",
+      "amount" : 1164.125,
+      "weight" : 1396.9501
+    }, {
+      "type" : "WATER",
+      "amount" : 1164.125,
+      "weight" : 1280.5375
+    }, {
+      "type" : "FOOD",
+      "amount" : 1164.125,
+      "weight" : 582.0625
+    } ],
+    "totalWeight" : 5396.5503,
+    "isWeightLimitExceeded" : false
+  },
+  "createdAt" : "2026-06-26T14:16:45.8911267"
 } ]

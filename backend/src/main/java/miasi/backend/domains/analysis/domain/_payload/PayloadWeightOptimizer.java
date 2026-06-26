@@ -74,14 +74,46 @@ public class PayloadWeightOptimizer {
   }
 
   private List<Resource> simulateAndFindDeficit(List<Module> modules, MissionManifest manifest) {
-    List<Resource> emptyWarehouse =
-        List.of(
-            new Resource(ResourceType.OXYGEN, 0),
-            new Resource(ResourceType.WATER, 0),
-            new Resource(ResourceType.FOOD, 0));
+    // 1. Zapewniamy sztuczny, nieskończony zapas, by oszukać SurvivalPredictor
+    float MOCK_SUPPLY = 1_000_000f;
+    List<Resource> mockWarehouse = List.of(
+        new Resource(ResourceType.OXYGEN, MOCK_SUPPLY),
+        new Resource(ResourceType.WATER, MOCK_SUPPLY),
+        new Resource(ResourceType.FOOD, MOCK_SUPPLY)
+    );
 
-    List<DailyState> timeline = timelineSimulator.simulate(manifest, modules, emptyWarehouse);
-    return evaluator.calculateMinimumSurvivalSupplies(timeline);
+    // 2. Symulujemy oś czasu - załoga będzie cały czas w trybie OPTIMAL
+    List<DailyState> timeline = timelineSimulator.simulate(manifest, modules, mockWarehouse);
+
+    // 3. Szukamy najniższego punktu, do jakiego spadły zapasy
+    float minOxygen = MOCK_SUPPLY;
+    float minWater = MOCK_SUPPLY;
+    float minFood = MOCK_SUPPLY;
+
+    for (DailyState state : timeline) {
+      minOxygen = Math.min(minOxygen, getResourceAmount(state.getWarehouse(), ResourceType.OXYGEN));
+      minWater = Math.min(minWater, getResourceAmount(state.getWarehouse(), ResourceType.WATER));
+      minFood = Math.min(minFood, getResourceAmount(state.getWarehouse(), ResourceType.FOOD));
+    }
+
+    // 4. Deficyt to różnica między początkowym zapasem a najniższym odnotowanym stanem
+    return List.of(
+        new Resource(ResourceType.OXYGEN, MOCK_SUPPLY - minOxygen),
+        new Resource(ResourceType.WATER, MOCK_SUPPLY - minWater),
+        new Resource(ResourceType.FOOD, MOCK_SUPPLY - minFood)
+    );
+  }
+
+  // Metoda pomocnicza dla PayloadWeightOptimizer
+  private float getResourceAmount(List<Resource> warehouse, ResourceType type) {
+    if (warehouse == null) {
+      return 0f;
+    }
+    return warehouse.stream()
+        .filter(r -> r.getType() == type)
+        .map(Resource::getAmount)
+        .findFirst()
+        .orElse(0f);
   }
 
   private List<Module> initializeMandatoryModules(List<Module> catalog) {
