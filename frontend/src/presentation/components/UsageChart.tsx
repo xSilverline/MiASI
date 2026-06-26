@@ -38,39 +38,99 @@ interface CustomTooltipProps {
   label?: string | number;
 }
 
-// const generateMockData = () => {
-//   const data = [];
-//   let woda = 100.0;
-//   let tlen = 100.0;
-//   let zywnosc = 100.0;
-//
-//   for (let sol = 0; sol <= TOTAL_SIMULATION_DAYS; sol++) {
-//     if (sol > 0) {
-//       woda -= 0.12;
-//       tlen -= 0.13;
-//       if (sol === DELIVERY_SOL) zywnosc += 25;
-//       zywnosc -= 0.14;
-//     }
-//     data.push({
-//       sol,
-//       woda: Math.max(0, Number(woda.toFixed(2))),
-//       tlen: Math.max(0, Number(tlen.toFixed(2))),
-//       zywnosc: Math.max(0, Number(zywnosc.toFixed(2))),
-//       energia: 8.0,
-//     });
-//   }
-//   return data;
-// };
+const getNiceStep = (range: number) => {
+  if (range <= 0) return 1;
 
-// const chartData = generateMockData();
+  const roughStep = range / 5;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+  const normalized = roughStep / magnitude;
+
+  if (normalized <= 1) return magnitude;
+  if (normalized <= 2) return 2 * magnitude;
+  if (normalized <= 5) return 5 * magnitude;
+
+  return 10 * magnitude;
+};
+
+const getDynamicYAxis = (data: ChartDataPoint[]) => {
+  const values = data.flatMap((point) => [
+    point.waterStore,
+    point.oxygenStore,
+    point.foodStore,
+    point.energyStore,
+  ]);
+
+  const finiteValues = values.filter(Number.isFinite);
+
+  if (finiteValues.length === 0) {
+    return {
+      domain: [0, 100] as [number, number],
+      majorTicks: [0, 25, 50, 75, 100],
+      minorTicks: [10, 20, 30, 40, 60, 70, 80, 90],
+    };
+  }
+
+  const minValue = Math.min(...finiteValues);
+  const maxValue = Math.max(...finiteValues);
+
+  const lowerRaw = Math.min(0, minValue);
+  const upperRaw = maxValue;
+
+  const range = upperRaw - lowerRaw || Math.max(Math.abs(upperRaw), 1);
+  const padding = range * 0.08;
+
+  const paddedMin = lowerRaw - padding;
+  const paddedMax = upperRaw + padding;
+
+  const step = getNiceStep(paddedMax - paddedMin);
+
+  const domainMin = Math.floor(paddedMin / step) * step;
+  const domainMax = Math.ceil(paddedMax / step) * step;
+
+  const majorTicks: number[] = [];
+  for (let tick = domainMin; tick <= domainMax + step * 0.001; tick += step) {
+    majorTicks.push(Number(tick.toFixed(6)));
+  }
+
+  const minorStep = step / 2;
+  const minorTicks: number[] = [];
+
+  for (let tick = domainMin + minorStep; tick < domainMax; tick += minorStep) {
+    const rounded = Number(tick.toFixed(6));
+    if (!majorTicks.includes(rounded)) {
+      minorTicks.push(rounded);
+    }
+  }
+
+  return {
+    domain: [domainMin, domainMax] as [number, number],
+    majorTicks,
+    minorTicks,
+  };
+};
+
+const formatAxisValue = (value: number) => {
+  if (Math.abs(value) >= 1000) {
+    return value.toLocaleString("pl-PL", {
+      maximumFractionDigits: 0,
+    });
+  }
+
+  if (Math.abs(value) >= 10) {
+    return value.toLocaleString("pl-PL", {
+      maximumFractionDigits: 1,
+    });
+  }
+
+  return value.toLocaleString("pl-PL", {
+    maximumFractionDigits: 2,
+  });
+};
 
 const xMajorTicks: number[] = [];
 for (let i = 0; i <= TOTAL_SIMULATION_DAYS; i += 25) {
   xMajorTicks.push(i);
 }
-
-const yMajorTicks = [0, 25, 50, 75, 100];
-const yMinorTicks = [10, 20, 30, 40, 60, 70, 80, 90];
 
 const CustomXAxisTick: React.FC<CustomXAxisTickProps> = ({
   x = 0,
@@ -115,7 +175,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
             >
               <span className="uppercase tracking-wide">{item.name}:</span>
               <span className="text-white font-bold">
-                {Number(item.value).toFixed(2)}%
+                {formatAxisValue(Number(item.value))}
               </span>
             </p>
           ))}
@@ -137,6 +197,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({
       </div>
     );
   }
+  const yAxis = getDynamicYAxis(data);
   const maxSol = Math.ceil(missionDuration * 1.05);
   return (
     <div className="bg-mars-itemBackground p-6 rounded-xl shadow-md w-full flex flex-col flex-1 min-h-75">
@@ -182,8 +243,10 @@ export const UsageChart: React.FC<UsageChartProps> = ({
               tick={{ fontSize: 11 }}
               axisLine={false}
               tickLine={false}
-              domain={[0, 100]}
-              ticks={yMajorTicks}
+              domain={yAxis.domain}
+              ticks={yAxis.majorTicks}
+              tickFormatter={(value) => formatAxisValue(Number(value))}
+              width={70}
             />
 
             {xMajorTicks.map((sol) => (
@@ -194,7 +257,7 @@ export const UsageChart: React.FC<UsageChartProps> = ({
                 opacity={1.0}
               />
             ))}
-            {yMinorTicks.map((yVal) => (
+            {yAxis.minorTicks.map((yVal) => (
               <ReferenceLine
                 key={`y-minor-${yVal}`}
                 y={yVal}
@@ -202,7 +265,8 @@ export const UsageChart: React.FC<UsageChartProps> = ({
                 opacity={0.5}
               />
             ))}
-            {yMajorTicks.map((yVal) => (
+
+            {yAxis.majorTicks.map((yVal) => (
               <ReferenceLine
                 key={`y-major-${yVal}`}
                 y={yVal}

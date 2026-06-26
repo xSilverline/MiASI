@@ -242,4 +242,490 @@
     "isWeightLimitExceeded" : false
   },
   "createdAt" : "2026-06-26T14:16:45.8911267"
+}, {
+  "id" : "3ddbab57-f121-43bb-aaea-539b86d788c9",
+  "inputManifest" : {
+    "id" : 2,
+    "durationSols" : 45,
+    "rescueSols" : 0,
+    "maxWeightSolZero" : 12500.0,
+    "crew" : [ {
+      "name" : "Engineering Crew",
+      "count" : 6,
+      "minimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 0.55,
+          "weight" : 0.275
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 0.75,
+          "weight" : 0.90000004
+        }, {
+          "type" : "WATER",
+          "amount" : 0.9,
+          "weight" : 0.99
+        } ]
+      },
+      "optimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 1.0,
+          "weight" : 0.5
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 1.1,
+          "weight" : 1.32
+        }, {
+          "type" : "WATER",
+          "amount" : 1.8,
+          "weight" : 1.98
+        } ]
+      }
+    }, {
+      "name" : "Science Crew",
+      "count" : 4,
+      "minimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 0.5,
+          "weight" : 0.25
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 0.7,
+          "weight" : 0.84000003
+        }, {
+          "type" : "WATER",
+          "amount" : 0.85,
+          "weight" : 0.93500006
+        } ]
+      },
+      "optimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 0.9,
+          "weight" : 0.45
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 1.0,
+          "weight" : 1.2
+        }, {
+          "type" : "WATER",
+          "amount" : 1.6,
+          "weight" : 1.7600001
+        } ]
+      }
+    } ],
+    "deliveries" : [ ],
+    "threats" : [ ]
+  },
+  "configuration" : {
+    "optimalModules" : [ {
+      "id" : "solar-array",
+      "name" : "Solar Array",
+      "weight" : 1200.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ {
+        "type" : "ENERGY",
+        "amount" : 45.0,
+        "weight" : 0.0
+      } ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "greenhouse",
+      "name" : "Greenhouse",
+      "weight" : 1800.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ {
+        "type" : "FOOD",
+        "amount" : 18.0,
+        "weight" : 9.0
+      }, {
+        "type" : "OXYGEN",
+        "amount" : 5.0,
+        "weight" : 6.0
+      } ],
+      "consumption" : [ {
+        "type" : "ENERGY",
+        "amount" : 10.0,
+        "weight" : 0.0
+      }, {
+        "type" : "WATER",
+        "amount" : 6.0,
+        "weight" : 6.6000004
+      } ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "oxygen-generator",
+      "name" : "Oxygen Generator",
+      "weight" : 1100.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ {
+        "type" : "OXYGEN",
+        "amount" : 35.0,
+        "weight" : 42.0
+      } ],
+      "consumption" : [ {
+        "type" : "ENERGY",
+        "amount" : 12.0,
+        "weight" : 0.0
+      }, {
+        "type" : "WATER",
+        "amount" : 2.0,
+        "weight" : 2.2
+      } ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "water-recycler",
+      "name" : "Water Recycler",
+      "weight" : 1300.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ {
+        "type" : "WATER",
+        "amount" : 24.0,
+        "weight" : 26.400002
+      } ],
+      "consumption" : [ {
+        "type" : "ENERGY",
+        "amount" : 8.0,
+        "weight" : 0.0
+      } ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "habitat-module",
+      "name" : "Habitat Module",
+      "weight" : 2600.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ {
+        "type" : "ENERGY",
+        "amount" : 15.0,
+        "weight" : 0.0
+      }, {
+        "type" : "OXYGEN",
+        "amount" : 4.0,
+        "weight" : 4.8
+      } ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    } ],
+    "startingResources" : [ {
+      "type" : "OXYGEN",
+      "amount" : 0.0,
+      "weight" : 0.0
+    }, {
+      "type" : "WATER",
+      "amount" : 53.4375,
+      "weight" : 58.78125
+    }, {
+      "type" : "FOOD",
+      "amount" : 0.0,
+      "weight" : 0.0
+    } ],
+    "totalWeight" : 8058.7812,
+    "isWeightLimitExceeded" : false
+  },
+  "createdAt" : "2026-06-26T14:48:49.1003666"
+}, {
+  "id" : "940033ec-fef1-435d-9478-b003d70fcdaa",
+  "inputManifest" : {
+    "id" : 2,
+    "durationSols" : 45,
+    "rescueSols" : 0,
+    "maxWeightSolZero" : 12500.0,
+    "crew" : [ {
+      "name" : "Male",
+      "count" : 2,
+      "minimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 10.0,
+          "weight" : 5.0
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 100.0,
+          "weight" : 120.00001
+        }, {
+          "type" : "WATER",
+          "amount" : 50.0,
+          "weight" : 55.0
+        } ]
+      },
+      "optimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 15.0,
+          "weight" : 7.5
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 200.0,
+          "weight" : 240.00002
+        }, {
+          "type" : "WATER",
+          "amount" : 100.0,
+          "weight" : 110.0
+        } ]
+      }
+    }, {
+      "name" : "Female",
+      "count" : 2,
+      "minimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 8.0,
+          "weight" : 4.0
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 100.0,
+          "weight" : 120.00001
+        }, {
+          "type" : "WATER",
+          "amount" : 50.0,
+          "weight" : 55.0
+        } ]
+      },
+      "optimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 12.0,
+          "weight" : 6.0
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 200.0,
+          "weight" : 240.00002
+        }, {
+          "type" : "WATER",
+          "amount" : 100.0,
+          "weight" : 110.0
+        } ]
+      }
+    } ],
+    "deliveries" : [ ],
+    "threats" : [ ]
+  },
+  "configuration" : {
+    "optimalModules" : [ {
+      "id" : "solar-array",
+      "name" : "Solar Array",
+      "weight" : 1200.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "greenhouse",
+      "name" : "Greenhouse",
+      "weight" : 1800.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "oxygen-generator",
+      "name" : "Oxygen Generator",
+      "weight" : 1100.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "water-recycler",
+      "name" : "Water Recycler",
+      "weight" : 1300.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "habitat-module",
+      "name" : "Habitat Module",
+      "weight" : 2600.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    } ],
+    "startingResources" : [ {
+      "type" : "OXYGEN",
+      "amount" : 36000.0,
+      "weight" : 43200.0
+    }, {
+      "type" : "WATER",
+      "amount" : 18000.0,
+      "weight" : 19800.0
+    }, {
+      "type" : "FOOD",
+      "amount" : 2430.0,
+      "weight" : 1215.0
+    } ],
+    "totalWeight" : 72215.0,
+    "isWeightLimitExceeded" : false
+  },
+  "createdAt" : "2026-06-26T14:49:59.3030049"
+}, {
+  "id" : "764ab8a3-3dce-4e6a-bdc1-4cc0dab469bf",
+  "inputManifest" : {
+    "id" : 2,
+    "durationSols" : 45,
+    "rescueSols" : 0,
+    "maxWeightSolZero" : 12500.0,
+    "crew" : [ {
+      "name" : "Male",
+      "count" : 50,
+      "minimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 10.0,
+          "weight" : 5.0
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 100.0,
+          "weight" : 120.00001
+        }, {
+          "type" : "WATER",
+          "amount" : 50.0,
+          "weight" : 55.0
+        } ]
+      },
+      "optimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 15.0,
+          "weight" : 7.5
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 200.0,
+          "weight" : 240.00002
+        }, {
+          "type" : "WATER",
+          "amount" : 100.0,
+          "weight" : 110.0
+        } ]
+      }
+    }, {
+      "name" : "Female",
+      "count" : 10,
+      "minimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 8.0,
+          "weight" : 4.0
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 100.0,
+          "weight" : 120.00001
+        }, {
+          "type" : "WATER",
+          "amount" : 50.0,
+          "weight" : 55.0
+        } ]
+      },
+      "optimalNeeds" : {
+        "dailyConsumption" : [ {
+          "type" : "FOOD",
+          "amount" : 12.0,
+          "weight" : 6.0
+        }, {
+          "type" : "OXYGEN",
+          "amount" : 200.0,
+          "weight" : 240.00002
+        }, {
+          "type" : "WATER",
+          "amount" : 100.0,
+          "weight" : 110.0
+        } ]
+      }
+    } ],
+    "deliveries" : [ ],
+    "threats" : [ ]
+  },
+  "configuration" : {
+    "optimalModules" : [ {
+      "id" : "solar-array",
+      "name" : "Solar Array",
+      "weight" : 1200.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "greenhouse",
+      "name" : "Greenhouse",
+      "weight" : 1800.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "oxygen-generator",
+      "name" : "Oxygen Generator",
+      "weight" : 1100.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "water-recycler",
+      "name" : "Water Recycler",
+      "weight" : 1300.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    }, {
+      "id" : "habitat-module",
+      "name" : "Habitat Module",
+      "weight" : 2600.0,
+      "minCount" : 1,
+      "maxCount" : 1,
+      "production" : [ ],
+      "consumption" : [ ],
+      "status" : "ACTIVE",
+      "efficiency" : 1.0
+    } ],
+    "startingResources" : [ {
+      "type" : "OXYGEN",
+      "amount" : 540000.0,
+      "weight" : 648000.0
+    }, {
+      "type" : "WATER",
+      "amount" : 270000.0,
+      "weight" : 297000.0
+    }, {
+      "type" : "FOOD",
+      "amount" : 39150.0,
+      "weight" : 19575.0
+    } ],
+    "totalWeight" : 972575.0,
+    "isWeightLimitExceeded" : false
+  },
+  "createdAt" : "2026-06-26T14:50:25.2605341"
 } ]
